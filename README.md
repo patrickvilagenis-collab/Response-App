@@ -27,20 +27,29 @@ coaching. It's a professional coaching tool — not a game.
   no user data sent to a server. UI in **English, German, and Spanish (Spain)**,
   switchable instantly without data loss.
 
-## Running the app
+## Put it online (anyone can use it, AI included)
+
+Deploy to **Vercel** and you get a public URL with **AI evaluation built in** —
+visitors never enter a key. Your Anthropic key is stored as a secret on the
+server and used only by the serverless proxy in [`api/evaluate.js`](./api/evaluate.js).
+
+**Full step-by-step: [`DEPLOY.md`](./DEPLOY.md)** (≈3 minutes). In short: import
+the repo on Vercel, add an `ANTHROPIC_API_KEY` environment variable, click
+Deploy. Every response is then scored by the integrated AI automatically; if the
+AI is ever unavailable, the app falls back to a built-in offline evaluator so it
+never breaks.
+
+## Running it locally (optional, for development)
 
 ```bash
 npm install
 npm run dev      # http://localhost:5173
 ```
 
-Other scripts: `npm run build` (production build), `npm run preview` (serve the
-build), `npm run typecheck`.
-
-It works fully **offline out of the box** — a built-in deterministic evaluator
-scores responses with no API key. For richer AI scoring, add an Anthropic API
-key in **Settings → AI evaluation** (the key is stored only in your browser and
-only transcript text is ever sent).
+Locally the AI proxy isn't running, so the app uses the offline evaluator. To
+test the AI path locally, install the Vercel CLI and run `vercel dev` with
+`ANTHROPIC_API_KEY` set. Other scripts: `npm run build`, `npm run preview`,
+`npm run typecheck`.
 
 > First run: pick a language, enter any display name to create a local profile,
 > then open a challenge from Home or the Library.
@@ -58,15 +67,16 @@ The full product, UX, and technical specification lives in [`docs/`](./docs/):
 
 ## Tech stack
 
-React + TypeScript + Vite, no backend. State persists locally
-(`localStorage`); voice uses the Web Speech API with graceful fallback to text.
-Contextual media is rendered as inline SVG scenes so every challenge has a
-setting that loads instantly and offline.
+React + TypeScript + Vite front end, plus one Vercel serverless function for the
+secure AI proxy. User data persists locally (`localStorage`); voice uses the Web
+Speech API with graceful fallback to text. Contextual media is rendered as
+inline SVG scenes so every challenge has a setting that loads instantly.
 
 ```
+api/evaluate.js          secure serverless AI proxy (holds the key server-side)
 src/
   data/challenges.ts     seed library (localized scenarios, rubrics, model answers)
-  lib/evaluator.ts       offline + optional LLM evaluation
+  lib/evaluator.ts       offline evaluator + integrated AI (via /api/evaluate)
   lib/scoring.ts         composite score + speed bonus
   lib/speech.ts          Web Speech API wrapper
   lib/stats.ts           progress + recommendations
@@ -74,6 +84,7 @@ src/
   components/            SceneMedia, TimerRing, AppShell, LanguagePicker
   screens/               Login, Home, Library, Scenario, Response, Results, History, Settings
   state/store.tsx        app state, routing, persistence
+vercel.json              deploy config
 ```
 
 ## Status

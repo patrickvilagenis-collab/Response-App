@@ -589,9 +589,12 @@ for development and graceful degradation).
 
 ### 12.5 Security & secrets
 
-- Any LLM/STT API keys must **not** be embedded in client code for production;
-  v1 local-only demo may use a user-supplied key in Settings or a thin proxy.
-  Flagged as an open question ([§18](#18-open-questions--assumptions)).
+- LLM/STT API keys must **never** be embedded in client code. **Resolved for the
+  hosted build:** the front end calls a same-origin serverless function
+  (`/api/evaluate` on Vercel) that holds `ANTHROPIC_API_KEY` as a server-side
+  secret and proxies to the model. Visitors enter no key; only transcript text
+  (no audio) is sent. If the proxy is unreachable, the app falls back to the
+  offline evaluator. See [`DEPLOY.md`](../DEPLOY.md).
 
 ---
 
@@ -690,9 +693,10 @@ for development and graceful degradation).
 - Challenge content is authored by the product team and ships with the app.
 
 **Open questions**
-1. **LLM key handling for a client-only app** — user-supplied key vs. thin proxy
-   vs. requiring P4 backend? (Affects whether high-quality evaluation works
-   offline-of-server in v1.) → see [§12.5](#125-security--secrets).
+1. ~~**LLM key handling for a client-only app**~~ — **Resolved:** hosted on
+   Vercel with a serverless proxy holding the key server-side; integrated AI for
+   all visitors, offline fallback when unreachable. See [§12.5](#125-security--secrets)
+   and [`DEPLOY.md`](../DEPLOY.md).
 2. **External STT provider** — which service for the WebSpeech fallback, and is
    it acceptable to send transcript audio off-device when enabled?
 3. **Rubric authoring per locale** — author natively in 3 languages, or author

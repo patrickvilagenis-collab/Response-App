@@ -101,7 +101,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     storage.clearAll();
     setProfile(null);
     setAttempts([]);
-    setSettingsState({ useLlm: false });
+    setSettingsState({ useLlm: true });
     setRoute({ name: "login" });
   }, []);
 

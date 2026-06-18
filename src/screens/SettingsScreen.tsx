@@ -6,14 +6,13 @@ import { storage } from "../lib/storage";
 
 export function SettingsScreen() {
   const { t, settings, setSettings, profile, login } = useApp();
-  const [apiKey, setApiKey] = useState(settings.apiKey ?? "");
   const [useLlm, setUseLlm] = useState(settings.useLlm);
   const [inputDefault, setInputDefault] = useState(profile?.inputDefault ?? "voice");
   const [saved, setSaved] = useState(false);
   const [micResult, setMicResult] = useState<string | null>(null);
 
   function save() {
-    setSettings({ useLlm, apiKey: apiKey.trim() || undefined });
+    setSettings({ useLlm });
     if (profile) {
       const updated = { ...profile, inputDefault };
       storage.saveProfile(updated);
@@ -67,16 +66,7 @@ export function SettingsScreen() {
           <input type="checkbox" checked={useLlm} onChange={(e) => setUseLlm(e.target.checked)} />
           {t("settings.useLlm")}
         </label>
-        <label className="field">
-          {t("settings.apiKey")}
-          <input
-            type="password"
-            value={apiKey}
-            onChange={(e) => setApiKey(e.target.value)}
-            placeholder="sk-ant-..."
-          />
-        </label>
-        <p className="muted small">{t("settings.apiKeyHint")}</p>
+        <p className="muted small">{t("settings.aiIntegrated")}</p>
       </section>
 
       <p className="muted small privacy-note">🔒 {t("settings.privacy")}</p>

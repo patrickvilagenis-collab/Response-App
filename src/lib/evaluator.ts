@@ -207,14 +207,14 @@ function justify(dim: "content" | "delivery" | "time", score: number, locale: Lo
 
 // --- Optional LLM path (Anthropic), used only when a key is configured ---
 
-const EVAL_MODEL = "claude-sonnet-4-6";
-
+// Calls the same-origin serverless proxy (/api/evaluate). The Anthropic key
+// lives server-side only, so integrated AI works for every visitor with no key
+// entered in the browser. Throws on any failure so evaluate() can fall back.
 export async function llmEvaluate(
   challenge: Challenge,
   transcript: string,
   responseTimeSec: number,
-  locale: Locale,
-  apiKey: string
+  locale: Locale
 ): Promise<Evaluation> {
   const localeName = { en: "English", de: "German", "es-ES": "Spanish (Spain)" }[locale];
   const sys =
@@ -239,30 +239,18 @@ export async function llmEvaluate(
     '"time":{"score":0-100,"justification":"..."}},"headline":"1-2 sentences",' +
     '"coaching":{"worked":["..."],"missing":["..."],"betterPhrasings":["..."],"focusNext":"..."}}';
 
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
+  const user = `Evaluate this response. Input:\n${JSON.stringify(payload)}\n\nReturn JSON exactly in this shape:\n${schema}`;
+
+  const res = await fetch("/api/evaluate", {
     method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true",
-    },
-    body: JSON.stringify({
-      model: EVAL_MODEL,
-      max_tokens: 900,
-      system: sys,
-      messages: [
-        {
-          role: "user",
-          content: `Evaluate this response. Input:\n${JSON.stringify(payload)}\n\nReturn JSON exactly in this shape:\n${schema}`,
-        },
-      ],
-    }),
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ system: sys, user, max_tokens: 900 }),
   });
 
-  if (!res.ok) throw new Error(`LLM evaluation failed: ${res.status}`);
+  if (!res.ok) throw new Error(`AI evaluation unavailable: ${res.status}`);
   const data = await res.json();
-  const text: string = data?.content?.[0]?.text ?? "";
+  const text: string = data?.text ?? "";
+  if (!text) throw new Error("AI evaluation returned empty");
   const jsonStr = text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
   const parsed = JSON.parse(jsonStr);
 
@@ -308,11 +296,13 @@ export async function evaluate(
   transcript: string,
   responseTimeSec: number,
   locale: Locale,
-  opts: { useLlm: boolean; apiKey?: string }
+  opts: { useLlm: boolean }
 ): Promise<Evaluation> {
-  if (opts.useLlm && opts.apiKey) {
+  // AI is integrated by default via the secure proxy. If it's unreachable
+  // (offline, not yet configured, local dev), fall back to the offline evaluator.
+  if (opts.useLlm) {
     try {
-      return await llmEvaluate(challenge, transcript, responseTimeSec, locale, opts.apiKey);
+      return await llmEvaluate(challenge, transcript, responseTimeSec, locale);
     } catch {
       // graceful degradation to offline evaluator
     }

@@ -51,7 +51,7 @@ export const storage = {
   },
 
   getSettings(): Settings {
-    return read<Settings>(KEYS.settings, { useLlm: false });
+    return read<Settings>(KEYS.settings, { useLlm: true });
   },
   saveSettings(settings: Settings): void {
     write(KEYS.settings, settings);

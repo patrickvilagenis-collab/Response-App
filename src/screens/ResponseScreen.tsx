@@ -44,7 +44,6 @@ export function ResponseScreen({ challengeId }: { challengeId: string }) {
 
       const evaluation = await evaluate(ch, text, elapsed, locale, {
         useLlm: settings.useLlm,
-        apiKey: settings.apiKey,
       });
 
       const attempt: Attempt = {

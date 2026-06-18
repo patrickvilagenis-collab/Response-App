@@ -122,6 +122,7 @@ export interface Profile {
 }
 
 export interface Settings {
-  apiKey?: string; // optional Anthropic key for higher-quality LLM evaluation
+  // AI evaluation is integrated server-side (no key in the browser). This toggle
+  // lets a user opt for the faster offline evaluator instead.
   useLlm: boolean;
 }
