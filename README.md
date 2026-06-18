@@ -27,6 +27,24 @@ coaching. It's a professional coaching tool — not a game.
   no user data sent to a server. UI in **English, German, and Spanish (Spain)**,
   switchable instantly without data loss.
 
+## Running the app
+
+```bash
+npm install
+npm run dev      # http://localhost:5173
+```
+
+Other scripts: `npm run build` (production build), `npm run preview` (serve the
+build), `npm run typecheck`.
+
+It works fully **offline out of the box** — a built-in deterministic evaluator
+scores responses with no API key. For richer AI scoring, add an Anthropic API
+key in **Settings → AI evaluation** (the key is stored only in your browser and
+only transcript text is ever sent).
+
+> First run: pick a language, enter any display name to create a local profile,
+> then open a challenge from Home or the Library.
+
 ## Specification
 
 The full product, UX, and technical specification lives in [`docs/`](./docs/):
@@ -38,7 +56,28 @@ The full product, UX, and technical specification lives in [`docs/`](./docs/):
 | [`docs/challenge-library.md`](./docs/challenge-library.md) | Seed challenges with contextual media, rubrics, and expert model answers. |
 | [`docs/data-model.md`](./docs/data-model.md) | Local-storage schema and TypeScript types. |
 
+## Tech stack
+
+React + TypeScript + Vite, no backend. State persists locally
+(`localStorage`); voice uses the Web Speech API with graceful fallback to text.
+Contextual media is rendered as inline SVG scenes so every challenge has a
+setting that loads instantly and offline.
+
+```
+src/
+  data/challenges.ts     seed library (localized scenarios, rubrics, model answers)
+  lib/evaluator.ts       offline + optional LLM evaluation
+  lib/scoring.ts         composite score + speed bonus
+  lib/speech.ts          Web Speech API wrapper
+  lib/stats.ts           progress + recommendations
+  i18n/                  EN / DE / ES-ES strings
+  components/            SceneMedia, TimerRing, AppShell, LanguagePicker
+  screens/               Login, Home, Library, Scenario, Response, Results, History, Settings
+  state/store.tsx        app state, routing, persistence
+```
+
 ## Status
 
-Specification draft (v1.0). No application code yet — see the
-[roadmap](./docs/SPECIFICATION.md#17-phased-delivery-roadmap) for phased delivery.
+Working v1 (local-only). See the
+[roadmap](./docs/SPECIFICATION.md#17-phased-delivery-roadmap) for what's next
+(external STT fallback, PWA/offline shell, cloud sync).
