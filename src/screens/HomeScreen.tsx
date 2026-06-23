@@ -1,28 +1,38 @@
 import { useApp } from "../state/store";
 import { computeStats, recommend, randomChallenge } from "../lib/stats";
 import { SceneMedia } from "../components/SceneMedia";
-import { TRACKS } from "../lib/tracks";
+import { TRACKS, challengesInTrack, type TrackId } from "../lib/tracks";
 import { BAND_COLORS, bandFor } from "../lib/scoring";
 import { CHALLENGES, getChallenge } from "../data/challenges";
+import type { Challenge, Profile } from "../types";
 
 const CHALLENGE_IDS = CHALLENGES.map((c) => c.id);
+const PREF_DIFF: Record<string, number> = { ic: 2, manager: 2, director: 3, exec: 4 };
 
 export function HomeScreen() {
   const { t, locale, profile, attempts, go } = useApp();
   const stats = computeStats(attempts);
-  const rec = recommend(attempts, stats);
-  const recommendedThree = pickThree(rec.id);
+  const fallback = recommend(attempts, stats);
+  const personalized = personalize(profile, stats.clearedIds);
+  const rec = personalized[0] ?? fallback;
+  const recommendedThree = personalized.length >= 3 ? personalized.slice(0, 3) : pickThree(rec.id);
 
+  const goalLabel = profile?.goalTrack ? t(`track.${profile.goalTrack}`) : t(`cat.${rec.category}`);
   const dimLabel = stats.weakestDimension ? t(`dim.${stats.weakestDimension}`) : "—";
 
   return (
     <div className="page home">
       <div className="home-greeting">
-        <span className="eyebrow gold">{t("home.eyebrow")}</span>
+        <span className="eyebrow gold">
+          {t("home.eyebrow")}
+          {profile?.segment === "company" && <span className="seg-badge">{t("home.viaCompany")}</span>}
+        </span>
         <h1>
           {t("home.welcome")} <span className="grad">{profile?.displayName}</span>
         </h1>
-        <p className="muted">{t("home.subtitle")}</p>
+        <p className="muted">
+          {profile?.goalTrack ? t("home.focusOn") + " " + goalLabel + "." : t("home.subtitle")}
+        </p>
       </div>
 
       {/* Two velocities */}
@@ -38,7 +48,7 @@ export function HomeScreen() {
           <span className="velocity-icon">▶</span>
           <span className="velocity-body">
             <strong>{t("home.vDeepTitle")}</strong>
-            <span className="muted small">{t(`cat.${rec.category}`)}</span>
+            <span className="muted small">{goalLabel}</span>
           </span>
         </button>
       </div>
@@ -116,6 +126,20 @@ function ProgressStat({ value, label, accent }: { value: string; label: string; 
       <div className="pstat-label">{label}</div>
     </div>
   );
+}
+
+/** Order challenges by the user's goal track + role-level difficulty, uncleared first. */
+function personalize(profile: Profile | null, cleared: Set<string>): Challenge[] {
+  if (!profile?.goalTrack) return [];
+  const pool = challengesInTrack(profile.goalTrack as TrackId);
+  if (pool.length === 0) return [];
+  const pref = profile.roleLevel ? PREF_DIFF[profile.roleLevel] : 2;
+  return [...pool].sort((a, b) => {
+    const ac = cleared.has(a.id) ? 1 : 0;
+    const bc = cleared.has(b.id) ? 1 : 0;
+    if (ac !== bc) return ac - bc; // uncleared first
+    return Math.abs(a.difficulty - pref) - Math.abs(b.difficulty - pref); // closest to role level
+  });
 }
 
 function pickThree(recId: string) {

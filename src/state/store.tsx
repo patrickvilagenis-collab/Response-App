@@ -7,6 +7,7 @@ import { getChallenge } from "../data/challenges";
 
 export type Route =
   | { name: "login" }
+  | { name: "onboarding" }
   | { name: "home" }
   | { name: "library"; track?: string }
   | { name: "scenario"; challengeId: string }
@@ -26,6 +27,7 @@ interface AppState {
   lastAttempt: Attempt | null;
   t: (key: string) => string;
   login: (profile: Profile) => void;
+  updateProfile: (patch: Partial<Profile>) => void;
   logout: () => void;
   setLocale: (locale: Locale) => void;
   setSettings: (s: Settings) => void;
@@ -53,7 +55,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setProfile(p);
         setLocaleState(p.language);
         setAttempts(storage.getAttempts(p.id));
-        setRoute({ name: "home" });
+        setRoute(p.onboarded ? { name: "home" } : { name: "onboarding" });
       }
     }
   }, []);
@@ -66,7 +68,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setProfile(p);
     setLocaleState(p.language);
     setAttempts(storage.getAttempts(p.id));
-    setRoute({ name: "home" });
+    setRoute(p.onboarded ? { name: "home" } : { name: "onboarding" });
+  }, []);
+
+  // Persist profile changes without navigating (settings, onboarding steps).
+  const updateProfile = useCallback((patch: Partial<Profile>) => {
+    setProfile((prev) => {
+      if (!prev) return prev;
+      const next = { ...prev, ...patch };
+      storage.saveProfile(next);
+      return next;
+    });
   }, []);
 
   const logout = useCallback(() => {
@@ -150,6 +162,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     lastAttempt,
     t,
     login,
+    updateProfile,
     logout,
     setLocale,
     setSettings,

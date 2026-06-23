@@ -1,6 +1,7 @@
 import { useApp } from "./state/store";
 import { AppShell } from "./components/AppShell";
 import { LoginScreen } from "./screens/LoginScreen";
+import { OnboardingScreen } from "./screens/OnboardingScreen";
 import { HomeScreen } from "./screens/HomeScreen";
 import { LibraryScreen } from "./screens/LibraryScreen";
 import { ScenarioScreen } from "./screens/ScenarioScreen";
@@ -16,6 +17,10 @@ export function App() {
 
   if (!profile || route.name === "login") {
     return <LoginScreen />;
+  }
+
+  if (route.name === "onboarding") {
+    return <OnboardingScreen />;
   }
 
   let screen;

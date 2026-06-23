@@ -403,6 +403,30 @@ input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 .admin-user-avg { margin-left: auto; font-size: 1.7rem; font-weight: 800; }
 .admin-cat-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
 
+/* ---------- Onboarding ---------- */
+.onb { min-height: 100%; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+.onb-top { width: 100%; max-width: 760px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 6vh; }
+.onb-card { width: 100%; max-width: 560px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 34px 30px; box-shadow: var(--shadow-lg); margin: auto 0; }
+.onb-dots { display: flex; gap: 8px; margin-bottom: 20px; }
+.onb-dot { width: 28px; height: 5px; border-radius: 999px; background: var(--line); transition: background 0.3s; }
+.onb-dot.active { background: var(--accent); }
+.onb-dot.done { background: var(--gold); }
+.onb-title { font-size: 1.9rem; margin-bottom: 18px; }
+.onb-q { font-weight: 600; font-size: 1.05rem; margin-bottom: 14px; }
+.onb-options { display: grid; gap: 10px; }
+.onb-options.two { grid-template-columns: 1fr 1fr; }
+.onb-opt { display: flex; align-items: center; gap: 12px; text-align: left; background: var(--panel-2); border: 1.5px solid var(--line); border-radius: var(--radius-sm); padding: 14px 16px; color: var(--text); font-size: 0.98rem; font-weight: 500; transition: all 0.15s; }
+.onb-opt.big { flex-direction: column; align-items: flex-start; gap: 4px; }
+.onb-opt:hover { border-color: var(--accent); }
+.onb-opt.sel { border-color: var(--accent); background: var(--accent-soft); }
+.onb-opt-icon { font-size: 1.3rem; color: var(--accent); }
+.onb-tracks { display: flex; flex-wrap: wrap; gap: 10px; }
+.onb-track { display: inline-flex; align-items: center; gap: 8px; background: var(--panel-2); border: 1.5px solid var(--line); border-radius: 999px; padding: 0.7rem 1.1rem; font-size: 0.95rem; font-weight: 600; color: var(--text); transition: all 0.15s; }
+.onb-track:hover { border-color: var(--accent); }
+.onb-track.sel { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.onb-actions { display: flex; justify-content: space-between; margin-top: 26px; }
+.seg-badge { margin-left: 8px; background: var(--gold-soft); color: var(--gold); font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.18rem 0.5rem; border-radius: 999px; }
+
 /* ---------- Home (redesign) ---------- */
 .eyebrow.gold { color: var(--gold); }
 .home-greeting { margin-bottom: 22px; }
@@ -466,6 +490,8 @@ input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
   .tab.active { color: var(--accent); background: var(--panel-2); }
   .stat-row, .progress-strip { grid-template-columns: repeat(2, 1fr); }
   .velocity-row { grid-template-columns: 1fr; }
+  .onb-options.two { grid-template-columns: 1fr; }
+  .onb-title { font-size: 1.55rem; }
   .scenario-text { font-size: 1.2rem; }
   .content { padding: 18px 16px 96px; }
   h1 { font-size: 1.45rem; }

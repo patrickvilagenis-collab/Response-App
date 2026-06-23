@@ -2,10 +2,9 @@ import { useState } from "react";
 import { useApp } from "../state/store";
 import { LanguagePicker } from "../components/LanguagePicker";
 import { testMicrophone } from "../lib/speech";
-import { storage } from "../lib/storage";
 
 export function SettingsScreen() {
-  const { t, settings, setSettings, profile, login, go } = useApp();
+  const { t, settings, setSettings, profile, updateProfile, go } = useApp();
   const [useLlm, setUseLlm] = useState(settings.useLlm);
   const [inputDefault, setInputDefault] = useState(profile?.inputDefault ?? "voice");
   const [saved, setSaved] = useState(false);
@@ -13,11 +12,7 @@ export function SettingsScreen() {
 
   function save() {
     setSettings({ useLlm });
-    if (profile) {
-      const updated = { ...profile, inputDefault };
-      storage.saveProfile(updated);
-      login(updated); // persists + keeps session
-    }
+    updateProfile({ inputDefault });
     setSaved(true);
     setTimeout(() => setSaved(false), 1500);
   }

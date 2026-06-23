@@ -114,6 +114,9 @@ export interface Attempt {
   createdAt: string;
 }
 
+export type RoleLevel = "ic" | "manager" | "director" | "exec";
+export type Segment = "individual" | "company";
+
 export interface Profile {
   id: string;
   displayName: string;
@@ -121,6 +124,11 @@ export interface Profile {
   language: Locale;
   inputDefault: "voice" | "text";
   createdAt: string;
+  // Set during the 3-tap onboarding; personalizes the home.
+  onboarded?: boolean;
+  roleLevel?: RoleLevel;
+  goalTrack?: string;
+  segment?: Segment;
 }
 
 export interface Settings {
