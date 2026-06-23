@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import { useApp } from "../state/store";
 import { BAND_COLORS, bandFor } from "../lib/scoring";
+import { getChallenge } from "../data/challenges";
+import { TRACKS, tracksFor } from "../lib/tracks";
 
 interface LoggedAttempt {
   ts: string;
@@ -124,6 +126,23 @@ export function AdminScreen() {
 
   const current = selected ? groups.find((g) => g.key === selected) : null;
 
+  const teamAvg = list.length ? Math.round(list.reduce((s, a) => s + a.final, 0) / list.length) : 0;
+  const trackBreakdown = useMemo(() => {
+    const acc = new Map<string, number[]>();
+    for (const a of list) {
+      const ch = getChallenge(a.challengeId);
+      if (!ch) continue;
+      for (const tr of tracksFor(ch)) {
+        if (!acc.has(tr)) acc.set(tr, []);
+        acc.get(tr)!.push(a.final);
+      }
+    }
+    return TRACKS.map((tr) => {
+      const scores = acc.get(tr.id) ?? [];
+      return { id: tr.id, icon: tr.icon, count: scores.length, avg: scores.length ? Math.round(scores.reduce((s, x) => s + x, 0) / scores.length) : 0 };
+    }).filter((x) => x.count > 0);
+  }, [list]);
+
   // ---- Gate ----
   if (state !== "ok") {
     return (
@@ -210,6 +229,28 @@ export function AdminScreen() {
         <button className="btn ghost sm" onClick={() => exportCsv(list, "response-app-all.csv")} disabled={list.length === 0}>⬇ {t("admin.export")}</button>
         <button className="btn ghost sm" onClick={unlock}>↻ {t("admin.refresh")}</button>
       </div>
+
+      {list.length > 0 && (
+        <>
+          <div className="team-kpis">
+            <div className="team-kpi"><span className="team-kpi-num">{groups.length}</span><span className="team-kpi-label">{t("team.people")}</span></div>
+            <div className="team-kpi"><span className="team-kpi-num">{list.length}</span><span className="team-kpi-label">{t("team.sessions")}</span></div>
+            <div className="team-kpi"><span className="team-kpi-num" style={{ color: BAND_COLORS[bandFor(teamAvg)] }}>{teamAvg}%</span><span className="team-kpi-label">{t("team.avg")}</span></div>
+          </div>
+          {trackBreakdown.length > 0 && (
+            <div className="team-tracks">
+              <span className="facet-label">{t("team.byTheme")}</span>
+              {trackBreakdown.map((tr) => (
+                <div key={tr.id} className="team-track-row">
+                  <span className="team-track-name"><span className="track-chip-icon">{tr.icon}</span> {t(`track.${tr.id}`)}</span>
+                  <div className="dimbar-track"><div className="dimbar-fill" style={{ width: `${tr.avg}%`, background: BAND_COLORS[bandFor(tr.avg)] }} /></div>
+                  <span className="team-track-val">{tr.avg}%</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
 
       {list.length === 0 ? (
         <p className="muted">{t("admin.empty")}</p>

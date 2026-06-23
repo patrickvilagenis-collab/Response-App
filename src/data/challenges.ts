@@ -897,6 +897,252 @@ export const CHALLENGES: Challenge[] = [
       "es-ES": "La seguridad nos la tomamos extremadamente en serio, así que no le voy a dar una cifra de memoria y arriesgarme a equivocarme — usted merece el dato exacto, no mi suposición. Lo que sí le digo es que revisamos el desempeño en seguridad con rigor y actuamos en consecuencia. Mándeme su pregunta y le respondo hoy mismo con los datos exactos y su contexto.",
     },
   },
+  {
+    id: "C-021",
+    type: "situational",
+    category: "professional_communication",
+    difficulty: 2,
+    media: {
+      scene: "exec_committee",
+      alt: {
+        en: "A leadership team seated, waiting for a first-time presenter to begin.",
+        de: "Ein Führungsteam sitzt und wartet, dass ein:e Erstvortragende:r beginnt.",
+        "es-ES": "Un equipo directivo sentado, esperando a que empiece quien presenta por primera vez.",
+      },
+    },
+    roleCaption: {
+      en: "You are a junior team member, presenting to leadership for the first time.",
+      de: "Du bist ein:e Nachwuchskraft und präsentierst zum ersten Mal vor der Führung.",
+      "es-ES": "Eres alguien junior del equipo, presentando ante la dirección por primera vez.",
+    },
+    scenario: {
+      en: "It's your first time presenting to the senior leadership team. You have their full attention and 30 seconds to open. They don't know you yet. How do you start?",
+      de: "Es ist dein erstes Mal vor dem oberen Führungsteam. Du hast ihre volle Aufmerksamkeit und 30 Sekunden für den Einstieg. Sie kennen dich noch nicht. Wie beginnst du?",
+      "es-ES": "Es tu primera vez presentando ante el equipo de alta dirección. Tienes toda su atención y 30 segundos para abrir. Aún no te conocen. ¿Cómo empiezas?",
+    },
+    weights: { content: 0.45, delivery: 0.35, time: 0.2 },
+    keyPoints: [
+      { en: "open with a clear headline, not a slow build", de: "mit einer klaren Kernaussage beginnen", "es-ES": "abrir con un titular claro, sin rodeos" },
+      { en: "say who you are briefly and credibly", de: "kurz und glaubwürdig sagen, wer du bist", "es-ES": "decir quién eres, breve y con credibilidad" },
+      { en: "state why this matters to them", de: "sagen, warum es für sie wichtig ist", "es-ES": "decir por qué les importa a ellos" },
+      { en: "composed, confident tone", de: "ruhiger, souveräner Ton", "es-ES": "tono sereno y seguro" },
+    ],
+    rubric: {
+      content: { strong: "Crisp headline + who you are + why it matters to them, in seconds.", adequate: "Opens but buries the point or over-explains background.", weak: "Rambling warm-up, apologetic, or no clear point." },
+      delivery: { strong: "Calm, confident, earns the room fast.", adequate: "Mostly composed; a little nervous.", weak: "Shaky, apologetic, or rushed." },
+      time: { strong: "Lands the open well inside the window.", adequate: "Fits.", weak: "Runs long before getting anywhere." },
+    },
+    modelAnswer: {
+      en: "Thanks for the time. I'm Sam from the growth team, and in the next two minutes I'll show you one change that can lift activation by double digits — and exactly what I need from you to ship it. Here's the headline: our drop-off is in onboarding, not acquisition. Let me show you.",
+      de: "Danke für Ihre Zeit. Ich bin Sam aus dem Growth-Team, und in den nächsten zwei Minuten zeige ich Ihnen eine Änderung, die die Aktivierung zweistellig steigern kann — und was ich dafür von Ihnen brauche. Die Kernaussage: Unser Abbruch liegt im Onboarding, nicht in der Akquise. Ich zeige es Ihnen.",
+      "es-ES": "Gracias por el tiempo. Soy Sam, del equipo de growth, y en los próximos dos minutos os enseño un cambio que puede subir la activación a doble dígito — y qué necesito de vosotros para lanzarlo. El titular: nuestra fuga está en el onboarding, no en la captación. Os lo muestro.",
+    },
+  },
+  {
+    id: "C-022",
+    type: "situational",
+    category: "professional_communication",
+    difficulty: 2,
+    media: {
+      scene: "office_1on1",
+      alt: {
+        en: "A one-on-one with your manager about pay.",
+        de: "Ein Vier-Augen-Gespräch mit deiner Führungskraft über Gehalt.",
+        "es-ES": "Un 1:1 con tu manager sobre el salario.",
+      },
+    },
+    roleCaption: {
+      en: "You are asking your manager for a raise — for the first time.",
+      de: "Du bittest deine Führungskraft zum ersten Mal um eine Gehaltserhöhung.",
+      "es-ES": "Le pides a tu manager una subida — por primera vez.",
+    },
+    scenario: {
+      en: "You booked this 1:1 to ask for a raise. Your manager sits down and says, \"So — what did you want to talk about?\" Make your case.",
+      de: "Du hast dieses 1:1 angesetzt, um um eine Erhöhung zu bitten. Deine Führungskraft setzt sich und fragt: „Also — worüber wolltest du sprechen?“ Mach deinen Fall.",
+      "es-ES": "Reservaste este 1:1 para pedir una subida. Tu manager se sienta y dice: «Bueno — ¿de qué querías hablar?». Defiende tu caso.",
+    },
+    weights: { content: 0.55, delivery: 0.3, time: 0.15 },
+    keyPoints: [
+      { en: "ask directly, no over-apologizing", de: "direkt fragen, ohne sich zu entschuldigen", "es-ES": "pedir directamente, sin disculparse de más" },
+      { en: "evidence: concrete results / impact", de: "Belege: konkrete Ergebnisse / Wirkung", "es-ES": "evidencia: resultados / impacto concretos" },
+      { en: "a specific ask (number or range)", de: "eine konkrete Forderung (Zahl/Spanne)", "es-ES": "una petición concreta (cifra o rango)" },
+      { en: "confident, collaborative tone", de: "selbstbewusster, kooperativer Ton", "es-ES": "tono seguro y colaborativo" },
+    ],
+    rubric: {
+      content: { strong: "Direct ask, backed by concrete results, with a specific number/range.", adequate: "Asks but vague on evidence or the number.", weak: "Hints, apologizes, or makes it about needs not value." },
+      delivery: { strong: "Confident and collaborative, not entitled or meek.", adequate: "Slightly tentative.", weak: "Apologetic or aggressive." },
+      time: { strong: "Makes the case efficiently.", adequate: "Fits.", weak: "Meanders." },
+    },
+    modelAnswer: {
+      en: "I wanted to talk about my compensation. Over the last year I've owned the billing migration and cut support tickets by 30%, and I've taken on mentoring two new hires. Based on that scope and the market, I'd like to move my salary to [X]. I'm not looking for a fight — I want to understand what it takes to get there, and I'd love your support.",
+      de: "Ich möchte über meine Vergütung sprechen. Im letzten Jahr habe ich die Billing-Migration verantwortet, die Support-Tickets um 30 % gesenkt und zwei Neueinsteiger gementort. Angesichts dieses Umfangs und des Marktes möchte ich mein Gehalt auf [X] anheben. Ich suche keinen Streit — ich will verstehen, was dafür nötig ist, und würde mich über deine Unterstützung freuen.",
+      "es-ES": "Quería hablar de mi retribución. En el último año he liderado la migración de facturación y he reducido los tickets de soporte un 30%, además de mentorizar a dos incorporaciones. Por ese alcance y el mercado, me gustaría llevar mi salario a [X]. No busco pelea — quiero entender qué hace falta para llegar ahí, y me encantaría tu apoyo.",
+    },
+  },
+  {
+    id: "C-023",
+    type: "conflict",
+    category: "conflict_resolution",
+    difficulty: 2,
+    media: {
+      scene: "video_call",
+      alt: {
+        en: "A daily standup video call where your idea was just dismissed.",
+        de: "Ein tägliches Standup per Video, in dem deine Idee gerade abgetan wurde.",
+        "es-ES": "Una daily por vídeo donde acaban de descartar tu idea.",
+      },
+    },
+    roleCaption: {
+      en: "You are an individual contributor in the daily standup.",
+      de: "Du bist Fachkraft im täglichen Standup.",
+      "es-ES": "Eres colaborador individual en la daily.",
+    },
+    scenario: {
+      en: "In standup you propose an approach, and a senior engineer cuts in: \"That won't work, we tried it years ago.\" Everyone moves on. You still think you're right. What do you say?",
+      de: "Im Standup schlägst du einen Ansatz vor, und ein:e Senior-Engineer unterbricht: „Das klappt nicht, haben wir vor Jahren versucht.“ Alle machen weiter. Du hältst dich für richtig. Was sagst du?",
+      "es-ES": "En la daily propones un enfoque y un ingeniero senior te corta: «Eso no funciona, lo intentamos hace años». Todos siguen. Tú crees que tienes razón. ¿Qué dices?",
+    },
+    weights: { content: 0.45, delivery: 0.35, time: 0.2 },
+    keyPoints: [
+      { en: "stay calm, don't shrink or get defensive", de: "ruhig bleiben, nicht klein machen oder defensiv", "es-ES": "mantener la calma, ni encogerse ni a la defensiva" },
+      { en: "acknowledge their experience", de: "ihre Erfahrung anerkennen", "es-ES": "reconocer su experiencia" },
+      { en: "ask what's different now / hold your point", de: "fragen, was jetzt anders ist / Punkt halten", "es-ES": "preguntar qué cambió ahora / sostener tu punto" },
+      { en: "propose a small concrete next step", de: "kleinen konkreten nächsten Schritt vorschlagen", "es-ES": "proponer un siguiente paso pequeño y concreto" },
+    ],
+    rubric: {
+      content: { strong: "Respects their experience, surfaces what's changed, holds the idea, proposes a low-cost test.", adequate: "Holds the idea but either meek or pushy; no next step.", weak: "Caves silently, or argues without a path." },
+      delivery: { strong: "Composed, respectful, quietly confident.", adequate: "A bit tentative or a bit sharp.", weak: "Defensive, deflated, or combative." },
+      time: { strong: "Concise and controlled.", adequate: "Fits.", weak: "Rambles or freezes." },
+    },
+    modelAnswer: {
+      en: "Totally hear you — you've got way more history here than I do. Can I check one thing, though: when we tried it before, did we have the new caching layer? Because that was the blocker, and it's gone now. I might be wrong, but it feels cheap to test — give me half a day to spike it and I'll bring numbers. If it flops, we drop it.",
+      de: "Verstehe ich total — du hast hier viel mehr Historie als ich. Eine Sache aber: Hatten wir beim letzten Versuch schon die neue Caching-Schicht? Denn das war der Blocker, und der ist weg. Vielleicht irre ich mich, aber es ist billig zu testen — gib mir einen halben Tag für einen Spike und ich bringe Zahlen. Wenn es floppt, lassen wir es.",
+      "es-ES": "Te entiendo del todo — tienes mucha más historia aquí que yo. Pero déjame comprobar una cosa: cuando lo intentamos, ¿teníamos ya la nueva capa de caché? Porque ese era el bloqueo, y ya no está. Puedo equivocarme, pero es barato probarlo — dame medio día para un spike y traigo números. Si falla, lo dejamos.",
+    },
+  },
+  {
+    id: "C-024",
+    type: "situational",
+    category: "strategic_thinking",
+    difficulty: 4,
+    media: {
+      scene: "exec_committee",
+      alt: {
+        en: "The board interrupting a strategy presentation with hard questions.",
+        de: "Der Vorstand unterbricht eine Strategiepräsentation mit harten Fragen.",
+        "es-ES": "El consejo interrumpe una presentación de estrategia con preguntas duras.",
+      },
+    },
+    roleCaption: {
+      en: "You are the executive presenting strategy to the board.",
+      de: "Du bist die Führungskraft, die dem Vorstand die Strategie präsentiert.",
+      "es-ES": "Eres el ejecutivo presentando la estrategia al consejo.",
+    },
+    scenario: {
+      en: "Mid-presentation, a board member stops you: \"I'm not convinced this strategy survives contact with the market. Why should we bet the company on it?\" Respond.",
+      de: "Mitten in der Präsentation stoppt dich ein Vorstandsmitglied: „Ich bin nicht überzeugt, dass diese Strategie dem Markt standhält. Warum sollten wir das Unternehmen darauf verwetten?“ Antworte.",
+      "es-ES": "A mitad de presentación, un consejero te detiene: «No me convence que esta estrategia sobreviva al contacto con el mercado. ¿Por qué deberíamos apostar la empresa a ella?». Responde.",
+    },
+    weights: { content: 0.55, delivery: 0.3, time: 0.15 },
+    keyPoints: [
+      { en: "welcome the challenge, no defensiveness", de: "die Herausforderung annehmen, ohne Abwehr", "es-ES": "acoger el reto, sin ponerse a la defensiva" },
+      { en: "the core thesis in one line", de: "die Kernthese in einem Satz", "es-ES": "la tesis central en una frase" },
+      { en: "the evidence and the key risk you've priced in", de: "Belege und das eingepreiste Hauptrisiko", "es-ES": "la evidencia y el riesgo clave que has contemplado" },
+      { en: "what would make you change course", de: "was dich umsteuern ließe", "es-ES": "qué te haría cambiar de rumbo" },
+    ],
+    rubric: {
+      content: { strong: "Welcomes it, gives a one-line thesis, cites evidence + the priced-in risk, names the kill-criteria.", adequate: "Defends it but thin on evidence or risk.", weak: "Defensive, vague, or capitulates." },
+      delivery: { strong: "Calm conviction under fire; board-grade.", adequate: "Mostly composed.", weak: "Rattled or arrogant." },
+      time: { strong: "Tight, decisive.", adequate: "Fits.", weak: "Runs long." },
+    },
+    modelAnswer: {
+      en: "That's exactly the question we should stress-test, so thank you. The thesis in one line: we win by owning the workflow, not the feature. The evidence is that our design-partner cohort already consolidated three tools onto us and renewed at 140%. The risk I've priced in is slower enterprise sales, which is why we gate spend to milestones. And I'll be clear on what changes my mind: if we don't hit 120% net retention by Q3, we pivot. I'm not betting on faith — I'm betting on a signal we can already see.",
+      de: "Genau das sollten wir stresstesten, danke. Die These in einem Satz: Wir gewinnen, indem wir den Workflow besitzen, nicht das Feature. Der Beleg: Unsere Design-Partner haben bereits drei Tools auf uns konsolidiert und mit 140 % verlängert. Das eingepreiste Risiko sind langsamere Enterprise-Verkäufe — deshalb koppeln wir Ausgaben an Meilensteine. Und klar, was mich umstimmt: Erreichen wir bis Q3 keine 120 % Net Retention, schwenken wir um. Ich wette nicht auf Glauben, sondern auf ein Signal, das wir schon sehen.",
+      "es-ES": "Esa es justo la pregunta que deberíamos poner a prueba, así que gracias. La tesis en una frase: ganamos siendo dueños del flujo de trabajo, no de la función. La evidencia: nuestros socios de diseño ya consolidaron tres herramientas en nosotros y renovaron al 140%. El riesgo que he contemplado es una venta enterprise más lenta, por eso ligamos el gasto a hitos. Y seré claro con lo que me haría cambiar: si no llegamos al 120% de retención neta para el T3, pivotamos. No apuesto por fe — apuesto por una señal que ya vemos.",
+    },
+  },
+  {
+    id: "C-025",
+    type: "conflict",
+    category: "feedback_difficult_conversations",
+    difficulty: 4,
+    media: {
+      scene: "office_1on1",
+      alt: {
+        en: "A serious, private conversation across a desk.",
+        de: "Ein ernstes, privates Gespräch am Schreibtisch.",
+        "es-ES": "Una conversación seria y privada en la mesa de despacho.",
+      },
+    },
+    roleCaption: {
+      en: "You are the leader, about to let go a long-tenured employee.",
+      de: "Du bist die Führungskraft und musst eine:n langjährige:n Mitarbeitende:n entlassen.",
+      "es-ES": "Eres el líder, a punto de despedir a alguien con mucha antigüedad.",
+    },
+    scenario: {
+      en: "You have to let go someone who's been here 12 years — the role is being cut. They just sat down, no idea what's coming. Open the conversation.",
+      de: "Du musst dich von jemandem trennen, der seit 12 Jahren hier ist — die Stelle entfällt. Die Person hat sich gerade gesetzt, ahnungslos. Eröffne das Gespräch.",
+      "es-ES": "Tienes que despedir a alguien que lleva 12 años aquí — se elimina el puesto. Acaba de sentarse, sin saber qué viene. Abre la conversación.",
+    },
+    weights: { content: 0.45, delivery: 0.35, time: 0.2 },
+    keyPoints: [
+      { en: "be direct and humane; deliver the news clearly up front", de: "direkt und menschlich; die Nachricht klar zuerst", "es-ES": "directo y humano; dar la noticia clara al principio" },
+      { en: "no false hope or burying the message", de: "keine falsche Hoffnung, nicht beschönigen", "es-ES": "sin falsas esperanzas ni rodeos" },
+      { en: "respect their dignity and tenure", de: "Würde und Betriebszugehörigkeit achten", "es-ES": "respetar su dignidad y antigüedad" },
+      { en: "what happens next / support offered", de: "wie es weitergeht / angebotene Unterstützung", "es-ES": "qué pasa ahora / apoyo ofrecido" },
+    ],
+    rubric: {
+      content: { strong: "Delivers the decision clearly and early, with dignity and concrete next steps/support.", adequate: "Gets there but rambles first or softens into ambiguity.", weak: "Buries it, gives false hope, or is cold and abrupt." },
+      delivery: { strong: "Calm, warm, steady; doesn't flinch or over-apologize.", adequate: "Mostly composed; a little evasive.", weak: "Cold, nervous, or waffling." },
+      time: { strong: "Clear opening, unhurried but contained.", adequate: "Fits.", weak: "Stalls or rushes." },
+    },
+    modelAnswer: {
+      en: "Thanks for coming in. I have hard news and I want to be straight with you out of respect: we're eliminating your role, and today is your last day in it. This is about the position, not your work — twelve years here matter, and they're not lost on me. Here's what happens next: [package, support, references], and I'll personally help with introductions. Take a moment — then ask me anything.",
+      de: "Danke, dass du da bist. Ich habe eine schwere Nachricht und will aus Respekt offen sein: Wir streichen deine Stelle, und heute ist dein letzter Tag darin. Es geht um die Position, nicht um deine Arbeit — zwölf Jahre hier zählen, und das ist mir bewusst. So geht es weiter: [Paket, Unterstützung, Referenzen], und ich helfe persönlich bei Kontakten. Nimm dir einen Moment — und frag mich dann alles.",
+      "es-ES": "Gracias por venir. Tengo una noticia difícil y, por respeto, quiero ser directo: eliminamos tu puesto, y hoy es tu último día en él. Es por la posición, no por tu trabajo — doce años aquí cuentan, y soy muy consciente de ello. Esto es lo que pasa ahora: [paquete, apoyo, referencias], y te ayudaré personalmente con presentaciones. Tómate un momento — y luego pregúntame lo que quieras.",
+    },
+  },
+  {
+    id: "C-026",
+    type: "conflict",
+    category: "leadership_decisions",
+    difficulty: 3,
+    media: {
+      scene: "office_1on1",
+      alt: {
+        en: "A tense retention conversation with a top performer.",
+        de: "Ein angespanntes Bindungsgespräch mit einer Top-Kraft.",
+        "es-ES": "Una conversación tensa de retención con alguien clave.",
+      },
+    },
+    roleCaption: {
+      en: "You are the leader; your best person wants to leave.",
+      de: "Du bist die Führungskraft; deine beste Person will gehen.",
+      "es-ES": "Eres el líder; tu mejor persona quiere irse.",
+    },
+    scenario: {
+      en: "Your best engineer closes your door and says, \"I've got an offer. I'm probably taking it — I don't feel like I'm growing here.\" How do you respond, right now?",
+      de: "Dein:e beste:r Engineer schließt die Tür und sagt: „Ich habe ein Angebot. Wahrscheinlich nehme ich es an — ich habe das Gefühl, hier nicht zu wachsen.“ Wie reagierst du, jetzt?",
+      "es-ES": "Tu mejor ingeniera cierra la puerta y dice: «Tengo una oferta. Probablemente la acepte — siento que aquí no crezco». ¿Cómo respondes, ahora mismo?",
+    },
+    weights: { content: 0.5, delivery: 0.3, time: 0.2 },
+    keyPoints: [
+      { en: "stay calm; don't panic or guilt-trip", de: "ruhig bleiben; keine Panik, keine Schuldgefühle", "es-ES": "mantener la calma; sin pánico ni culpabilizar" },
+      { en: "get curious about the real reason (growth)", de: "den echten Grund verstehen (Wachstum)", "es-ES": "indagar el motivo real (crecimiento)" },
+      { en: "acknowledge their value honestly", de: "ihren Wert ehrlich anerkennen", "es-ES": "reconocer su valor con honestidad" },
+      { en: "a concrete next step, not just a counteroffer", de: "konkreter nächster Schritt, nicht nur Gegenangebot", "es-ES": "un siguiente paso concreto, no solo una contraoferta" },
+    ],
+    rubric: {
+      content: { strong: "Calm, digs into the growth issue, values them genuinely, proposes a concrete next step beyond money.", adequate: "Reacts well but jumps to a counteroffer or stays vague.", weak: "Panics, guilts them, or gives up immediately." },
+      delivery: { strong: "Composed and sincere; leaderly.", adequate: "Mostly steady.", weak: "Defensive, desperate, or cold." },
+      time: { strong: "Controlled within time.", adequate: "Fits.", weak: "Spirals." },
+    },
+    modelAnswer: {
+      en: "First — thank you for telling me to my face instead of just leaving; that means a lot. I'm not going to throw money at this in the next thirty seconds, because I think you're naming something real about growth. Help me understand: is it scope, a title, the kind of problems, or me? Don't decide today. Give me 48 hours to come back with a concrete path — and if it's genuinely not here, I'll help you leave well. You're worth fighting for the right way.",
+      de: "Erst mal — danke, dass du es mir ins Gesicht sagst, statt einfach zu gehen; das bedeutet mir viel. Ich werfe jetzt nicht in dreißig Sekunden Geld auf das Problem, denn ich glaube, du benennst etwas Echtes zum Thema Wachstum. Hilf mir zu verstehen: Geht es um Scope, einen Titel, die Art der Probleme oder um mich? Entscheide nicht heute. Gib mir 48 Stunden für einen konkreten Weg — und wenn es hier wirklich nicht geht, helfe ich dir, gut zu gehen. Du bist es wert, richtig umworben zu werden.",
+      "es-ES": "Primero — gracias por decírmelo a la cara en vez de irte sin más; eso significa mucho. No voy a tirarte dinero en treinta segundos, porque creo que estás nombrando algo real sobre crecimiento. Ayúdame a entender: ¿es el alcance, un título, el tipo de problemas, o soy yo? No decidas hoy. Dame 48 horas para volver con un camino concreto — y si de verdad no está aquí, te ayudaré a irte bien. Mereces que se luche por ti de la forma correcta.",
+    },
+  },
 ];
 
 export function getChallenge(id: string): Challenge | undefined {

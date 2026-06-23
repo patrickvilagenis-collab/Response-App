@@ -46,6 +46,12 @@ const SITUATION_BY_ID: Record<string, Situation> = {
   "C-018": "reflection",
   "C-019": "feedback",
   "C-020": "crisis",
+  "C-021": "board",
+  "C-022": "one_on_one",
+  "C-023": "conflict",
+  "C-024": "board",
+  "C-025": "feedback",
+  "C-026": "one_on_one",
 };
 
 export function situationOf(c: Challenge): Situation {

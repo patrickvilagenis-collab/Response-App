@@ -3,16 +3,17 @@ import { useApp } from "../state/store";
 import { LanguagePicker } from "./LanguagePicker";
 import type { Route } from "../state/store";
 
-const NAV: { name: Route["name"]; key: string }[] = [
-  { name: "home", key: "nav.home" },
-  { name: "library", key: "nav.library" },
-  { name: "history", key: "nav.history" },
-  { name: "settings", key: "nav.settings" },
-];
-
 export function AppShell({ children }: { children: ReactNode }) {
   const { t, route, go, logout, profile } = useApp();
   const active = route.name;
+
+  const NAV: { name: Route["name"]; key: string }[] = [
+    { name: "home", key: "nav.home" },
+    { name: "library", key: "nav.library" },
+    { name: "history", key: "nav.history" },
+    ...(profile?.segment === "company" ? [{ name: "admin" as const, key: "nav.team" }] : []),
+    { name: "settings", key: "nav.settings" },
+  ];
   // Dark "focus" theme on the spotlight screens; full immersion (no chrome) on
   // the live moment (scenario, response, warm-up).
   const dark = active === "scenario" || active === "response" || active === "results" || active === "warmup";

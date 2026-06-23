@@ -403,6 +403,17 @@ input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 .admin-user-avg { margin-left: auto; font-size: 1.7rem; font-weight: 800; }
 .admin-cat-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
 
+/* team dashboard */
+.team-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 6px 0 16px; }
+.team-kpi { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; text-align: center; box-shadow: var(--shadow); }
+.team-kpi-num { display: block; font-family: var(--font-display); font-size: 1.8rem; font-weight: 600; color: var(--accent); }
+.team-kpi-label { font-size: 0.74rem; color: var(--muted); }
+.team-tracks { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin-bottom: 18px; box-shadow: var(--shadow); }
+.team-tracks .facet-label { display: block; margin-bottom: 10px; }
+.team-track-row { display: grid; grid-template-columns: 1fr 2fr auto; align-items: center; gap: 10px; margin-bottom: 8px; }
+.team-track-name { font-size: 0.86rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+.team-track-val { font-size: 0.82rem; font-weight: 700; color: var(--muted); min-width: 34px; text-align: right; }
+
 /* ---------- Onboarding ---------- */
 .onb { min-height: 100%; display: flex; flex-direction: column; align-items: center; padding: 20px; }
 .onb-top { width: 100%; max-width: 760px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 6vh; }

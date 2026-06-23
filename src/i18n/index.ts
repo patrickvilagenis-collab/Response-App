@@ -26,6 +26,7 @@ const en: Dict = {
   "nav.library": "Practice",
   "nav.history": "History",
   "nav.settings": "Settings",
+  "nav.team": "Team",
   "nav.logout": "Log out",
 
   "home.welcome": "Welcome back,",
@@ -202,7 +203,11 @@ const en: Dict = {
   "warmup.avg": "Average",
   "warmup.again": "Go again",
 
-  "admin.title": "Admin — user responses",
+  "admin.title": "Team dashboard",
+  "team.people": "People",
+  "team.sessions": "Sessions",
+  "team.avg": "Team average",
+  "team.byTheme": "By theme",
   "admin.subtitle": "Responses logged from all users on this deployment.",
   "admin.password": "Admin password",
   "admin.unlock": "Unlock",
@@ -240,6 +245,7 @@ const de: Dict = {
   "nav.library": "Üben",
   "nav.history": "Verlauf",
   "nav.settings": "Einstellungen",
+  "nav.team": "Team",
   "nav.logout": "Abmelden",
 
   "home.welcome": "Willkommen zurück,",
@@ -416,7 +422,11 @@ const de: Dict = {
   "warmup.avg": "Durchschnitt",
   "warmup.again": "Nochmal",
 
-  "admin.title": "Admin — Nutzerantworten",
+  "admin.title": "Team-Dashboard",
+  "team.people": "Personen",
+  "team.sessions": "Sitzungen",
+  "team.avg": "Team-Durchschnitt",
+  "team.byTheme": "Nach Thema",
   "admin.subtitle": "Antworten aller Nutzer dieses Deployments.",
   "admin.password": "Admin-Passwort",
   "admin.unlock": "Entsperren",
@@ -454,6 +464,7 @@ const esES: Dict = {
   "nav.library": "Practicar",
   "nav.history": "Historial",
   "nav.settings": "Ajustes",
+  "nav.team": "Equipo",
   "nav.logout": "Cerrar sesión",
 
   "home.welcome": "Hola de nuevo,",
@@ -630,7 +641,11 @@ const esES: Dict = {
   "warmup.avg": "Media",
   "warmup.again": "Otra vez",
 
-  "admin.title": "Admin — respuestas de usuarios",
+  "admin.title": "Panel de equipo",
+  "team.people": "Personas",
+  "team.sessions": "Sesiones",
+  "team.avg": "Media del equipo",
+  "team.byTheme": "Por tema",
   "admin.subtitle": "Respuestas registradas de todos los usuarios de este despliegue.",
   "admin.password": "Contraseña de admin",
   "admin.unlock": "Desbloquear",
