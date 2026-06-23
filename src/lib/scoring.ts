@@ -1,6 +1,6 @@
 import type { Band, Weights } from "../types";
 
-export const MAX_RESPONSE_SEC = 30;
+export const MAX_RESPONSE_SEC = 60;
 export const MAX_SPEED_BONUS = 5;
 export const QUALITY_FLOOR = 50;
 

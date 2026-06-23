@@ -127,13 +127,13 @@ export function offlineEvaluate(
   let delivery = Math.round(clamp(88 - density * 240 + (wc >= 18 ? 8 : -10)));
   if (wc < 6) delivery = Math.min(delivery, 25);
 
-  // --- Time: fit + efficiency over the 30s window ---
+  // --- Time: fit + efficiency over the 60s window ---
   let time: number;
   if (wc < 6) {
     time = 25;
-  } else if (responseTimeSec <= 24 && coverage >= 0.6) {
+  } else if (responseTimeSec <= 48 && coverage >= 0.6) {
     time = 92; // complete and efficient
-  } else if (responseTimeSec <= 30 && coverage >= 0.5) {
+  } else if (responseTimeSec <= 60 && coverage >= 0.5) {
     time = 78;
   } else if (coverage < 0.4) {
     time = 50; // used time but thin
@@ -218,10 +218,12 @@ export async function llmEvaluate(
 ): Promise<Evaluation> {
   const localeName = { en: "English", de: "German", "es-ES": "Spanish (Spain)" }[locale];
   const sys =
-    "You are an expert executive communication coach evaluating a spoken response delivered under a 30-second limit. " +
-    "Score strictly against the rubric and model answer. Be strict but fair — this is a professional challenge platform, not a confidence-builder. " +
+    "You are an expert executive communication coach. You evaluate the USER'S OWN spoken response to a high-pressure scenario, delivered under a 60-second limit. " +
+    "Crucial: every comment must be about what the USER actually said — quote their exact words when praising or criticising. Do not invent content they did not say. " +
+    "Score strictly against the rubric and compare against the expert model answer (a reference example, NOT the user's words). Be strict but fair — this is a professional challenge platform, not a confidence-builder. " +
     "Reward a clear stance, structure, stakeholder awareness and composure; penalize hedging, filler, missing structure and non-responsiveness. " +
-    `Write all feedback and alternative phrasings in ${localeName}. Return ONLY valid JSON.`;
+    "In 'improvedVersion', rewrite the USER'S OWN answer into a version that would score 90+: keep their specific situation, facts and intent, but fix structure, add what's missing, and tighten delivery. It must read as an upgraded version of THEIR answer, clearly different from the generic model answer. " +
+    `Write ALL feedback, phrasings and the rewrite in ${localeName}. Return ONLY valid JSON.`;
 
   const payload = {
     scenario: challenge.scenario[locale] ?? challenge.scenario.en,
@@ -229,22 +231,28 @@ export async function llmEvaluate(
     type: challenge.type,
     weights: challenge.weights,
     rubric: challenge.rubric,
-    modelAnswer: challenge.modelAnswer[locale] ?? challenge.modelAnswer.en,
-    response: transcript,
+    expertModelAnswer_reference_only: challenge.modelAnswer[locale] ?? challenge.modelAnswer.en,
+    USER_RESPONSE_to_analyse: transcript,
     responseTimeSec,
+    timeLimitSec: 60,
   };
 
   const schema =
-    '{"dimensions":{"content":{"score":0-100,"justification":"..."},"delivery":{"score":0-100,"justification":"..."},' +
-    '"time":{"score":0-100,"justification":"..."}},"headline":"1-2 sentences",' +
-    '"coaching":{"worked":["..."],"missing":["..."],"betterPhrasings":["..."],"focusNext":"..."}}';
+    '{"dimensions":{"content":{"score":0-100,"justification":"why, quoting the user"},' +
+    '"delivery":{"score":0-100,"justification":"why, quoting the user"},' +
+    '"time":{"score":0-100,"justification":"..."}},"headline":"1-2 sentences about THIS answer",' +
+    '"coaching":{"worked":["specific strong things the user actually said"],' +
+    '"missing":["specific gaps in the user\'s answer"],' +
+    '"betterPhrasings":["1-3 stronger lines they could have used"],' +
+    '"improvedVersion":"the user\'s OWN answer rewritten to score 90+, same situation",' +
+    '"focusNext":"one prioritised improvement"}}';
 
-  const user = `Evaluate this response. Input:\n${JSON.stringify(payload)}\n\nReturn JSON exactly in this shape:\n${schema}`;
+  const user = `Analyse and score the USER_RESPONSE below. Base everything on the user's actual words. Input:\n${JSON.stringify(payload)}\n\nReturn JSON exactly in this shape:\n${schema}`;
 
   const res = await fetch("/api/evaluate", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ system: sys, user, max_tokens: 900 }),
+    body: JSON.stringify({ system: sys, user, max_tokens: 1200 }),
   });
 
   if (!res.ok) throw new Error(`AI evaluation unavailable: ${res.status}`);
@@ -277,6 +285,7 @@ export async function llmEvaluate(
       worked: arr(parsed.coaching?.worked),
       missing: arr(parsed.coaching?.missing),
       betterPhrasings: arr(parsed.coaching?.betterPhrasings),
+      improvedVersion: String(parsed.coaching?.improvedVersion ?? ""),
       focusNext: String(parsed.coaching?.focusNext ?? ""),
     },
     source: "llm",

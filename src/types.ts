@@ -79,6 +79,8 @@ export interface Coaching {
   worked: string[];
   missing: string[];
   betterPhrasings: string[];
+  /** The user's OWN answer rewritten to score high (AI path only). */
+  improvedVersion?: string;
   focusNext: string;
 }
 

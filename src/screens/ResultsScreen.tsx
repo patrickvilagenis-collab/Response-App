@@ -45,6 +45,11 @@ export function ResultsScreen({ attemptId }: { attemptId: string }) {
         {ev.source === "offline" && <p className="muted small">{t("eval.offline")}</p>}
       </div>
 
+      <section className="your-response">
+        <h2 className="section-title">{t("results.yourAnswer")}</h2>
+        <div className="answer-card you">{attempt.transcript || "—"}</div>
+      </section>
+
       <section className="dims">
         <h2 className="section-title">{t("results.dimensions")}</h2>
         <DimBar label={t("results.content")} d={ev.dimensions.content} reduce={prefersReducedMotion} />
@@ -65,6 +70,14 @@ export function ResultsScreen({ attemptId }: { attemptId: string }) {
           ))}
         </div>
 
+        {ev.coaching.improvedVersion && (
+          <div className="coach-block">
+            <h3>{t("results.improved")}</h3>
+            <p className="muted small">{t("results.improvedHint")}</p>
+            <div className="answer-card improved">{ev.coaching.improvedVersion}</div>
+          </div>
+        )}
+
         <div className="focus-box">
           <span className="focus-label">{t("results.focus")}</span>
           {ev.coaching.focusNext}
@@ -72,14 +85,10 @@ export function ResultsScreen({ attemptId }: { attemptId: string }) {
       </section>
 
       <section className="compare">
-        <details className="answer-box">
-          <summary>{t("results.yourAnswer")}</summary>
-          <p>{attempt.transcript || "—"}</p>
-        </details>
-        <details className="answer-box model" open>
-          <summary>{t("results.model")}</summary>
+        <div className="answer-box model">
+          <div className="answer-title">{t("results.model")}</div>
           <p>{ch?.modelAnswer[locale]}</p>
-        </details>
+        </div>
       </section>
 
       <div className="result-actions">
