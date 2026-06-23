@@ -38,6 +38,9 @@ export default async function handler(req, res) {
       try { return decodeURIComponent(String(v || "")); } catch { return String(v || ""); }
     };
     const dims = body.dims || {};
+    const c = body.coaching || {};
+    const strArr = (v, n) =>
+      Array.isArray(v) ? v.slice(0, 6).map((x) => String(x).slice(0, n)) : [];
     const rec = {
       ts: new Date().toISOString(),
       user: String(body.user || "anon").slice(0, 80),
@@ -59,6 +62,14 @@ export default async function handler(req, res) {
         content: Number(dims.content) || 0,
         delivery: Number(dims.delivery) || 0,
         time: Number(dims.time) || 0,
+      },
+      headline: String(body.headline || "").slice(0, 400),
+      coaching: {
+        worked: strArr(c.worked, 300),
+        missing: strArr(c.missing, 300),
+        betterPhrasings: strArr(c.betterPhrasings, 400),
+        improvedVersion: String(c.improvedVersion || "").slice(0, 2000),
+        focusNext: String(c.focusNext || "").slice(0, 400),
       },
       // Approximate origin, provided automatically by Vercel's edge headers.
       country: String(h["x-vercel-ip-country"] || "").slice(0, 4),

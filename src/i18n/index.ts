@@ -170,6 +170,7 @@ const en: Dict = {
   "admin.searchUser": "Search by name",
   "admin.input": "Input",
   "admin.scoredBy": "Scored by",
+  "admin.export": "Export CSV",
 };
 
 const de: Dict = {
@@ -334,6 +335,7 @@ const de: Dict = {
   "admin.searchUser": "Nach Namen suchen",
   "admin.input": "Eingabe",
   "admin.scoredBy": "Bewertet von",
+  "admin.export": "CSV exportieren",
 };
 
 const esES: Dict = {
@@ -498,6 +500,7 @@ const esES: Dict = {
   "admin.searchUser": "Buscar por nombre",
   "admin.input": "Entrada",
   "admin.scoredBy": "Evaluado por",
+  "admin.export": "Exportar CSV",
 };
 
 const dicts: Record<Locale, Dict> = { en, de, "es-ES": esES };

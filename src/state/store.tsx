@@ -125,6 +125,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
             delivery: a.evaluation.dimensions.delivery.score,
             time: a.evaluation.dimensions.time.score,
           },
+          headline: a.evaluation.headline,
+          coaching: a.evaluation.coaching,
         }),
       }).catch(() => {});
     },

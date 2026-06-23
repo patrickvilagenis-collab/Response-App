@@ -360,6 +360,10 @@ input:focus, textarea:focus { border-color: var(--accent); }
 .admin-user-meta { display: flex; flex-direction: column; flex: 1; min-width: 0; }
 .admin-user-meta strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .admin-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(180deg, var(--accent-2), var(--accent)); color: #07122b; font-weight: 800; display: grid; place-items: center; flex-shrink: 0; }
+.admin-user-bar { display: flex; gap: 8px; }
+.admin-headline { font-weight: 500; font-size: 0.95rem; }
+.admin-coaching { display: grid; gap: 10px; margin-top: 4px; }
+.admin-coaching .coach-block { margin-bottom: 0; }
 .admin-user-head { display: flex; align-items: center; gap: 14px; margin: 14px 0; }
 .admin-user-head h2 { margin: 0; }
 .admin-user-avg { margin-left: auto; font-size: 1.7rem; font-weight: 800; }

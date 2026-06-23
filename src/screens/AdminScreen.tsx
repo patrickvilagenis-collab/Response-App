@@ -20,8 +20,46 @@ interface LoggedAttempt {
   speedBonus?: number;
   responseTimeSec: number;
   dims?: { content: number; delivery: number; time: number };
+  headline?: string;
+  coaching?: {
+    worked: string[];
+    missing: string[];
+    betterPhrasings: string[];
+    improvedVersion: string;
+    focusNext: string;
+  };
   country?: string;
   city?: string;
+}
+
+const CSV_COLS = [
+  "ts", "user", "country", "city", "challengeId", "type", "category", "difficulty",
+  "locale", "inputMode", "final", "band", "content", "delivery", "time",
+  "responseTimeSec", "source", "speedBonus", "scenario", "transcript",
+  "improvedVersion", "focusNext",
+];
+
+function exportCsv(rows: LoggedAttempt[], filename: string) {
+  const esc = (v: unknown) => '"' + String(v ?? "").replace(/"/g, '""') + '"';
+  const lines = [CSV_COLS.join(",")];
+  for (const a of rows) {
+    lines.push(
+      [
+        a.ts, a.user, a.country, a.city, a.challengeId, a.type, a.category, a.difficulty,
+        a.locale, a.inputMode, a.final, a.band, a.dims?.content, a.dims?.delivery, a.dims?.time,
+        a.responseTimeSec, a.source, a.speedBonus, a.scenario, a.transcript,
+        a.coaching?.improvedVersion, a.coaching?.focusNext,
+      ].map(esc).join(",")
+    );
+  }
+  // UTF-8 BOM so Excel reads accents correctly.
+  const blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const el = document.createElement("a");
+  el.href = url;
+  el.download = filename;
+  el.click();
+  URL.revokeObjectURL(url);
 }
 
 type State = "locked" | "loading" | "ok" | "wrong" | "notConfigured";
@@ -124,7 +162,10 @@ export function AdminScreen() {
     return (
       <div className="page admin">
         <Header t={t} go={go} />
-        <button className="btn ghost sm" onClick={() => setSelected(null)}>← {t("admin.allUsers")}</button>
+        <div className="admin-user-bar">
+          <button className="btn ghost sm" onClick={() => setSelected(null)}>← {t("admin.allUsers")}</button>
+          <button className="btn ghost sm" onClick={() => exportCsv(current.attempts, `response-app-${current.name}.csv`)}>⬇ {t("admin.export")}</button>
+        </div>
 
         <div className="admin-user-head">
           <div className="admin-avatar">{current.name.charAt(0).toUpperCase()}</div>
@@ -166,6 +207,7 @@ export function AdminScreen() {
           onChange={(e) => setQuery(e.target.value)}
         />
         <span className="muted small">{groups.length} {t("admin.users")} · {list.length} {t("admin.count")}</span>
+        <button className="btn ghost sm" onClick={() => exportCsv(list, "response-app-all.csv")} disabled={list.length === 0}>⬇ {t("admin.export")}</button>
         <button className="btn ghost sm" onClick={unlock}>↻ {t("admin.refresh")}</button>
       </div>
 
@@ -230,8 +272,46 @@ function AttemptCard({ a, t }: { a: LoggedAttempt; t: (k: string) => string }) {
             {t("admin.input")}: {a.inputMode} · {t("admin.scoredBy")}: {a.source === "llm" ? "AI" : "offline"}
             {a.speedBonus ? ` · +${a.speedBonus} ${t("eval.speedBonus")}` : ""}
           </div>
+
+          {a.headline && <div className="admin-headline">{a.headline}</div>}
+
+          {a.coaching && (
+            <div className="admin-coaching">
+              {a.coaching.worked?.length > 0 && (
+                <CoachMini title={t("results.worked")} items={a.coaching.worked} tone="good" />
+              )}
+              {a.coaching.missing?.length > 0 && (
+                <CoachMini title={t("results.missing")} items={a.coaching.missing} tone="warn" />
+              )}
+              {a.coaching.improvedVersion && (
+                <div className="coach-block">
+                  <h3>{t("results.improved")}</h3>
+                  <div className="answer-card improved">{a.coaching.improvedVersion}</div>
+                </div>
+              )}
+              {a.coaching.focusNext && (
+                <div className="focus-box">
+                  <span className="focus-label">{t("results.focus")}</span>
+                  {a.coaching.focusNext}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
+    </div>
+  );
+}
+
+function CoachMini({ title, items, tone }: { title: string; items: string[]; tone: "good" | "warn" }) {
+  return (
+    <div className="coach-block">
+      <h3>{title}</h3>
+      <ul className={`coach-list ${tone}`}>
+        {items.map((it, i) => (
+          <li key={i}>{it}</li>
+        ))}
+      </ul>
     </div>
   );
 }
