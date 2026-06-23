@@ -8,6 +8,8 @@ import { ResponseScreen } from "./screens/ResponseScreen";
 import { ResultsScreen } from "./screens/ResultsScreen";
 import { HistoryScreen } from "./screens/HistoryScreen";
 import { SettingsScreen } from "./screens/SettingsScreen";
+import { WarmUpScreen } from "./screens/WarmUpScreen";
+import { AdminScreen } from "./screens/AdminScreen";
 
 export function App() {
   const { profile, route } = useApp();
@@ -38,6 +40,12 @@ export function App() {
       break;
     case "settings":
       screen = <SettingsScreen />;
+      break;
+    case "warmup":
+      screen = <WarmUpScreen />;
+      break;
+    case "admin":
+      screen = <AdminScreen />;
       break;
     default:
       screen = <HomeScreen />;

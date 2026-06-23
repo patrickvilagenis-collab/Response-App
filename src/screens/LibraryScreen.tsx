@@ -3,6 +3,7 @@ import { useApp } from "../state/store";
 import { CHALLENGES } from "../data/challenges";
 import { computeStats } from "../lib/stats";
 import { SceneMedia } from "../components/SceneMedia";
+import { WarmUpBanner } from "../components/WarmUpBanner";
 import type { Difficulty } from "../types";
 
 export function LibraryScreen() {
@@ -35,6 +36,8 @@ export function LibraryScreen() {
           </button>
         ))}
       </div>
+
+      {(diff === "all" || diff === 1) && <WarmUpBanner />}
 
       <div className="card-grid">
         {list.map((c) => (

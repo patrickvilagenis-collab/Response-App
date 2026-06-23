@@ -12,7 +12,9 @@ export type Route =
   | { name: "response"; challengeId: string }
   | { name: "results"; attemptId: string }
   | { name: "history" }
-  | { name: "settings" };
+  | { name: "settings" }
+  | { name: "warmup" }
+  | { name: "admin" };
 
 interface AppState {
   profile: Profile | null;
@@ -91,11 +93,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const go = useCallback((r: Route) => setRoute(r), []);
 
-  const recordAttempt = useCallback((a: Attempt) => {
-    storage.addAttempt(a);
-    setAttempts((prev) => [a, ...prev]);
-    setLastAttempt(a);
-  }, []);
+  const recordAttempt = useCallback(
+    (a: Attempt) => {
+      storage.addAttempt(a);
+      setAttempts((prev) => [a, ...prev]);
+      setLastAttempt(a);
+      // Fire-and-forget central logging for admin review. No-op if the backend
+      // store isn't configured; never blocks or breaks the user flow.
+      void fetch("/api/log", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          user: profile?.displayName ?? "anon",
+          challengeId: a.challengeId,
+          category: a.category,
+          difficulty: a.difficulty,
+          locale: a.locale,
+          inputMode: a.inputMode,
+          transcript: a.transcript,
+          final: a.evaluation.final,
+          responseTimeSec: a.responseTimeSec,
+        }),
+      }).catch(() => {});
+    },
+    [profile]
+  );
 
   const clearAll = useCallback(() => {
     storage.clearAll();

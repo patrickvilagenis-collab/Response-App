@@ -13,6 +13,7 @@ const en: Dict = {
   "app.tagline": "Speak under pressure. Improve every day.",
 
   "login.title": "Welcome",
+  "login.heroLine": "Step into high-stakes moments and learn to respond with clarity, speed and presence.",
   "login.subtitle": "Local profile — your data stays in this browser.",
   "login.name": "Display name",
   "login.password": "Password (optional)",
@@ -141,6 +142,28 @@ const en: Dict = {
   "dim.content": "Content",
   "dim.delivery": "Delivery",
   "dim.time": "Time",
+
+  "warmup.title": "Rapid-fire warm-up",
+  "warmup.subtitle": "A fast drumbeat of short questions to get you talking.",
+  "warmup.start": "Start warm-up",
+  "warmup.next": "Next",
+  "warmup.finish": "Finish",
+  "warmup.done": "Warm-up complete",
+  "warmup.summary": "Your quick round — answers and instant scores",
+  "warmup.avg": "Average",
+  "warmup.again": "Go again",
+
+  "admin.title": "Admin — user responses",
+  "admin.subtitle": "Responses logged from all users on this deployment.",
+  "admin.password": "Admin password",
+  "admin.unlock": "Unlock",
+  "admin.wrong": "Wrong password, or admin storage isn't configured.",
+  "admin.empty": "No responses logged yet.",
+  "admin.notConfigured": "Central logging isn't set up yet. See DEPLOY.md to enable it (a storage + admin password on Vercel).",
+  "admin.refresh": "Refresh",
+  "admin.count": "responses",
+  "admin.user": "User",
+  "admin.when": "When",
 };
 
 const de: Dict = {
@@ -148,6 +171,7 @@ const de: Dict = {
   "app.tagline": "Unter Druck sprechen. Jeden Tag besser werden.",
 
   "login.title": "Willkommen",
+  "login.heroLine": "Tritt in Hochdruck-Momente ein und lerne, mit Klarheit, Tempo und Präsenz zu reagieren.",
   "login.subtitle": "Lokales Profil — deine Daten bleiben in diesem Browser.",
   "login.name": "Anzeigename",
   "login.password": "Passwort (optional)",
@@ -276,6 +300,28 @@ const de: Dict = {
   "dim.content": "Inhalt",
   "dim.delivery": "Auftreten",
   "dim.time": "Zeit",
+
+  "warmup.title": "Schnelles Aufwärmen",
+  "warmup.subtitle": "Ein schneller Takt kurzer Fragen, damit du ins Reden kommst.",
+  "warmup.start": "Aufwärmen starten",
+  "warmup.next": "Weiter",
+  "warmup.finish": "Fertig",
+  "warmup.done": "Aufwärmen abgeschlossen",
+  "warmup.summary": "Deine schnelle Runde — Antworten und Sofort-Scores",
+  "warmup.avg": "Durchschnitt",
+  "warmup.again": "Nochmal",
+
+  "admin.title": "Admin — Nutzerantworten",
+  "admin.subtitle": "Antworten aller Nutzer dieses Deployments.",
+  "admin.password": "Admin-Passwort",
+  "admin.unlock": "Entsperren",
+  "admin.wrong": "Falsches Passwort oder Admin-Speicher nicht konfiguriert.",
+  "admin.empty": "Noch keine Antworten protokolliert.",
+  "admin.notConfigured": "Zentrale Protokollierung ist noch nicht eingerichtet. Siehe DEPLOY.md, um sie zu aktivieren (Speicher + Admin-Passwort auf Vercel).",
+  "admin.refresh": "Aktualisieren",
+  "admin.count": "Antworten",
+  "admin.user": "Nutzer",
+  "admin.when": "Wann",
 };
 
 const esES: Dict = {
@@ -283,6 +329,7 @@ const esES: Dict = {
   "app.tagline": "Habla bajo presión. Mejora cada día.",
 
   "login.title": "Bienvenido",
+  "login.heroLine": "Métete en momentos de alta presión y aprende a responder con claridad, rapidez y presencia.",
   "login.subtitle": "Perfil local — tus datos se quedan en este navegador.",
   "login.name": "Nombre para mostrar",
   "login.password": "Contraseña (opcional)",
@@ -411,6 +458,28 @@ const esES: Dict = {
   "dim.content": "Contenido",
   "dim.delivery": "Presencia",
   "dim.time": "Tiempo",
+
+  "warmup.title": "Calentamiento rápido",
+  "warmup.subtitle": "Una ráfaga rápida de preguntas cortas para soltarte a hablar.",
+  "warmup.start": "Empezar calentamiento",
+  "warmup.next": "Siguiente",
+  "warmup.finish": "Terminar",
+  "warmup.done": "Calentamiento completado",
+  "warmup.summary": "Tu ronda rápida — respuestas y puntuaciones al instante",
+  "warmup.avg": "Media",
+  "warmup.again": "Otra vez",
+
+  "admin.title": "Admin — respuestas de usuarios",
+  "admin.subtitle": "Respuestas registradas de todos los usuarios de este despliegue.",
+  "admin.password": "Contraseña de admin",
+  "admin.unlock": "Desbloquear",
+  "admin.wrong": "Contraseña incorrecta, o el almacén de admin no está configurado.",
+  "admin.empty": "Aún no hay respuestas registradas.",
+  "admin.notConfigured": "El registro central aún no está configurado. Consulta DEPLOY.md para activarlo (un almacén + contraseña de admin en Vercel).",
+  "admin.refresh": "Actualizar",
+  "admin.count": "respuestas",
+  "admin.user": "Usuario",
+  "admin.when": "Cuándo",
 };
 
 const dicts: Record<Locale, Dict> = { en, de, "es-ES": esES };

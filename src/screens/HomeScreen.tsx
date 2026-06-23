@@ -1,6 +1,7 @@
 import { useApp } from "../state/store";
 import { computeStats, recommend, randomChallenge } from "../lib/stats";
 import { SceneMedia } from "../components/SceneMedia";
+import { WarmUpBanner } from "../components/WarmUpBanner";
 import { BAND_COLORS } from "../lib/scoring";
 import { bandFor } from "../lib/scoring";
 import { getChallenge } from "../data/challenges";
@@ -27,6 +28,8 @@ export function HomeScreen() {
         <Stat label={t("home.stats.streak")} value={String(stats.streakDays)} />
         <Stat label={t("home.weakest")} value={dimLabel} />
       </div>
+
+      <WarmUpBanner />
 
       <section className="rec-card">
         <div className="rec-media">

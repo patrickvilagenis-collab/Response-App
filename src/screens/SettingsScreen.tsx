@@ -5,7 +5,7 @@ import { testMicrophone } from "../lib/speech";
 import { storage } from "../lib/storage";
 
 export function SettingsScreen() {
-  const { t, settings, setSettings, profile, login } = useApp();
+  const { t, settings, setSettings, profile, login, go } = useApp();
   const [useLlm, setUseLlm] = useState(settings.useLlm);
   const [inputDefault, setInputDefault] = useState(profile?.inputDefault ?? "voice");
   const [saved, setSaved] = useState(false);
@@ -73,6 +73,10 @@ export function SettingsScreen() {
 
       <button className="btn primary" onClick={save}>
         {saved ? t("settings.saved") : t("settings.save")}
+      </button>
+
+      <button className="btn ghost sm admin-link" onClick={() => go({ name: "admin" })}>
+        🔐 {t("admin.title")}
       </button>
     </div>
   );
