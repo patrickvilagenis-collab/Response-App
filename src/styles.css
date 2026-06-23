@@ -476,6 +476,44 @@ input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 .ch-card { text-align: left; color: var(--text); box-shadow: var(--shadow); transition: transform 0.1s, box-shadow 0.2s; }
 .ch-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
 
+/* ---------- Practice (sprint 3) ---------- */
+.practice-search { width: 100%; margin-bottom: 14px; }
+.chip-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 14px; scrollbar-width: thin; }
+.chip-scroll::-webkit-scrollbar { height: 5px; }
+.chip-scroll::-webkit-scrollbar-thumb { background: var(--line); border-radius: 999px; }
+.sit-chip { white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; background: var(--panel); border: 1px solid var(--line); color: var(--text); border-radius: 999px; padding: 0.5rem 0.95rem; font-size: 0.88rem; font-weight: 600; flex-shrink: 0; transition: all 0.15s; }
+.sit-chip:hover { border-color: var(--accent); }
+.sit-chip.active { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+
+.facet-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.facet-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; min-width: 52px; }
+.facet-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.facet-pill { display: inline-flex; align-items: center; gap: 5px; background: transparent; border: 1px solid var(--line); color: var(--muted); border-radius: 999px; padding: 0.34rem 0.7rem; font-size: 0.8rem; font-weight: 600; transition: all 0.15s; }
+.facet-pill:hover { color: var(--text); border-color: var(--accent); }
+.facet-pill.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+.facet-pill.active .track-chip-icon { color: var(--accent); }
+
+.rail { margin-bottom: 10px; }
+.rail-head { display: flex; align-items: baseline; justify-content: space-between; margin: 18px 0 10px; }
+.rail-title { font-size: 1.1rem; margin: 0; display: inline-flex; align-items: center; gap: 8px; }
+.rail-track { display: flex; gap: 14px; overflow-x: auto; padding: 2px 2px 12px; scroll-snap-type: x mandatory; }
+.rail-track::-webkit-scrollbar { height: 6px; }
+.rail-track::-webkit-scrollbar-thumb { background: var(--line); border-radius: 999px; }
+.rail-track .pcard { min-width: 246px; max-width: 246px; scroll-snap-align: start; }
+
+.pcard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.pcard { display: flex; flex-direction: column; text-align: left; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; color: var(--text); box-shadow: var(--shadow); transition: transform 0.1s, box-shadow 0.2s; }
+.pcard:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.pcard-cover { position: relative; }
+.pcard-cover-grad { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,16,32,0.15), transparent 40%, rgba(11,16,32,0.25)); }
+.pcard-situation { position: absolute; top: 9px; left: 9px; background: rgba(255,255,255,0.94); color: #16181d; font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 999px; backdrop-filter: blur(4px); }
+.pcard-cleared { position: absolute; top: 9px; right: 9px; width: 22px; height: 22px; display: grid; place-items: center; background: var(--good); color: #fff; border-radius: 50%; font-size: 0.7rem; font-weight: 800; }
+.pcard-body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.pcard-level { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gold); }
+.pcard-text { font-size: 0.92rem; line-height: 1.45; margin: 0; flex: 1; }
+.pcard-cta { color: var(--accent); font-weight: 700; font-size: 0.86rem; }
+.practice-empty { padding: 20px 0; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 720px) {
   .topnav { display: none; }

@@ -4,60 +4,136 @@ import { CHALLENGES } from "../data/challenges";
 import { computeStats } from "../lib/stats";
 import { SceneMedia } from "../components/SceneMedia";
 import { WarmUpBanner } from "../components/WarmUpBanner";
-import { TRACKS, tracksFor, type TrackId } from "../lib/tracks";
+import { TRACKS, tracksFor, challengesInTrack, type TrackId } from "../lib/tracks";
+import { SITUATIONS, situationOf, levelOf, LEVELS, type Situation } from "../lib/facets";
+import type { Challenge, RoleLevel } from "../types";
 
 export function LibraryScreen() {
   const { t, locale, attempts, go, route } = useApp();
   const stats = computeStats(attempts);
+
   const initialTrack = (route.name === "library" && route.track ? route.track : "all") as TrackId | "all";
   const [track, setTrack] = useState<TrackId | "all">(initialTrack);
+  const [situation, setSituation] = useState<Situation | "all">("all");
+  const [level, setLevel] = useState<RoleLevel | "all">("all");
+  const [query, setQuery] = useState("");
 
-  const list = useMemo(
-    () => CHALLENGES.filter((c) => track === "all" || tracksFor(c).includes(track)),
-    [track]
+  const q = query.trim().toLowerCase();
+  const filtered = useMemo(
+    () =>
+      CHALLENGES.filter(
+        (c) =>
+          (track === "all" || tracksFor(c).includes(track)) &&
+          (situation === "all" || situationOf(c) === situation) &&
+          (level === "all" || levelOf(c.difficulty) === level) &&
+          (q === "" || (c.scenario[locale] ?? "").toLowerCase().includes(q))
+      ),
+    [track, situation, level, q, locale]
   );
 
+  const noFilters = track === "all" && situation === "all" && level === "all" && q === "";
+
+  function card(c: Challenge) {
+    return (
+      <button key={c.id} className="pcard" onClick={() => go({ name: "scenario", challengeId: c.id })}>
+        <div className="pcard-cover">
+          <SceneMedia scene={c.media.scene} alt={c.media.alt[locale] ?? ""} />
+          <div className="pcard-cover-grad" />
+          <span className="pcard-situation">{t(`situation.${situationOf(c)}`)}</span>
+          {stats.clearedIds.has(c.id) && <span className="pcard-cleared">✓</span>}
+        </div>
+        <div className="pcard-body">
+          <span className="pcard-level">{t(`lvl.${levelOf(c.difficulty)}`)}</span>
+          <p className="pcard-text">{trim(c.scenario[locale], 110)}</p>
+          <span className="pcard-cta">{t("library.start")} →</span>
+        </div>
+      </button>
+    );
+  }
+
   return (
-    <div className="page library">
+    <div className="page practice">
       <div className="hero">
         <span className="eyebrow gold">{t("library.eyebrow")}</span>
         <h1>{t("library.title")}</h1>
         <p className="muted">{t("library.subtitle")}</p>
       </div>
 
-      <div className="track-filter">
-        <button className={`track-pill ${track === "all" ? "active" : ""}`} onClick={() => setTrack("all")}>
+      <input
+        className="practice-search"
+        placeholder={"🔍 " + t("library.search")}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+
+      {/* Situation-first chips */}
+      <div className="chip-scroll">
+        <button className={`sit-chip ${situation === "all" ? "active" : ""}`} onClick={() => setSituation("all")}>
           {t("library.all")}
         </button>
-        {TRACKS.map((tr) => (
+        {SITUATIONS.map((s) => (
           <button
-            key={tr.id}
-            className={`track-pill ${track === tr.id ? "active" : ""}`}
-            onClick={() => setTrack(tr.id)}
+            key={s.id}
+            className={`sit-chip ${situation === s.id ? "active" : ""}`}
+            onClick={() => setSituation((cur) => (cur === s.id ? "all" : s.id))}
           >
-            <span className="track-chip-icon">{tr.icon}</span> {t(`track.${tr.id}`)}
+            <span>{s.icon}</span> {t(`situation.${s.id}`)}
           </button>
         ))}
       </div>
 
-      {(track === "all" || track === "pressure") && <WarmUpBanner />}
-
-      <div className="card-grid">
-        {list.map((c) => (
-          <button key={c.id} className="ch-card" onClick={() => go({ name: "scenario", challengeId: c.id })}>
-            <div className="ch-media">
-              <SceneMedia scene={c.media.scene} alt={c.media.alt[locale] ?? ""} />
-              {stats.clearedIds.has(c.id) && <span className="cleared-badge">✓ {t("library.cleared")}</span>}
-              <span className={`tile-diff d${c.difficulty}`}>{t(`diff.${c.difficulty}`)}</span>
-            </div>
-            <div className="ch-body">
-              <div className="ch-cat">{t(`cat.${c.category}`)}</div>
-              <p className="ch-scenario">{trim(c.scenario[locale], 116)}</p>
-              <span className="ch-cta">{t("library.start")} →</span>
-            </div>
+      {/* Facets: level + track */}
+      <div className="facet-row">
+        <span className="facet-label">{t("facet.level")}</span>
+        <div className="facet-pills">
+          <button className={`facet-pill ${level === "all" ? "active" : ""}`} onClick={() => setLevel("all")}>
+            {t("library.all")}
           </button>
-        ))}
+          {LEVELS.map((l) => (
+            <button key={l} className={`facet-pill ${level === l ? "active" : ""}`} onClick={() => setLevel(l)}>
+              {t(`lvl.${l}`)}
+            </button>
+          ))}
+        </div>
       </div>
+      <div className="facet-row">
+        <span className="facet-label">{t("facet.track")}</span>
+        <div className="facet-pills">
+          <button className={`facet-pill ${track === "all" ? "active" : ""}`} onClick={() => setTrack("all")}>
+            {t("library.all")}
+          </button>
+          {TRACKS.map((tr) => (
+            <button key={tr.id} className={`facet-pill ${track === tr.id ? "active" : ""}`} onClick={() => setTrack(tr.id)}>
+              <span className="track-chip-icon">{tr.icon}</span> {t(`track.${tr.id}`)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <WarmUpBanner />
+
+      {noFilters ? (
+        // Thematic rails when nothing is filtered
+        TRACKS.map((tr) => {
+          const items = challengesInTrack(tr.id);
+          if (items.length === 0) return null;
+          return (
+            <section key={tr.id} className="rail">
+              <div className="rail-head">
+                <h2 className="rail-title">
+                  <span className="track-chip-icon">{tr.icon}</span> {t(`track.${tr.id}`)}
+                </h2>
+                <button className="link-btn" onClick={() => setTrack(tr.id)}>{t("home.seeAll")} →</button>
+              </div>
+              <div className="rail-track">{items.map(card)}</div>
+            </section>
+          );
+        })
+      ) : filtered.length === 0 ? (
+        <p className="muted practice-empty">{t("library.noResults")}</p>
+      ) : (
+        <div className="pcard-grid">{filtered.map(card)}</div>
+      )}
     </div>
   );
 }
