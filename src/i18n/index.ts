@@ -164,6 +164,12 @@ const en: Dict = {
   "admin.count": "responses",
   "admin.user": "User",
   "admin.when": "When",
+  "admin.allUsers": "All users",
+  "admin.users": "users",
+  "admin.avg": "avg",
+  "admin.searchUser": "Search by name",
+  "admin.input": "Input",
+  "admin.scoredBy": "Scored by",
 };
 
 const de: Dict = {
@@ -322,6 +328,12 @@ const de: Dict = {
   "admin.count": "Antworten",
   "admin.user": "Nutzer",
   "admin.when": "Wann",
+  "admin.allUsers": "Alle Nutzer",
+  "admin.users": "Nutzer",
+  "admin.avg": "Ø",
+  "admin.searchUser": "Nach Namen suchen",
+  "admin.input": "Eingabe",
+  "admin.scoredBy": "Bewertet von",
 };
 
 const esES: Dict = {
@@ -480,6 +492,12 @@ const esES: Dict = {
   "admin.count": "respuestas",
   "admin.user": "Usuario",
   "admin.when": "Cuándo",
+  "admin.allUsers": "Todos los usuarios",
+  "admin.users": "usuarios",
+  "admin.avg": "media",
+  "admin.searchUser": "Buscar por nombre",
+  "admin.input": "Entrada",
+  "admin.scoredBy": "Evaluado por",
 };
 
 const dicts: Record<Locale, Dict> = { en, de, "es-ES": esES };

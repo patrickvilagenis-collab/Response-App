@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import type { Attempt, Locale, Profile, Settings } from "../types";
 import { storage } from "../lib/storage";
 import { translator } from "../i18n";
+import { getChallenge } from "../data/challenges";
 
 export type Route =
   | { name: "login" }
@@ -105,14 +106,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           user: profile?.displayName ?? "anon",
+          profileId: a.profileId,
           challengeId: a.challengeId,
           category: a.category,
+          type: a.type,
           difficulty: a.difficulty,
           locale: a.locale,
           inputMode: a.inputMode,
+          scenario: getChallenge(a.challengeId)?.scenario[a.locale] ?? "",
           transcript: a.transcript,
           final: a.evaluation.final,
+          band: a.evaluation.band,
+          source: a.evaluation.source,
+          speedBonus: a.evaluation.speedBonus,
           responseTimeSec: a.responseTimeSec,
+          dims: {
+            content: a.evaluation.dimensions.content.score,
+            delivery: a.evaluation.dimensions.delivery.score,
+            time: a.evaluation.dimensions.time.score,
+          },
         }),
       }).catch(() => {});
     },
