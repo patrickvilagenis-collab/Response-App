@@ -13,10 +13,23 @@ const NAV: { name: Route["name"]; key: string }[] = [
 export function AppShell({ children }: { children: ReactNode }) {
   const { t, route, go, logout, profile } = useApp();
   const active = route.name;
-  const focus = active === "scenario" || active === "response" || active === "results" || active === "warmup";
+  // Dark "focus" theme on the spotlight screens; full immersion (no chrome) on
+  // the live moment (scenario, response, warm-up).
+  const dark = active === "scenario" || active === "response" || active === "results" || active === "warmup";
+  const immersive = active === "scenario" || active === "response" || active === "warmup";
+
+  if (immersive) {
+    return (
+      <div className="shell focus-mode immersive-shell">
+        <div className="spotlight-beam" aria-hidden="true" />
+        <button className="focus-exit" onClick={() => go({ name: "library" })} aria-label="Exit">✕</button>
+        <main className="content immersive">{children}</main>
+      </div>
+    );
+  }
 
   return (
-    <div className={`shell${focus ? " focus-mode" : ""}`}>
+    <div className={`shell${dark ? " focus-mode" : ""}`}>
       <header className="topbar">
         <button className="brand" onClick={() => go({ name: "home" })}>
           <span className="brand-mark sm">◐</span>

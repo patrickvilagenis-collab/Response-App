@@ -23,20 +23,11 @@ export function ScenarioScreen({ challengeId }: { challengeId: string }) {
 
   return (
     <div className="page scenario">
-      <button className="back" onClick={() => go({ name: "library" })}>
-        ← {t("scenario.back")}
-      </button>
-
       <div className="scenario-stage">
-        <div className="scenario-media">
+        <div className={`scenario-media reveal ${stage >= 0 ? "in" : ""}`}>
           <SceneMedia scene={ch.media.scene} alt={ch.media.alt[locale] ?? ""} />
+          <div className="scenario-media-glow" aria-hidden="true" />
           {stage < 1 && <div className="media-loading">{t("scenario.loadingMedia")}</div>}
-        </div>
-
-        <div className="tagrow center">
-          <span className="tag">{t(`cat.${ch.category}`)}</span>
-          <span className="tag ghost">{t(`type.${ch.type}`)}</span>
-          <span className={`tag diff d${ch.difficulty}`}>{t(`diff.${ch.difficulty}`)}</span>
         </div>
 
         <div className={`role-caption reveal ${stage >= 1 ? "in" : ""}`}>
@@ -46,7 +37,7 @@ export function ScenarioScreen({ challengeId }: { challengeId: string }) {
 
         <p className={`scenario-text reveal ${stage >= 2 ? "in" : ""}`}>{ch.scenario[locale]}</p>
 
-        <div className={`reveal ${stage >= 3 ? "in" : ""}`}>
+        <div className={`scenario-launch reveal ${stage >= 3 ? "in" : ""}`}>
           <p className="muted small center read-hint">{t("scenario.readFirst")}</p>
           <button
             className="btn play"

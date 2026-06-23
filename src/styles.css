@@ -514,6 +514,37 @@ input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 .pcard-cta { color: var(--accent); font-weight: 700; font-size: 0.86rem; }
 .practice-empty { padding: 20px 0; }
 
+/* ---------- Focus / spotlight polish (sprint 4) ---------- */
+.immersive-shell { min-height: 100%; position: relative; overflow-x: hidden; }
+.spotlight-beam { position: fixed; top: -40px; left: 50%; transform: translateX(-50%); width: min(720px, 96vw); height: 380px; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse 60% 100% at 50% 0%, rgba(124, 140, 255, 0.22), rgba(124,140,255,0.06) 45%, transparent 72%); }
+.focus-exit { position: fixed; top: 16px; left: 16px; z-index: 6; width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14); color: #eef1f8; font-size: 0.95rem; display: grid; place-items: center; transition: background 0.2s; }
+.focus-exit:hover { background: rgba(255,255,255,0.16); }
+.content.immersive { position: relative; z-index: 1; max-width: 660px; margin: 0 auto; padding: 60px 22px 56px; min-height: 100%; }
+
+/* Scenario — cinematic */
+.scenario-stage { max-width: 620px; margin: 0 auto; text-align: center; }
+.scenario-media { position: relative; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid rgba(255,255,255,0.08); box-shadow: var(--shadow-lg); margin-bottom: 20px; }
+.scenario-media-glow { position: absolute; inset: 0; box-shadow: inset 0 0 90px rgba(99,102,241,0.28); pointer-events: none; }
+.role-caption { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); text-align: left; max-width: 480px; margin: 0 auto 4px; }
+.scenario-text { font-family: var(--font-display); font-size: 1.75rem; line-height: 1.4; font-weight: 500; letter-spacing: -0.01em; margin: 18px auto; max-width: 560px; }
+.scenario-launch { margin-top: 6px; }
+.btn.play { max-width: 420px; margin: 0 auto; box-shadow: 0 10px 30px rgba(99,102,241,0.45); animation: playPulse 2.4s ease-in-out infinite; }
+.btn.play:disabled { animation: none; }
+@keyframes playPulse { 0%, 100% { box-shadow: 0 10px 30px rgba(99,102,241,0.4); } 50% { box-shadow: 0 10px 42px rgba(99,102,241,0.7); } }
+
+/* Response — timer as hero */
+.response { max-width: 520px; }
+.response-scenario { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); font-style: italic; color: var(--muted); font-size: 0.95rem; }
+.timer-ring { width: 168px; height: 168px; }
+.timer-num { font-family: var(--font-display); }
+
+/* Results — score under the spotlight */
+.result-hero { background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)); border-color: rgba(255,255,255,0.1); }
+.big-score { font-family: var(--font-display); font-size: 4.6rem; }
+.result-hero::before { background: radial-gradient(420px 220px at 50% -25%, var(--band, var(--accent)), transparent 70%); opacity: 0.22; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 720px) {
   .topnav { display: none; }
