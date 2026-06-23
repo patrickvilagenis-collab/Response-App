@@ -8,7 +8,7 @@ import { getChallenge } from "../data/challenges";
 export type Route =
   | { name: "login" }
   | { name: "home" }
-  | { name: "library" }
+  | { name: "library"; track?: string }
   | { name: "scenario"; challengeId: string }
   | { name: "response"; challengeId: string }
   | { name: "results"; attemptId: string }

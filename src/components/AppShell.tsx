@@ -13,9 +13,10 @@ const NAV: { name: Route["name"]; key: string }[] = [
 export function AppShell({ children }: { children: ReactNode }) {
   const { t, route, go, logout, profile } = useApp();
   const active = route.name;
+  const focus = active === "scenario" || active === "response" || active === "results" || active === "warmup";
 
   return (
-    <div className="shell">
+    <div className={`shell${focus ? " focus-mode" : ""}`}>
       <header className="topbar">
         <button className="brand" onClick={() => go({ name: "home" })}>
           <span className="brand-mark sm">◐</span>
