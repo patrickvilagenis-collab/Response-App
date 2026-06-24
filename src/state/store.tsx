@@ -27,6 +27,7 @@ interface AppState {
   lastAttempt: Attempt | null;
   t: (key: string) => string;
   login: (profile: Profile) => void;
+  loginAccount: (email: string, name: string) => void;
   updateProfile: (patch: Partial<Profile>) => void;
   logout: () => void;
   setLocale: (locale: Locale) => void;
@@ -46,20 +47,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [route, setRoute] = useState<Route>({ name: "login" });
   const [lastAttempt, setLastAttempt] = useState<Attempt | null>(null);
 
-  // Restore session on first load.
-  useEffect(() => {
-    const id = storage.getCurrentProfileId();
-    if (id) {
-      const p = storage.getProfiles().find((x) => x.id === id);
-      if (p) {
-        setProfile(p);
-        setLocaleState(p.language);
-        setAttempts(storage.getAttempts(p.id));
-        setRoute(p.onboarded ? { name: "home" } : { name: "onboarding" });
-      }
-    }
-  }, []);
-
   const t = useMemo(() => translator(locale), [locale]);
 
   const login = useCallback((p: Profile) => {
@@ -69,6 +56,72 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setLocaleState(p.language);
     setAttempts(storage.getAttempts(p.id));
     setRoute(p.onboarded ? { name: "home" } : { name: "onboarding" });
+  }, []);
+
+  // Log in via a registered account (after email activation).
+  const loginAccount = useCallback(
+    (email: string, name: string) => {
+      const id = "acct_" + email;
+      const existing = storage.getProfiles().find((p) => p.id === id || p.email === email);
+      const p: Profile =
+        existing
+          ? { ...existing, email, displayName: existing.displayName || name }
+          : {
+              id,
+              displayName: name || email.split("@")[0],
+              email,
+              language: locale,
+              inputDefault: "voice",
+              createdAt: new Date().toISOString(),
+            };
+      login(p);
+      void fetch("/api/seen", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email }),
+      }).catch(() => {});
+    },
+    [login, locale]
+  );
+
+  // On first load: complete email activation (if ?activate=token) or restore session.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("activate");
+    const restore = () => {
+      const id = storage.getCurrentProfileId();
+      if (!id) return;
+      const p = storage.getProfiles().find((x) => x.id === id);
+      if (!p) return;
+      setProfile(p);
+      setLocaleState(p.language);
+      setAttempts(storage.getAttempts(p.id));
+      setRoute(p.onboarded ? { name: "home" } : { name: "onboarding" });
+      if (p.email) {
+        void fetch("/api/seen", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ email: p.email }),
+        }).catch(() => {});
+      }
+    };
+    if (token) {
+      window.history.replaceState({}, "", window.location.pathname);
+      fetch("/api/activate", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ token }),
+      })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => {
+          if (d?.ok) loginAccount(d.email, d.name);
+          else restore();
+        })
+        .catch(restore);
+      return;
+    }
+    restore();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Persist profile changes without navigating (settings, onboarding steps).
@@ -162,6 +215,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     lastAttempt,
     t,
     login,
+    loginAccount,
     updateProfile,
     logout,
     setLocale,

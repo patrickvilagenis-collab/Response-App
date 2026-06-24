@@ -403,6 +403,26 @@ input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 .admin-user-avg { margin-left: auto; font-size: 1.7rem; font-weight: 800; }
 .admin-cat-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
 
+/* team tabs + users */
+.admin-tabs { display: flex; gap: 6px; margin: 6px 0 16px; border-bottom: 1px solid var(--line); }
+.admin-tab { background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted); font-weight: 600; font-size: 0.95rem; padding: 0.5rem 0.2rem; margin-right: 14px; display: inline-flex; align-items: center; gap: 7px; }
+.admin-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.admin-tab-count { background: var(--accent-soft); color: var(--accent); font-size: 0.72rem; font-weight: 700; padding: 0.05rem 0.4rem; border-radius: 999px; }
+.user-row { display: flex; align-items: center; gap: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px 14px; }
+.user-row-meta { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+.user-row-meta strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-row-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.status-badge { font-size: 0.68rem; font-weight: 700; padding: 0.16rem 0.5rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.04em; }
+.status-badge.active { background: rgba(22,163,74,0.14); color: var(--good); }
+.status-badge.pending { background: rgba(201,138,22,0.16); color: var(--warn); }
+
+/* login: guest + email */
+.login-divider { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 0.78rem; margin: 4px 0; }
+.login-divider::before, .login-divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.login-sent { text-align: center; display: grid; gap: 12px; margin: 18px 0 8px; }
+.login-sent-icon { font-size: 2.2rem; }
+.login-sent p { color: var(--muted); }
+
 /* team dashboard */
 .team-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 6px 0 16px; }
 .team-kpi { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; text-align: center; box-shadow: var(--shadow); }

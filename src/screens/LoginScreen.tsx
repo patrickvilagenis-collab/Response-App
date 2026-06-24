@@ -1,32 +1,23 @@
 import { useState } from "react";
 import { useApp } from "../state/store";
-import { storage, hashPassword, uid } from "../lib/storage";
+import { storage, uid } from "../lib/storage";
 import { LanguagePicker } from "../components/LanguagePicker";
 import type { Profile } from "../types";
+
+type MagicState = "idle" | "sending" | "sent" | "devlink" | "error" | "notConfigured";
 
 export function LoginScreen() {
   const { t, locale, login } = useApp();
   const profiles = storage.getProfiles();
   const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
+  const [state, setState] = useState<MagicState>("idle");
+  const [devLink, setDevLink] = useState("");
 
-  function createOrLogin() {
-    const trimmed = name.trim();
-    if (!trimmed) return;
-    const existing = profiles.find((p) => p.displayName.toLowerCase() === trimmed.toLowerCase());
-    if (existing) {
-      if (existing.passwordHash && existing.passwordHash !== hashPassword(password)) {
-        setError(t("login.wrongPassword"));
-        return;
-      }
-      login({ ...existing, language: locale });
-      return;
-    }
+  function guest() {
     const profile: Profile = {
-      id: uid("p_"),
-      displayName: trimmed,
-      passwordHash: password ? hashPassword(password) : undefined,
+      id: uid("g_"),
+      displayName: name.trim() || t("login.guestName"),
       language: locale,
       inputDefault: "voice",
       createdAt: new Date().toISOString(),
@@ -35,12 +26,39 @@ export function LoginScreen() {
   }
 
   function quickLogin(p: Profile) {
-    if (p.passwordHash) {
-      setName(p.displayName);
-      setError("");
+    login({ ...p, language: locale });
+  }
+
+  async function sendMagic() {
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) {
+      setState("error");
       return;
     }
-    login({ ...p, language: locale });
+    setState("sending");
+    try {
+      const r = await fetch("/api/magic", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), name: name.trim() }),
+      });
+      if (r.status === 503) {
+        setState("notConfigured");
+        return;
+      }
+      if (!r.ok) {
+        setState("error");
+        return;
+      }
+      const d = await r.json();
+      if (d.link) {
+        setDevLink(d.link);
+        setState("devlink");
+      } else {
+        setState("sent");
+      }
+    } catch {
+      setState("error");
+    }
   }
 
   return (
@@ -61,44 +79,71 @@ export function LoginScreen() {
           <h1>{t("app.name")}</h1>
           <p className="muted">{t("login.title")}</p>
 
-        <div className="login-form">
-          <label>
-            {t("login.name")}
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Alex"
-              autoFocus
-            />
-          </label>
-          <label>
-            {t("login.password")}
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && createOrLogin()}
-            />
-          </label>
-          {error && <div className="error">{error}</div>}
-          <button className="btn primary block" onClick={createOrLogin} disabled={!name.trim()}>
-            {t("login.start")}
-          </button>
-        </div>
-
-        {profiles.length > 0 && (
-          <div className="profile-list">
-            <span className="muted small">{t("login.existing")}</span>
-            <div className="chips">
-              {profiles.map((p) => (
-                <button key={p.id} className="chip" onClick={() => quickLogin(p)}>
-                  {p.passwordHash ? "🔒 " : ""}
-                  {p.displayName}
-                </button>
-              ))}
+          {state === "sent" || state === "devlink" ? (
+            <div className="login-sent">
+              <div className="login-sent-icon">✉️</div>
+              {state === "sent" ? (
+                <p>
+                  {t("login.sent")} <strong>{email}</strong>. {t("login.checkEmail")}
+                </p>
+              ) : (
+                <>
+                  <p>{t("login.devLink")}</p>
+                  <a className="btn primary block" href={devLink}>
+                    {t("login.activateNow")} →
+                  </a>
+                </>
+              )}
+              <button className="btn ghost block" onClick={() => setState("idle")}>
+                ← {t("login.back")}
+              </button>
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="login-form">
+              <label>
+                {t("login.name")}
+                <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Alex" autoFocus />
+              </label>
+
+              <button className="btn primary block" onClick={guest}>
+                {t("login.guest")}
+              </button>
+
+              <div className="login-divider">
+                <span>{t("login.orEmail")}</span>
+              </div>
+
+              <label>
+                {t("login.email")}
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && sendMagic()}
+                  placeholder="you@work.com"
+                />
+              </label>
+              {state === "error" && <div className="error">{t("login.emailInvalid")}</div>}
+              {state === "notConfigured" && <div className="notice">{t("login.notConfigured")}</div>}
+              <button className="btn ghost block" onClick={sendMagic} disabled={state === "sending"}>
+                {state === "sending" ? "…" : "✉️ " + t("login.sendLink")}
+              </button>
+            </div>
+          )}
+
+          {profiles.length > 0 && state === "idle" && (
+            <div className="profile-list">
+              <span className="muted small">{t("login.existing")}</span>
+              <div className="chips">
+                {profiles.map((p) => (
+                  <button key={p.id} className="chip" onClick={() => quickLogin(p)}>
+                    {p.email ? "✉ " : "🙂 "}
+                    {p.displayName}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <p className="muted small center">{t("login.subtitle")}</p>
         </div>
       </div>
@@ -126,18 +171,14 @@ function SpotlightHero() {
       </defs>
       <rect width="420" height="520" fill="#0a1126" />
       <rect width="420" height="520" fill="url(#sp-glow)" />
-      {/* spotlight cone */}
       <polygon points="210,-20 120,430 300,430" fill="url(#sp-cone)" />
-      {/* stage floor */}
       <rect y="400" width="420" height="120" fill="url(#sp-floor)" />
       <ellipse cx="210" cy="430" rx="150" ry="26" fill="#6f9bff" opacity="0.16" />
-      {/* audience silhouettes */}
       <g fill="#0c1430" opacity="0.9">
         <circle cx="40" cy="470" r="18" /><circle cx="90" cy="478" r="20" />
         <circle cx="330" cy="478" r="20" /><circle cx="382" cy="470" r="18" />
         <rect x="20" y="486" width="120" height="40" /><rect x="300" y="486" width="120" height="40" />
       </g>
-      {/* speaker under the spotlight */}
       <g transform="translate(210 300)">
         <ellipse cx="0" cy="128" rx="46" ry="12" fill="#000" opacity="0.3" />
         <path d="M -40 126 Q -40 50 0 50 Q 40 50 40 126 Z" fill="#27406e" />

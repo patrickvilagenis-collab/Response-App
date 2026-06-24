@@ -124,6 +124,7 @@ export interface Profile {
   language: Locale;
   inputDefault: "voice" | "text";
   createdAt: string;
+  email?: string; // set when the profile is tied to a registered account
   // Set during the 3-tap onboarding; personalizes the home.
   onboarded?: boolean;
   roleLevel?: RoleLevel;

@@ -77,6 +77,38 @@ challenge, score, time and full transcript.
 - This means transcripts are stored on the server. Tell your users if relevant —
   it changes the "data stays on your device" default.
 
+## Optional: accounts + activation email
+
+Anyone can use the app instantly as a **guest** (no setup). If you also want
+people to **register with their email** and receive an **activation link** — and
+to see active users in the Team dashboard — it works on the **same KV store** you
+already created (no per-user setup, nothing manual per person).
+
+- **With zero extra setup:** registration already works. Because no email
+  provider is configured, the app shows the user their activation link directly
+  on screen so they can activate in one click. Accounts and "active users" are
+  tracked in the Team dashboard → **Users** tab.
+
+- **To actually send the activation email** (one-time, not per user): add a
+  single secret in Vercel → Settings → Environment Variables:
+
+  | Name | Value |
+  |---|---|
+  | `RESEND_API_KEY` | an API key from <https://resend.com> (free tier) |
+  | `MAIL_FROM` *(optional)* | e.g. `Response <noreply@yourdomain.com>` |
+
+  Then **Redeploy**. From then on, every registration sends a real activation
+  email automatically — you never touch the platform again per user.
+
+  > Email note: to send to *any* address, Resend (like every email provider)
+  > needs you to **verify a sending domain once** (a couple of DNS records). It's
+  > a one-time step, not per user. Until then, Resend test mode only emails your
+  > own address — which is why the app falls back to showing the activation link
+  > on screen so nobody is ever blocked.
+
+The Team dashboard's **Users** tab shows everyone who registered, who's
+**active** vs **pending**, and when they were last seen.
+
 ## Other hosts
 
 The same pattern works on **Cloudflare Pages** or **Netlify** — move the proxy

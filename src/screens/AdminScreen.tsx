@@ -76,11 +76,22 @@ interface UserGroup {
   city?: string;
 }
 
+interface AccountUser {
+  email: string;
+  name: string;
+  status: string;
+  createdAt?: string;
+  activatedAt?: string;
+  lastSeen?: string;
+}
+
 export function AdminScreen() {
   const { t, go } = useApp();
   const [pw, setPw] = useState("");
   const [state, setState] = useState<State>("locked");
   const [list, setList] = useState<LoggedAttempt[]>([]);
+  const [users, setUsers] = useState<AccountUser[]>([]);
+  const [tab, setTab] = useState<"responses" | "users">("responses");
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
 
@@ -96,6 +107,15 @@ export function AdminScreen() {
       const d = await r.json();
       if (!d.configured) return setState("notConfigured");
       setList(d.attempts ?? []);
+      // Also load registered accounts (best-effort).
+      fetch("/api/users", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ password: pw }),
+      })
+        .then((u) => (u.ok ? u.json() : null))
+        .then((ud) => ud?.users && setUsers(ud.users))
+        .catch(() => {});
       setState("ok");
     } catch {
       setState("wrong");
@@ -215,9 +235,49 @@ export function AdminScreen() {
   }
 
   // ---- User list ----
+  const activeUsers = users.filter((u) => u.status === "active").length;
   return (
     <div className="page admin">
       <Header t={t} go={go} />
+
+      <div className="admin-tabs">
+        <button className={`admin-tab ${tab === "responses" ? "active" : ""}`} onClick={() => setTab("responses")}>
+          {t("team.responses")}
+        </button>
+        <button className={`admin-tab ${tab === "users" ? "active" : ""}`} onClick={() => setTab("users")}>
+          {t("team.users")} {users.length > 0 && <span className="admin-tab-count">{users.length}</span>}
+        </button>
+      </div>
+
+      {tab === "users" ? (
+        <>
+          <div className="team-kpis">
+            <div className="team-kpi"><span className="team-kpi-num">{users.length}</span><span className="team-kpi-label">{t("team.registered")}</span></div>
+            <div className="team-kpi"><span className="team-kpi-num" style={{ color: "var(--good)" }}>{activeUsers}</span><span className="team-kpi-label">{t("team.active")}</span></div>
+            <div className="team-kpi"><span className="team-kpi-num" style={{ color: "var(--warn)" }}>{users.length - activeUsers}</span><span className="team-kpi-label">{t("team.pending")}</span></div>
+          </div>
+          {users.length === 0 ? (
+            <p className="muted">{t("team.noUsers")}</p>
+          ) : (
+            <div className="admin-list">
+              {users.map((u) => (
+                <div key={u.email} className="user-row">
+                  <div className="admin-avatar">{(u.name || u.email).charAt(0).toUpperCase()}</div>
+                  <div className="user-row-meta">
+                    <strong>{u.name}</strong>
+                    <span className="muted small">{u.email}</span>
+                  </div>
+                  <div className="user-row-right">
+                    <span className={`status-badge ${u.status}`}>{u.status === "active" ? t("team.statusActive") : t("team.statusPending")}</span>
+                    <span className="muted small">{u.lastSeen ? new Date(u.lastSeen).toLocaleDateString() : "—"}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      ) : (
+      <>
       <div className="admin-toolbar">
         <input
           className="admin-search"
@@ -267,6 +327,8 @@ export function AdminScreen() {
             </button>
           ))}
         </div>
+      )}
+      </>
       )}
     </div>
   );
