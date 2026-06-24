@@ -1,7 +1,7 @@
 // Request a password reset: emails a reset link if the account exists.
 // Always returns ok (so it doesn't reveal whether an email is registered).
 // Body: { email }. Returns { ok, emailed, link? }.
-import { store, cmd, validEmail, baseUrl, readBody, sendResetEmail, uuid } from "./_store.js";
+import { store, cmd, validEmail, baseUrl, readBody, sendResetEmail, uuid, clientIp, rateLimit } from "./_store.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -16,6 +16,12 @@ export default async function handler(req, res) {
   try {
     const email = String(readBody(req).email || "").trim().toLowerCase();
     if (!validEmail(email)) return res.status(400).json({ error: "invalid_email" });
+
+    const ip = clientIp(req);
+    const ipLimit = await rateLimit(s, "reset:ip:" + ip, 15, 3600);
+    if (!ipLimit.ok) return res.status(429).json({ error: "too_many", retryAfter: ipLimit.retryAfter });
+    const emailLimit = await rateLimit(s, "reset:email:" + email, 5, 3600);
+    if (!emailLimit.ok) return res.status(429).json({ error: "too_many", retryAfter: emailLimit.retryAfter });
 
     const raw = (await cmd(s, ["HGET", "ra:users", email]))?.result;
     if (!raw) {

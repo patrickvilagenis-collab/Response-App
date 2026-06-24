@@ -34,6 +34,10 @@ export default async function handler(req, res) {
       }
     }
     if (!user) return res.status(404).json({ error: "invalid_token" });
+    // Only owner-approved accounts can be activated.
+    if (user.status !== "approved" && user.status !== "active") {
+      return res.status(403).json({ error: "not_approved" });
+    }
 
     const { salt, hash } = makeHash(password);
     const now = new Date().toISOString();

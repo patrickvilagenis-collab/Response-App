@@ -36,6 +36,53 @@ export function readBody(req) {
   return typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
 }
 
+// Best-effort client IP for rate limiting (Vercel sets x-forwarded-for).
+export function clientIp(req) {
+  const xf = req.headers["x-forwarded-for"];
+  if (typeof xf === "string" && xf) return xf.split(",")[0].trim();
+  return req.headers["x-real-ip"] || "unknown";
+}
+
+// Fixed-window rate limiter backed by Redis. Returns { ok, retryAfter }.
+// Fails OPEN on any store error so a hiccup never locks real users out.
+export async function rateLimit(s, bucket, max, windowSec) {
+  if (!s) return { ok: true };
+  const key = "rl:" + bucket;
+  try {
+    const n = (await cmd(s, ["INCR", key]))?.result ?? 1;
+    if (n === 1) await cmd(s, ["EXPIRE", key, windowSec]);
+    if (n > max) {
+      const ttl = (await cmd(s, ["TTL", key]))?.result;
+      return { ok: false, retryAfter: ttl > 0 ? ttl : windowSec };
+    }
+    return { ok: true };
+  } catch {
+    return { ok: true };
+  }
+}
+
+// Owner / admin address that approval + notification emails go to.
+export function ownerEmail() {
+  return (process.env.OWNER_EMAIL || "patrickvilagenis@gmail.com").trim().toLowerCase();
+}
+
+// Emails the owner an Approve / Reject decision for a new user or guest.
+export async function sendOwnerApprovalEmail({ kind, name, email, approveLink, rejectLink }) {
+  const who = kind === "guest" ? "guest" : "account";
+  const detail = email ? `${escapeHtml(name || email)} &lt;${escapeHtml(email)}&gt;` : escapeHtml(name || "Someone");
+  const html = `
+    <div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:480px;margin:auto;padding:24px;color:#16181d">
+      <h1 style="font-size:22px;margin:0 0 8px">New ${who} access request</h1>
+      <p style="color:#5b6072;line-height:1.5"><strong>${detail}</strong> is requesting access to Response. Do you want to allow it?</p>
+      <p style="margin:24px 0">
+        <a href="${approveLink}" style="background:#16a34a;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:600;display:inline-block;margin-right:8px">✓ Approve</a>
+        <a href="${rejectLink}" style="background:#ef4444;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:600;display:inline-block">✕ Reject</a>
+      </p>
+      <p style="color:#9aa0b0;font-size:13px">If you didn't expect this, just click Reject (or ignore it).</p>
+    </div>`;
+  return sendMail(ownerEmail(), `Response — approve ${who} access for ${name || email || "a new user"}?`, html);
+}
+
 export async function sendActivationEmail(to, name, link) {
   const html = `
     <div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:480px;margin:auto;padding:24px;color:#16181d">

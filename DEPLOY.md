@@ -111,6 +111,25 @@ manual per person — and you see registered/active users in the Team → Users 
 The Team dashboard's **Users** tab shows everyone who registered, who's
 **active** vs **pending**, and when they were last seen.
 
+### Owner approval for new users (built in)
+
+Every new access request — both **registrations** and **guests** — is held as
+**pending** until the owner approves it. The owner gets an email with
+**Approve / Reject** buttons; only after approving does the user receive their
+activation link (registrations) or get unblocked (guests, whose browser waits
+and continues automatically). Approval emails go to **`OWNER_EMAIL`** (optional
+env var; defaults to the project owner's address). No extra setup is required
+beyond the `RESEND_API_KEY` you already configured for email.
+
+### Anti-abuse / brute force (built in)
+
+Login, registration, password-reset and guest endpoints are **rate-limited**
+per IP and per account (e.g. failed logins are capped at 8 per account / 50 per
+IP every 15 minutes), so someone hammering the form thousands of times is
+blocked with HTTP 429 long before they get anywhere. Limits live in the same KV
+store and **fail open** on a store hiccup so real users are never locked out by
+an outage.
+
 ### Cross-device sync (built in)
 
 Registered accounts also **sync their profile, attempt history and settings**
