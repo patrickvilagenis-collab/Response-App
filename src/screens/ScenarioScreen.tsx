@@ -53,12 +53,19 @@ export function ScenarioScreen({ challengeId }: { challengeId: string }) {
             <div className="tips-panel">
               <h4 className="tips-title">{t("tips.title")}</h4>
               <p className="tips-framework">{t(`tips.fw.${ch.type}`)}</p>
+
               <span className="tips-cover-label">{t("tips.cover")}</span>
               <ul className="tips-points">
                 {ch.keyPoints.map((kp, i) => (
                   <li key={i}>{kp[locale]}</li>
                 ))}
               </ul>
+
+              <span className="tips-cover-label shine">{t("tips.shineLabel")}</span>
+              <p className="tips-line">{t(`tips.shine.${ch.type}`)}</p>
+
+              <span className="tips-cover-label avoid">{t("tips.avoidLabel")}</span>
+              <p className="tips-line">{t(`tips.avoid.${ch.type}`)}</p>
             </div>
           )}
 

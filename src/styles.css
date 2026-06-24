@@ -590,9 +590,12 @@ input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 @keyframes tipsIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 .tips-title { margin: 0 0 8px; font-size: 0.95rem; color: var(--text); }
 .tips-framework { margin: 0 0 12px; font-size: 0.92rem; line-height: 1.5; color: var(--text); }
-.tips-cover-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+.tips-cover-label { display: block; margin-top: 14px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.tips-cover-label.shine { color: #5fd08a; }
+.tips-cover-label.avoid { color: #e6a23c; }
 .tips-points { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 5px; }
 .tips-points li { font-size: 0.9rem; line-height: 1.4; color: var(--text); }
+.tips-line { margin: 6px 0 0; font-size: 0.9rem; line-height: 1.5; color: var(--text); }
 
 /* Response — timer as hero */
 .response { max-width: 520px; }
