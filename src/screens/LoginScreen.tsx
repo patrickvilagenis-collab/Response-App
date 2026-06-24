@@ -83,10 +83,10 @@ export function LoginScreen() {
     setBusy(true);
     setMsg("");
     try {
-      const r = await fetch("/api/guest-request", {
+      const r = await fetch("/api/account", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ guestId: gid, name: name.trim() }),
+        body: JSON.stringify({ action: "guest-request", guestId: gid, name: name.trim() }),
       });
       if (r.status === 429) return setMsg(t("login.tooMany"));
       if (!r.ok) return enterAsGuest(); // 503 / backend hiccup → no gate available
@@ -111,10 +111,10 @@ export function LoginScreen() {
     if (!gid) return;
     const iv = setInterval(async () => {
       try {
-        const r = await fetch("/api/guest-status", {
+        const r = await fetch("/api/account", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ guestId: gid }),
+          body: JSON.stringify({ action: "guest-status", guestId: gid }),
         });
         const d = await r.json();
         if (d.status === "approved") {
@@ -142,10 +142,10 @@ export function LoginScreen() {
     setBusy(true);
     setMsg("");
     try {
-      const r = await fetch("/api/login", {
+      const r = await fetch("/api/account", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), password }),
+        body: JSON.stringify({ action: "login", email: email.trim(), password }),
       });
       if (r.status === 503) return setMsg(t("login.notConfigured"));
       if (r.status === 429) return setMsg(t("login.tooMany"));
@@ -168,10 +168,10 @@ export function LoginScreen() {
     setBusy(true);
     setMsg("");
     try {
-      const r = await fetch("/api/register", {
+      const r = await fetch("/api/account", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), name: name.trim() }),
+        body: JSON.stringify({ action: "register", email: email.trim(), name: name.trim() }),
       });
       if (r.status === 503) return setMsg(t("login.notConfigured"));
       if (r.status === 429) return setMsg(t("login.tooMany"));
@@ -191,10 +191,10 @@ export function LoginScreen() {
     setBusy(true);
     setMsg("");
     try {
-      const r = await fetch("/api/reset-request", {
+      const r = await fetch("/api/account", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email: email.trim() }),
+        body: JSON.stringify({ action: "reset-request", email: email.trim() }),
       });
       if (r.status === 503) return setMsg(t("login.notConfigured"));
       if (r.status === 429) return setMsg(t("login.tooMany"));
@@ -219,13 +219,13 @@ export function LoginScreen() {
     if (password !== confirm) return setMsg(t("login.pwMismatch"));
     setBusy(true);
     setMsg("");
-    const endpoint = setpwKind === "reset" ? "/api/reset" : "/api/activate";
+    const act = setpwKind === "reset" ? "reset" : "activate";
     const tokenVal = setpwKind === "reset" ? resetToken : activateToken;
     try {
-      const r = await fetch(endpoint, {
+      const r = await fetch("/api/account", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ token: tokenVal, password }),
+        body: JSON.stringify({ action: act, token: tokenVal, password }),
       });
       if (r.status === 400) return setMsg(t("login.weakPassword"));
       if (!r.ok) return setMsg(t("login.resetInvalid"));

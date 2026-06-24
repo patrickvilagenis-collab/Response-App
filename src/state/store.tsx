@@ -112,10 +112,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
             };
       login(p);
       void hydrateFromServer(p);
-      void fetch("/api/seen", {
+      void fetch("/api/account", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ action: "seen", email }),
       }).catch(() => {});
     },
     [login, locale, hydrateFromServer]
@@ -138,10 +138,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setRoute(p.onboarded ? { name: "home" } : { name: "onboarding" });
       if (p.email) {
         void hydrateFromServer(p);
-        void fetch("/api/seen", {
+        void fetch("/api/account", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ email: p.email }),
+          body: JSON.stringify({ action: "seen", email: p.email }),
         }).catch(() => {});
       }
     };
