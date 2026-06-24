@@ -85,7 +85,7 @@ export function LoginScreen() {
       if (r.status === 403) return setMsg(t("login.notActivated"));
       if (!r.ok) return setMsg(t("login.badCredentials"));
       const d = await r.json();
-      loginAccount(d.email, d.name);
+      loginAccount(d.email, d.name, d.token);
     } catch {
       setMsg(t("login.badCredentials"));
     } finally {
@@ -164,7 +164,7 @@ export function LoginScreen() {
       if (!r.ok) return setMsg(t("login.resetInvalid"));
       const d = await r.json();
       window.history.replaceState({}, "", window.location.pathname);
-      loginAccount(d.email, d.name);
+      loginAccount(d.email, d.name, d.token);
     } catch {
       setMsg(t("login.resetInvalid"));
     } finally {
