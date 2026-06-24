@@ -26,7 +26,7 @@ export function ScenarioScreen({ challengeId }: { challengeId: string }) {
     <div className="page scenario">
       <div className="scenario-stage">
         <div className={`scenario-media reveal ${stage >= 0 ? "in" : ""}`}>
-          <SceneMedia scene={ch.media.scene} alt={ch.media.alt[locale] ?? ""} />
+          <SceneMedia scene={ch.media.scene} alt={ch.media.alt[locale] ?? ""} seed={ch.id} />
           <div className="scenario-media-glow" aria-hidden="true" />
           {stage < 1 && <div className="media-loading">{t("scenario.loadingMedia")}</div>}
         </div>

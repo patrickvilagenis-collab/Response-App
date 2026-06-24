@@ -6,22 +6,75 @@ import type { SceneKind } from "../types";
 // (offline), we fall back to the inline SVG "scene" which works with no network.
 // Each SVG scene uses a unique gradient id prefix so multiple can coexist.
 
-// Curated Unsplash photo ids per scene kind. Sized + auto-formatted at the CDN.
-const SCENE_PHOTOS: Record<SceneKind, string> = {
-  boardroom: "1431540015161-0bf868a2d407",
-  office_1on1: "1600880292203-757bb62b4baf",
-  client_meeting: "1542744173-8e7e53415bb0",
-  exec_committee: "1521737604893-d14cc237f11d",
-  coaching_room: "1551836022-d5d88e9218df",
-  feedback_report: "1611224923853-80b023f02d71",
-  video_call: "1587825140708-dfaf72ae4b04",
+// A pool of curated Unsplash photo ids per scene kind. A per-scenario seed picks
+// one deterministically, so different scenarios that share a setting still get
+// different photos (variety) while each scenario is stable across renders.
+const SCENE_PHOTOS: Record<SceneKind, string[]> = {
+  boardroom: [
+    "1431540015161-0bf868a2d407",
+    "1497366216548-37526070297c",
+    "1505373877841-8d25f7d46678",
+    "1517502884422-41eaead166d4",
+    "1542744095-fcf48d80b0fd",
+  ],
+  office_1on1: [
+    "1600880292203-757bb62b4baf",
+    "1573497019940-1c28c88b4f3e",
+    "1521791136064-7986c2920216",
+    "1556761175-b413da4baf72",
+    "1565688534245-05d6b5be184a",
+  ],
+  client_meeting: [
+    "1542744173-8e7e53415bb0",
+    "1517245386807-bb43f82c33c4",
+    "1531973576160-7125cd663d86",
+    "1543269865-cbf427effbad",
+    "1559523161-0fc0d8b38a7a",
+  ],
+  exec_committee: [
+    "1521737604893-d14cc237f11d",
+    "1522071820081-009f0129c71c",
+    "1542626991-cbc4e32524cc",
+    "1560439514-4e9645039924",
+    "1556761175-4b46a572b786",
+  ],
+  coaching_room: [
+    "1551836022-d5d88e9218df",
+    "1573164574572-cb89e39749b4",
+    "1488998427799-e3362cec87c3",
+    "1573497620053-ea5300f94f21",
+    "1517048676732-d65bc937f952",
+  ],
+  feedback_report: [
+    "1611224923853-80b023f02d71",
+    "1551288049-bebda4e38f71",
+    "1460925895917-afdab827c52f",
+    "1504868584819-f8e8b4b6d7e3",
+    "1543286386-2e659306cd6c",
+  ],
+  video_call: [
+    "1587825140708-dfaf72ae4b04",
+    "1577412647305-991150c7d163",
+    "1600880292089-90a7e086ee0c",
+    "1591115765373-5207764f72e7",
+    "1609921212029-bb5a28e60960",
+  ],
 };
 
-function photoUrl(scene: SceneKind): string {
-  return `https://images.unsplash.com/photo-${SCENE_PHOTOS[scene]}?w=900&q=75&auto=format&fit=crop`;
+// Small stable string hash → index into the pool.
+function pickIndex(seed: string, len: number): number {
+  let h = 5381;
+  for (let i = 0; i < seed.length; i++) h = (h * 33) ^ seed.charCodeAt(i);
+  return (h >>> 0) % len;
 }
 
-export function SceneMedia({ scene, alt }: { scene: SceneKind; alt: string }) {
+function photoUrl(scene: SceneKind, seed: string): string {
+  const pool = SCENE_PHOTOS[scene];
+  const id = pool[pickIndex(seed || scene, pool.length)];
+  return `https://images.unsplash.com/photo-${id}?w=900&q=75&auto=format&fit=crop`;
+}
+
+export function SceneMedia({ scene, alt, seed = "" }: { scene: SceneKind; alt: string; seed?: string }) {
   const uid = useId().replace(/:/g, "");
   const [failed, setFailed] = useState(false);
   return (
@@ -34,7 +87,7 @@ export function SceneMedia({ scene, alt }: { scene: SceneKind; alt: string }) {
       ) : (
         <img
           className="scene-photo"
-          src={photoUrl(scene)}
+          src={photoUrl(scene, seed)}
           alt={alt}
           loading="lazy"
           onError={() => setFailed(true)}

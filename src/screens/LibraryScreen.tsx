@@ -37,7 +37,7 @@ export function LibraryScreen() {
     return (
       <button key={c.id} className="pcard" onClick={() => go({ name: "scenario", challengeId: c.id })}>
         <div className="pcard-cover">
-          <SceneMedia scene={c.media.scene} alt={c.media.alt[locale] ?? ""} />
+          <SceneMedia scene={c.media.scene} alt={c.media.alt[locale] ?? ""} seed={c.id} />
           <div className="pcard-cover-grad" />
           <span className="pcard-situation">{t(`situation.${situationOf(c)}`)}</span>
           {stats.clearedIds.has(c.id) && <span className="pcard-cleared">✓</span>}

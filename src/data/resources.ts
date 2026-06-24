@@ -14,6 +14,7 @@ export interface Resource {
 }
 
 export const RESOURCES: Resource[] = [
+  // ---------------- Podcasts ----------------
   {
     title: "The Diary of a CEO",
     source: "Steven Bartlett · YouTube",
@@ -48,6 +49,28 @@ export const RESOURCES: Resource[] = [
     },
   },
   {
+    title: "Think Fast, Talk Smart",
+    source: "Stanford GSB · Matt Abrahams",
+    kind: "podcast",
+    url: "https://www.gsb.stanford.edu/business-podcasts/think-fast-talk-smart-podcast",
+    blurb: {
+      en: "Practical, research-backed tools for speaking clearly and thinking on your feet.",
+      de: "Praktische, forschungsbasierte Werkzeuge, um klar zu sprechen und spontan zu denken.",
+      "es-ES": "Herramientas prácticas y con base científica para hablar claro y pensar sobre la marcha.",
+    },
+  },
+  {
+    title: "HBR IdeaCast",
+    source: "Harvard Business Review",
+    kind: "podcast",
+    url: "https://hbr.org/podcasts/ideacast",
+    blurb: {
+      en: "Weekly conversations with leading thinkers on management and leadership.",
+      de: "Wöchentliche Gespräche mit führenden Köpfen über Management und Leadership.",
+      "es-ES": "Conversaciones semanales con grandes pensadores sobre gestión y liderazgo.",
+    },
+  },
+  {
     title: "The Knowledge Project",
     source: "Shane Parrish · Farnam Street",
     kind: "podcast",
@@ -58,6 +81,52 @@ export const RESOURCES: Resource[] = [
       "es-ES": "Conversaciones sobre toma de decisiones, modelos mentales y pensamiento claro.",
     },
   },
+  {
+    title: "Masters of Scale",
+    source: "Reid Hoffman",
+    kind: "podcast",
+    url: "https://mastersofscale.com/",
+    blurb: {
+      en: "How leaders build and scale — told through candid founder stories.",
+      de: "Wie Führungskräfte aufbauen und skalieren — erzählt in offenen Gründergeschichten.",
+      "es-ES": "Cómo los líderes construyen y escalan — a través de historias sinceras de fundadores.",
+    },
+  },
+  {
+    title: "How I Built This",
+    source: "Guy Raz · NPR",
+    kind: "podcast",
+    url: "https://www.npr.org/podcasts/510313/how-i-built-this",
+    blurb: {
+      en: "Founders tell the real story behind how they built something from nothing.",
+      de: "Gründer erzählen die wahre Geschichte, wie sie aus dem Nichts etwas aufbauten.",
+      "es-ES": "Fundadores cuentan la historia real de cómo construyeron algo desde cero.",
+    },
+  },
+  {
+    title: "The Tim Ferriss Show",
+    source: "Tim Ferriss",
+    kind: "podcast",
+    url: "https://tim.blog/podcast/",
+    blurb: {
+      en: "Deconstructs world-class performers to find the habits and tactics you can use.",
+      de: "Zerlegt Spitzenleister, um Gewohnheiten und Taktiken zu finden, die du nutzen kannst.",
+      "es-ES": "Desmenuza a personas de élite para encontrar hábitos y tácticas que puedes aplicar.",
+    },
+  },
+  {
+    title: "Lenny's Podcast",
+    source: "Lenny Rachitsky",
+    kind: "podcast",
+    url: "https://www.lennyspodcast.com/",
+    blurb: {
+      en: "Product, growth and career lessons from people who've done it.",
+      de: "Produkt-, Wachstums- und Karriere-Lektionen von Leuten, die es gemacht haben.",
+      "es-ES": "Lecciones de producto, crecimiento y carrera de quienes ya lo han hecho.",
+    },
+  },
+
+  // ---------------- Talks & video ----------------
   {
     title: "How to speak so that people want to listen",
     source: "Julian Treasure · TED",
@@ -114,6 +183,17 @@ export const RESOURCES: Resource[] = [
     },
   },
   {
+    title: "Why good leaders make you feel safe",
+    source: "Simon Sinek · TED",
+    kind: "video",
+    url: "https://www.ted.com/talks/simon_sinek_why_good_leaders_make_you_feel_safe",
+    blurb: {
+      en: "Trust and safety as the real foundation of leadership.",
+      de: "Vertrauen und Sicherheit als wahres Fundament von Führung.",
+      "es-ES": "La confianza y la seguridad como verdadera base del liderazgo.",
+    },
+  },
+  {
     title: "The power of vulnerability",
     source: "Brené Brown · TED",
     kind: "video",
@@ -124,6 +204,118 @@ export const RESOURCES: Resource[] = [
       "es-ES": "Por qué el coraje y la apertura generan confianza y mejores equipos.",
     },
   },
+  {
+    title: "Dare to disagree",
+    source: "Margaret Heffernan · TED",
+    kind: "video",
+    url: "https://www.ted.com/talks/margaret_heffernan_dare_to_disagree",
+    blurb: {
+      en: "Why good conflict and dissent make better decisions.",
+      de: "Warum guter Konflikt und Widerspruch zu besseren Entscheidungen führen.",
+      "es-ES": "Por qué el buen conflicto y la discrepancia mejoran las decisiones.",
+    },
+  },
+  {
+    title: "Want to help someone? Shut up and listen",
+    source: "Ernesto Sirolli · TED",
+    kind: "video",
+    url: "https://www.ted.com/talks/ernesto_sirolli_want_to_help_someone_shut_up_and_listen",
+    blurb: {
+      en: "A funny, sharp lesson on the power of really listening first.",
+      de: "Eine witzige, scharfe Lektion über die Kraft, zuerst wirklich zuzuhören.",
+      "es-ES": "Una lección divertida y aguda sobre el poder de escuchar de verdad primero.",
+    },
+  },
+  {
+    title: "Grit: the power of passion and perseverance",
+    source: "Angela Duckworth · TED",
+    kind: "video",
+    url: "https://www.ted.com/talks/angela_lee_duckworth_grit_the_power_of_passion_and_perseverance",
+    blurb: {
+      en: "What actually predicts success — and how to build it.",
+      de: "Was Erfolg wirklich vorhersagt — und wie man es aufbaut.",
+      "es-ES": "Qué predice de verdad el éxito — y cómo cultivarlo.",
+    },
+  },
+  {
+    title: "How to make stress your friend",
+    source: "Kelly McGonigal · TED",
+    kind: "video",
+    url: "https://www.ted.com/talks/kelly_mcgonigal_how_to_make_stress_your_friend",
+    blurb: {
+      en: "Reframe pressure so it works for you, not against you.",
+      de: "Druck so umdeuten, dass er für dich arbeitet, nicht gegen dich.",
+      "es-ES": "Reinterpreta la presión para que juegue a tu favor, no en tu contra.",
+    },
+  },
+  {
+    title: "The puzzle of motivation",
+    source: "Dan Pink · TED",
+    kind: "video",
+    url: "https://www.ted.com/talks/dan_pink_the_puzzle_of_motivation",
+    blurb: {
+      en: "What really drives people — and why rewards often backfire.",
+      de: "Was Menschen wirklich antreibt — und warum Belohnungen oft scheitern.",
+      "es-ES": "Qué motiva de verdad a las personas — y por qué los premios suelen fallar.",
+    },
+  },
+  {
+    title: "Persuasive & confident speaking",
+    source: "Conor Neill · YouTube",
+    kind: "video",
+    url: "https://www.youtube.com/@ConorNeill",
+    blurb: {
+      en: "Short, practical lessons on speaking with authority and persuasion.",
+      de: "Kurze, praktische Lektionen über Sprechen mit Autorität und Überzeugung.",
+      "es-ES": "Lecciones breves y prácticas para hablar con autoridad y persuasión.",
+    },
+  },
+  {
+    title: "Stanford Graduate School of Business",
+    source: "Stanford GSB · YouTube",
+    kind: "video",
+    url: "https://www.youtube.com/@StanfordGSB",
+    blurb: {
+      en: "Talks from world-class leaders on management, strategy and communication.",
+      de: "Vorträge von Spitzenführungskräften zu Management, Strategie und Kommunikation.",
+      "es-ES": "Charlas de líderes de primer nivel sobre gestión, estrategia y comunicación.",
+    },
+  },
+  {
+    title: "Harvard Business Review",
+    source: "HBR · YouTube",
+    kind: "video",
+    url: "https://www.youtube.com/@HarvardBusinessReview",
+    blurb: {
+      en: "Short, research-backed videos on leadership and communication.",
+      de: "Kurze, forschungsbasierte Videos zu Führung und Kommunikation.",
+      "es-ES": "Vídeos breves y basados en investigación sobre liderazgo y comunicación.",
+    },
+  },
+  {
+    title: "TED",
+    source: "TED · YouTube",
+    kind: "video",
+    url: "https://www.youtube.com/@TED",
+    blurb: {
+      en: "The full TED archive — thousands of talks on every idea worth spreading.",
+      de: "Das gesamte TED-Archiv — tausende Vorträge zu jeder Idee, die es wert ist.",
+      "es-ES": "Todo el archivo de TED — miles de charlas sobre cada idea que vale la pena difundir.",
+    },
+  },
+  {
+    title: "Big Think",
+    source: "Big Think · YouTube",
+    kind: "video",
+    url: "https://www.youtube.com/@bigthink",
+    blurb: {
+      en: "Experts explain how to think, lead and communicate better.",
+      de: "Expert:innen erklären, wie man besser denkt, führt und kommuniziert.",
+      "es-ES": "Expertos explican cómo pensar, liderar y comunicar mejor.",
+    },
+  },
+
+  // ---------------- Reading ----------------
   {
     title: "Difficult Conversations",
     source: "Harvard Business Review",
@@ -136,14 +328,36 @@ export const RESOURCES: Resource[] = [
     },
   },
   {
-    title: "Harvard Business Review",
-    source: "HBR · YouTube",
-    kind: "video",
-    url: "https://www.youtube.com/@HarvardBusinessReview",
+    title: "Business Communication",
+    source: "Harvard Business Review",
+    kind: "article",
+    url: "https://hbr.org/topic/subject/business-communication",
     blurb: {
-      en: "Short, research-backed videos on leadership and communication.",
-      de: "Kurze, forschungsbasierte Videos zu Führung und Kommunikation.",
-      "es-ES": "Vídeos breves y basados en investigación sobre liderazgo y comunicación.",
+      en: "Everything HBR has written on communicating clearly and persuasively.",
+      de: "Alles, was HBR über klare und überzeugende Kommunikation geschrieben hat.",
+      "es-ES": "Todo lo que HBR ha escrito sobre comunicar con claridad y persuasión.",
+    },
+  },
+  {
+    title: "Leadership",
+    source: "Harvard Business Review",
+    kind: "article",
+    url: "https://hbr.org/topic/subject/leadership",
+    blurb: {
+      en: "HBR's deep library on leading people, teams and yourself.",
+      de: "HBRs umfangreiche Bibliothek über das Führen von Menschen, Teams und sich selbst.",
+      "es-ES": "La amplia biblioteca de HBR sobre liderar personas, equipos y a ti mismo.",
+    },
+  },
+  {
+    title: "Farnam Street",
+    source: "Shane Parrish · Blog",
+    kind: "article",
+    url: "https://fs.blog/blog/",
+    blurb: {
+      en: "Essays on mental models, decisions and thinking clearly.",
+      de: "Essays über mentale Modelle, Entscheidungen und klares Denken.",
+      "es-ES": "Ensayos sobre modelos mentales, decisiones y pensar con claridad.",
     },
   },
 ];
