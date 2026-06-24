@@ -244,6 +244,7 @@ async function guestRequest(s, req, res, body) {
   const guestId = String(body.guestId || "").trim().slice(0, 64);
   const name = String(body.name || "").trim().slice(0, 80);
   if (!GUEST_ID_RE.test(guestId)) return res.status(400).json({ error: "bad_id" });
+  if (name.length < 2) return res.status(400).json({ error: "name_required" });
 
   const ip = clientIp(req);
   const ipLimit = await rateLimit(s, "guest:ip:" + ip, 12, 3600);

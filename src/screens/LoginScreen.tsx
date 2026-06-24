@@ -4,7 +4,7 @@ import { storage, uid } from "../lib/storage";
 import { LanguagePicker } from "../components/LanguagePicker";
 import type { Profile } from "../types";
 
-type Mode = "login" | "register" | "forgot" | "sent" | "devlink" | "setpw" | "pending" | "guestwait" | "guestrejected";
+type Mode = "login" | "register" | "forgot" | "sent" | "devlink" | "setpw" | "pending" | "guestname" | "guestwait" | "guestrejected";
 
 const GUEST_ID_KEY = "ra.guestId";
 const GUEST_OK_KEY = "ra.guestApproved";
@@ -70,11 +70,17 @@ export function LoginScreen() {
     login(profile);
   }
 
-  // Guest access now requires the owner's approval. We create a pending request,
-  // email the owner, and wait. Already-approved devices (or backends without
-  // accounts) go straight in.
-  async function guest() {
+  // Guest access requires the owner's approval — and a name, so the owner knows
+  // who's asking. Already-approved devices skip straight in.
+  function guest() {
+    setMsg("");
     if (localStorage.getItem(GUEST_OK_KEY) === "1") return enterAsGuest();
+    setMode("guestname");
+  }
+
+  // Sends the (named) guest request and emails the owner to approve.
+  async function submitGuest() {
+    if (name.trim().length < 2) return setMsg(t("login.nameRequired"));
     let gid = localStorage.getItem(GUEST_ID_KEY);
     if (!gid) {
       gid = uid("guest");
@@ -89,7 +95,8 @@ export function LoginScreen() {
         body: JSON.stringify({ action: "guest-request", guestId: gid, name: name.trim() }),
       });
       if (r.status === 429) return setMsg(t("login.tooMany"));
-      if (!r.ok) return enterAsGuest(); // 503 / backend hiccup → no gate available
+      if (r.status === 503) return enterAsGuest(); // no accounts backend → nothing to gate
+      if (!r.ok) return setMsg(t("login.badCredentials"));
       const d = await r.json();
       if (d.status === "approved") {
         localStorage.setItem(GUEST_OK_KEY, "1");
@@ -98,7 +105,7 @@ export function LoginScreen() {
       if (d.status === "rejected") return setMode("guestrejected");
       setMode("guestwait");
     } catch {
-      enterAsGuest();
+      setMsg(t("login.badCredentials"));
     } finally {
       setBusy(false);
     }
@@ -276,6 +283,28 @@ export function LoginScreen() {
               {msg && <div className="error">{msg}</div>}
               <button className="btn primary block" onClick={doSetPassword} disabled={busy}>
                 {busy ? "…" : t("login.finish")}
+              </button>
+            </div>
+          ) : mode === "guestname" ? (
+            <div className="login-form">
+              <h3 className="login-formtitle">{t("login.guestNameTitle")}</h3>
+              <p className="muted small left">{t("login.guestNameSub")}</p>
+              <label>
+                {t("login.name")}
+                <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && submitGuest()}
+                  placeholder="Alex"
+                  autoFocus
+                />
+              </label>
+              {msg && <div className="error">{msg}</div>}
+              <button className="btn primary block" onClick={submitGuest} disabled={busy}>
+                {busy ? "…" : t("login.guestContinue")}
+              </button>
+              <button className="btn ghost block" onClick={() => go("login")}>
+                ← {t("login.back")}
               </button>
             </div>
           ) : mode === "pending" || mode === "guestwait" || mode === "guestrejected" ? (
