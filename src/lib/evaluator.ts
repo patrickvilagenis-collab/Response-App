@@ -247,20 +247,28 @@ export async function llmEvaluate(
     '"improvedVersion":"the user\'s OWN answer rewritten to score 90+, same situation",' +
     '"focusNext":"one prioritised improvement"}}';
 
-  const user = `Analyse and score the USER_RESPONSE below. Base everything on the user's actual words. Input:\n${JSON.stringify(payload)}\n\nReturn JSON exactly in this shape:\n${schema}`;
+  const user = `Analyse and score the USER_RESPONSE below. Base everything on the user's actual words. Keep "improvedVersion" under ~120 words and every justification to one sentence so the JSON stays complete. Input:\n${JSON.stringify(payload)}\n\nReturn JSON exactly in this shape:\n${schema}`;
 
   const res = await fetch("/api/evaluate", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ system: sys, user, max_tokens: 1200 }),
+    body: JSON.stringify({ system: sys, user, max_tokens: 2000 }),
   });
 
-  if (!res.ok) throw new Error(`AI evaluation unavailable: ${res.status}`);
+  if (!res.ok) {
+    let detail = `${res.status}`;
+    try {
+      const e = await res.json();
+      detail = e.detail || e.error || detail;
+    } catch {
+      /* ignore */
+    }
+    throw new Error(`HTTP ${res.status}: ${detail}`);
+  }
   const data = await res.json();
   const text: string = data?.text ?? "";
   if (!text) throw new Error("AI evaluation returned empty");
-  const jsonStr = text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
-  const parsed = JSON.parse(jsonStr);
+  const parsed = parseAiJson(text);
 
   const dims = {
     content: clampDim(parsed.dimensions?.content),
@@ -298,6 +306,19 @@ function clampDim(d: unknown): { score: number; justification: string } {
 }
 function arr(v: unknown): string[] {
   return Array.isArray(v) ? v.map(String) : [];
+}
+
+// Tolerantly extract the JSON object from the model's reply: strips ```json
+// code fences and any prose around it before parsing.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function parseAiJson(text: string): any {
+  let raw = text.trim();
+  const fence = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fence) raw = fence[1].trim();
+  const start = raw.indexOf("{");
+  const end = raw.lastIndexOf("}");
+  if (start === -1 || end <= start) throw new Error("AI evaluation: no JSON object in reply");
+  return JSON.parse(raw.slice(start, end + 1));
 }
 
 export async function evaluate(
