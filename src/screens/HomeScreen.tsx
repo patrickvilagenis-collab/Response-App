@@ -73,7 +73,7 @@ export function HomeScreen() {
         {recommendedThree.map((c) => (
           <button key={c.id} className="rec-tile" onClick={() => go({ name: "scenario", challengeId: c.id })}>
             <div className="rec-tile-media">
-              <SceneMedia scene={c.media.scene} alt={c.media.alt[locale] ?? ""} />
+              <SceneMedia scene={c.media.scene} alt={c.media.alt[locale] ?? ""} seed={c.id} />
               <span className={`tile-diff d${c.difficulty}`}>{t(`diff.${c.difficulty}`)}</span>
             </div>
             <div className="rec-tile-body">
