@@ -1,18 +1,45 @@
-import { useId } from "react";
+import { useId, useState } from "react";
 import type { SceneKind } from "../types";
 
-// Contextual media rendered as inline SVG "scenes" — they load instantly and
-// offline, and establish: Where am I? Who am I? What's my role? (see spec §5).
-// Each scene uses a unique gradient id prefix so multiple instances can coexist.
+// Contextual media for each scenario. We show a real, professional photo
+// (Unsplash, free license) so the moment feels real; if it fails to load
+// (offline), we fall back to the inline SVG "scene" which works with no network.
+// Each SVG scene uses a unique gradient id prefix so multiple can coexist.
+
+// Curated Unsplash photo ids per scene kind. Sized + auto-formatted at the CDN.
+const SCENE_PHOTOS: Record<SceneKind, string> = {
+  boardroom: "1431540015161-0bf868a2d407",
+  office_1on1: "1600880292203-757bb62b4baf",
+  client_meeting: "1542744173-8e7e53415bb0",
+  exec_committee: "1521737604893-d14cc237f11d",
+  coaching_room: "1551836022-d5d88e9218df",
+  feedback_report: "1611224923853-80b023f02d71",
+  video_call: "1587825140708-dfaf72ae4b04",
+};
+
+function photoUrl(scene: SceneKind): string {
+  return `https://images.unsplash.com/photo-${SCENE_PHOTOS[scene]}?w=900&q=75&auto=format&fit=crop`;
+}
 
 export function SceneMedia({ scene, alt }: { scene: SceneKind; alt: string }) {
   const uid = useId().replace(/:/g, "");
+  const [failed, setFailed] = useState(false);
   return (
     <div className="scene" role="img" aria-label={alt}>
-      <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        <Defs p={uid} scene={scene} />
-        {renderScene(scene, uid)}
-      </svg>
+      {failed ? (
+        <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <Defs p={uid} scene={scene} />
+          {renderScene(scene, uid)}
+        </svg>
+      ) : (
+        <img
+          className="scene-photo"
+          src={photoUrl(scene)}
+          alt={alt}
+          loading="lazy"
+          onError={() => setFailed(true)}
+        />
+      )}
       <div className="scene-vignette" aria-hidden="true" />
     </div>
   );

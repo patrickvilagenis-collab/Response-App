@@ -1143,6 +1143,334 @@ export const CHALLENGES: Challenge[] = [
       "es-ES": "Primero — gracias por decírmelo a la cara en vez de irte sin más; eso significa mucho. No voy a tirarte dinero en treinta segundos, porque creo que estás nombrando algo real sobre crecimiento. Ayúdame a entender: ¿es el alcance, un título, el tipo de problemas, o soy yo? No decidas hoy. Dame 48 horas para volver con un camino concreto — y si de verdad no está aquí, te ayudaré a irte bien. Mereces que se luche por ti de la forma correcta.",
     },
   },
+  {
+    id: "C-027",
+    type: "situational",
+    category: "professional_communication",
+    difficulty: 3,
+    media: {
+      scene: "office_1on1",
+      alt: {
+        en: "A one-on-one meeting room set for a pay conversation.",
+        de: "Ein Vier-Augen-Raum für ein Gehaltsgespräch.",
+        "es-ES": "Una sala de 1:1 preparada para una conversación de salario.",
+      },
+    },
+    roleCaption: {
+      en: "You're in a 1:1 to ask your manager for a raise.",
+      de: "Du bist im 1:1 und bittest deine Führungskraft um eine Gehaltserhöhung.",
+      "es-ES": "Estás en un 1:1 para pedirle un aumento a tu manager.",
+    },
+    scenario: {
+      en: "Your manager says, \"You wanted to talk about compensation?\" You believe you're underpaid for your impact this year. Make your case.",
+      de: "Deine Führungskraft sagt: „Du wolltest über Vergütung sprechen?“ Du bist überzeugt, für deine Wirkung dieses Jahr unterbezahlt zu sein. Begründe es.",
+      "es-ES": "Tu manager dice: «¿Querías hablar de tu salario?». Crees que estás mal pagado para el impacto que has tenido este año. Defiende tu caso.",
+    },
+    weights: { content: 0.55, delivery: 0.3, time: 0.15 },
+    keyPoints: [
+      { en: "lead with impact and results, not need", de: "mit Wirkung und Ergebnissen führen, nicht mit Bedarf", "es-ES": "empezar por impacto y resultados, no por necesidad" },
+      { en: "a specific, researched number or range", de: "eine konkrete, recherchierte Zahl oder Spanne", "es-ES": "una cifra o rango concreto y documentado" },
+      { en: "calm, confident, not apologetic", de: "ruhig, selbstbewusst, nicht entschuldigend", "es-ES": "tranquilo, seguro, sin disculparte" },
+      { en: "invite a path if not yes today", de: "einen Weg anbieten, falls nicht sofort ja", "es-ES": "proponer un camino si hoy no es un sí" },
+    ],
+    rubric: {
+      content: { strong: "Specific results, a researched number, and an open path forward.", adequate: "Makes the ask but vague on impact or number.", weak: "Based on need or feelings, no evidence." },
+      delivery: { strong: "Calm, confident, non-apologetic.", adequate: "Slightly hesitant.", weak: "Apologetic, anxious, or demanding." },
+      time: { strong: "Tight and complete.", adequate: "Fits.", weak: "Rambles or stalls." },
+    },
+    modelAnswer: {
+      en: "Thanks for making time. This year I led the migration that cut our costs 18% and took on the on-call rotation when we were short. Looking at market data for this role and scope, I'm currently below the midpoint — I'd like to bring my salary to around X. If that's not something you can do today, I'd love to understand what the path and timeline to it looks like, and what you'd need to see from me.",
+      de: "Danke für die Zeit. Dieses Jahr habe ich die Migration geleitet, die unsere Kosten um 18% gesenkt hat, und die Rufbereitschaft übernommen, als wir unterbesetzt waren. Laut Marktdaten für diese Rolle liege ich unter dem Mittelwert — ich möchte mein Gehalt auf rund X bringen. Falls das heute nicht geht, würde ich gern verstehen, wie der Weg und der Zeitrahmen dorthin aussehen und was du von mir sehen müsstest.",
+      "es-ES": "Gracias por el tiempo. Este año lideré la migración que redujo nuestros costes un 18% y asumí las guardias cuando íbamos cortos. Mirando los datos de mercado para este rol, estoy por debajo del punto medio — me gustaría llevar mi salario a unos X. Si hoy no es posible, me encantaría entender cuál es el camino y el plazo para llegar, y qué necesitarías ver de mí.",
+    },
+  },
+  {
+    id: "C-028",
+    type: "behavioral",
+    category: "self_awareness_development",
+    difficulty: 2,
+    media: {
+      scene: "video_call",
+      alt: {
+        en: "A video interview call, the interviewer waiting for your answer.",
+        de: "Ein Video-Interview, die interviewende Person wartet auf deine Antwort.",
+        "es-ES": "Una entrevista por videollamada; el entrevistador espera tu respuesta.",
+      },
+    },
+    roleCaption: {
+      en: "You're the candidate in a job interview.",
+      de: "Du bist Kandidat:in in einem Vorstellungsgespräch.",
+      "es-ES": "Eres el candidato en una entrevista de trabajo.",
+    },
+    scenario: {
+      en: "The interviewer opens with the classic: \"So — tell me about yourself.\" Give your answer.",
+      de: "Die interviewende Person beginnt mit dem Klassiker: „Also — erzählen Sie mir von sich.“ Antworte.",
+      "es-ES": "El entrevistador abre con el clásico: «Bueno — háblame de ti». Da tu respuesta.",
+    },
+    weights: { content: 0.5, delivery: 0.35, time: 0.15 },
+    keyPoints: [
+      { en: "present → past → future arc", de: "Gegenwart → Vergangenheit → Zukunft", "es-ES": "presente → pasado → futuro" },
+      { en: "relevant to the role, not your life story", de: "relevant für die Rolle, keine Lebensgeschichte", "es-ES": "relevante para el puesto, no tu biografía" },
+      { en: "one concrete achievement", de: "eine konkrete Leistung", "es-ES": "un logro concreto" },
+      { en: "end on why this role", de: "mit dem Warum dieser Rolle enden", "es-ES": "terminar en por qué este puesto" },
+    ],
+    rubric: {
+      content: { strong: "Tight present-past-future arc, role-relevant, one real achievement.", adequate: "Relevant but meandering or missing the future hook.", weak: "Life story, irrelevant, or no structure." },
+      delivery: { strong: "Warm, confident, conversational.", adequate: "A little stiff or rushed.", weak: "Monotone, nervous, or robotic." },
+      time: { strong: "Crisp, ~45–60s.", adequate: "Slightly long.", weak: "Way over or trails off." },
+    },
+    modelAnswer: {
+      en: "I'm a product manager who loves turning messy problems into shipped, measurable outcomes. Right now I lead the payments roadmap at my company, where I cut checkout drop-off by 12% last quarter. Before that I came from a data background, which is why I'm comfortable making calls with evidence rather than opinion. I'm looking to do that at bigger scale, and your team's focus on customer experience is exactly the kind of problem I want to own next.",
+      de: "Ich bin Produktmanager und liebe es, chaotische Probleme in lieferbare, messbare Ergebnisse zu verwandeln. Aktuell verantworte ich die Payments-Roadmap und habe den Checkout-Abbruch letztes Quartal um 12% gesenkt. Davor komme ich aus dem Datenbereich, deshalb treffe ich Entscheidungen lieber mit Belegen als mit Meinung. Das möchte ich in größerem Maßstab tun, und der Fokus eures Teams auf Kundenerlebnis ist genau das Problem, das ich als Nächstes übernehmen will.",
+      "es-ES": "Soy product manager y me encanta convertir problemas desordenados en resultados entregados y medibles. Ahora lidero la hoja de ruta de pagos en mi empresa, donde reduje el abandono del checkout un 12% el último trimestre. Antes venía del mundo de los datos, por eso me siento cómodo decidiendo con evidencia y no con opiniones. Quiero hacer esto a mayor escala, y el foco de tu equipo en la experiencia de cliente es justo el tipo de problema que quiero asumir.",
+    },
+  },
+  {
+    id: "C-029",
+    type: "behavioral",
+    category: "self_awareness_development",
+    difficulty: 2,
+    media: {
+      scene: "video_call",
+      alt: {
+        en: "A video interview; a pointed question on the table.",
+        de: "Ein Video-Interview; eine pointierte Frage steht im Raum.",
+        "es-ES": "Una entrevista por vídeo; una pregunta incisiva sobre la mesa.",
+      },
+    },
+    roleCaption: {
+      en: "You're the candidate; the question just got harder.",
+      de: "Du bist Kandidat:in; die Frage wurde gerade schwerer.",
+      "es-ES": "Eres el candidato; la pregunta se acaba de poner difícil.",
+    },
+    scenario: {
+      en: "\"What's your greatest weakness?\" — answered honestly, without a cliché and without sinking your chances. Go.",
+      de: "„Was ist Ihre größte Schwäche?“ — ehrlich beantwortet, ohne Klischee und ohne deine Chancen zu versenken. Los.",
+      "es-ES": "«¿Cuál es tu mayor debilidad?» — respóndela con honestidad, sin tópicos y sin hundir tus opciones. Adelante.",
+    },
+    weights: { content: 0.5, delivery: 0.3, time: 0.2 },
+    keyPoints: [
+      { en: "a real weakness, not a humblebrag", de: "eine echte Schwäche, kein verkapptes Lob", "es-ES": "una debilidad real, no un autoelogio" },
+      { en: "self-awareness about its impact", de: "Selbsterkenntnis über die Auswirkung", "es-ES": "consciencia de su impacto" },
+      { en: "concrete steps you're taking", de: "konkrete Schritte, die du unternimmst", "es-ES": "pasos concretos que estás dando" },
+      { en: "evidence of progress", de: "Beleg für Fortschritt", "es-ES": "prueba de progreso" },
+    ],
+    rubric: {
+      content: { strong: "Genuine weakness, honest impact, concrete improvement with evidence.", adequate: "Real but light on the fix or progress.", weak: "Cliché ('I work too hard') or a disqualifying flaw with no plan." },
+      delivery: { strong: "Honest, composed, self-assured.", adequate: "Slightly uneasy.", weak: "Defensive or evasive." },
+      time: { strong: "Concise and complete.", adequate: "Fits.", weak: "Over-explains or dodges." },
+    },
+    modelAnswer: {
+      en: "I tend to take on too much myself rather than delegating, because early on it felt faster. It bit me last year when I became the bottleneck on a launch. Since then I've been deliberately handing ownership to my team — I now run a weekly handoff and track what only I am doing. The launch we shipped this spring ran almost entirely without me in the critical path, which a year ago wouldn't have happened.",
+      de: "Ich neige dazu, zu viel selbst zu übernehmen, statt zu delegieren, weil es früher schneller wirkte. Letztes Jahr wurde ich dadurch zum Engpass bei einem Launch. Seitdem gebe ich bewusst Verantwortung ab — ich mache wöchentliche Übergaben und verfolge, was nur ich tue. Der Launch in diesem Frühjahr lief fast ganz ohne mich im kritischen Pfad, was vor einem Jahr nicht passiert wäre.",
+      "es-ES": "Tiendo a asumir demasiado yo mismo en vez de delegar, porque al principio parecía más rápido. Me pasó factura el año pasado cuando me convertí en el cuello de botella de un lanzamiento. Desde entonces delego responsabilidad de forma deliberada — hago un traspaso semanal y controlo qué hago solo yo. El lanzamiento de esta primavera salió casi sin mí en el camino crítico, algo que hace un año no habría pasado.",
+    },
+  },
+  {
+    id: "C-030",
+    type: "situational",
+    category: "feedback_difficult_conversations",
+    difficulty: 3,
+    media: {
+      scene: "client_meeting",
+      alt: {
+        en: "A client meeting where you must share a delay.",
+        de: "Ein Kundentermin, bei dem du eine Verzögerung mitteilen musst.",
+        "es-ES": "Una reunión con cliente donde debes comunicar un retraso.",
+      },
+    },
+    roleCaption: {
+      en: "You're the account lead; the project is slipping.",
+      de: "Du bist Account-Lead; das Projekt verzögert sich.",
+      "es-ES": "Eres el responsable de la cuenta; el proyecto se está retrasando.",
+    },
+    scenario: {
+      en: "You have to tell an important client the delivery will be two weeks late. They're already on the call expecting good news. Open the conversation.",
+      de: "Du musst einem wichtigen Kunden sagen, dass die Lieferung zwei Wochen später kommt. Er ist bereits im Call und erwartet gute Nachrichten. Eröffne das Gespräch.",
+      "es-ES": "Tienes que decirle a un cliente importante que la entrega se retrasará dos semanas. Ya está en la llamada esperando buenas noticias. Abre la conversación.",
+    },
+    weights: { content: 0.45, delivery: 0.35, time: 0.2 },
+    keyPoints: [
+      { en: "lead with the news clearly, no burying it", de: "die Nachricht klar voranstellen, nicht verstecken", "es-ES": "dar la noticia clara, sin esconderla" },
+      { en: "own it without excuses", de: "Verantwortung ohne Ausreden", "es-ES": "asumirlo sin excusas" },
+      { en: "a concrete recovery plan", de: "ein konkreter Recovery-Plan", "es-ES": "un plan de recuperación concreto" },
+      { en: "protect the relationship and trust", de: "Beziehung und Vertrauen schützen", "es-ES": "proteger la relación y la confianza" },
+    ],
+    rubric: {
+      content: { strong: "States the delay upfront, owns it, gives a credible recovery plan and what's protected.", adequate: "Shares it but softens too much or thin on the plan.", weak: "Buries the news, makes excuses, or has no plan." },
+      delivery: { strong: "Calm, direct, accountable.", adequate: "A little hesitant.", weak: "Defensive, vague, or over-apologetic." },
+      time: { strong: "Clear and contained.", adequate: "Fits.", weak: "Waffles." },
+    },
+    modelAnswer: {
+      en: "Before we go further, I want to be straight with you: the full delivery is going to be two weeks late, landing the 28th instead of the 14th. That's on us — a dependency took longer to harden than we planned, and I'd rather give you a date we'll hit than one we'll miss. Here's the plan: we'll ship the reporting module on the original date so your team isn't blocked, dedicate two more engineers to the rest, and I'll send you a written recovery timeline today with weekly checkpoints. What's the impact on your side I should be solving for?",
+      de: "Bevor wir weitermachen, will ich ehrlich sein: Die vollständige Lieferung kommt zwei Wochen später, am 28. statt am 14. Das liegt an uns — eine Abhängigkeit brauchte länger als geplant, und ich gebe dir lieber ein Datum, das wir halten. Der Plan: Das Reporting-Modul liefern wir zum ursprünglichen Termin, damit dein Team nicht blockiert ist, wir setzen zwei weitere Engineers auf den Rest, und ich schicke dir heute einen schriftlichen Recovery-Plan mit wöchentlichen Checkpoints. Welche Auswirkung auf deiner Seite soll ich mitlösen?",
+      "es-ES": "Antes de seguir, quiero ser sincero contigo: la entrega completa llegará dos semanas más tarde, el 28 en vez del 14. Es responsabilidad nuestra — una dependencia tardó más de lo previsto, y prefiero darte una fecha que vamos a cumplir. Este es el plan: entregaremos el módulo de informes en la fecha original para no bloquear a tu equipo, dedicamos dos ingenieros más al resto, y hoy te envío un cronograma de recuperación por escrito con puntos de control semanales. ¿Qué impacto en tu lado debería ayudarte a resolver?",
+    },
+  },
+  {
+    id: "C-031",
+    type: "feedback360",
+    category: "feedback_difficult_conversations",
+    difficulty: 3,
+    media: {
+      scene: "office_1on1",
+      alt: {
+        en: "A private 1:1 to give honest feedback.",
+        de: "Ein vertrauliches 1:1 für ehrliches Feedback.",
+        "es-ES": "Un 1:1 privado para dar feedback honesto.",
+      },
+    },
+    roleCaption: {
+      en: "You're the manager; a strong performer has slipped.",
+      de: "Du bist die Führungskraft; eine sonst starke Person hat nachgelassen.",
+      "es-ES": "Eres el manager; alguien que rendía bien ha bajado.",
+    },
+    scenario: {
+      en: "A team member you respect has missed three deadlines and their work quality has dropped. They don't seem aware. Give the feedback.",
+      de: "Ein Teammitglied, das du schätzt, hat drei Fristen verpasst und die Qualität ist gesunken. Es scheint sich dessen nicht bewusst zu sein. Gib das Feedback.",
+      "es-ES": "Una persona de tu equipo a la que respetas ha incumplido tres entregas y su calidad ha bajado. No parece consciente. Dale el feedback.",
+    },
+    weights: { content: 0.5, delivery: 0.35, time: 0.15 },
+    keyPoints: [
+      { en: "specific, observed facts not labels", de: "konkrete, beobachtete Fakten statt Etiketten", "es-ES": "hechos concretos observados, no etiquetas" },
+      { en: "state the impact", de: "die Auswirkung benennen", "es-ES": "nombrar el impacto" },
+      { en: "ask, listen for what's going on", de: "fragen, zuhören, was los ist", "es-ES": "preguntar y escuchar qué pasa" },
+      { en: "agree a clear way forward", de: "einen klaren Weg vereinbaren", "es-ES": "acordar un camino claro" },
+    ],
+    rubric: {
+      content: { strong: "Concrete examples, clear impact, genuine inquiry, agreed next step.", adequate: "Names it but vague or skips the inquiry.", weak: "Labels them, no examples, or avoids the point." },
+      delivery: { strong: "Direct and kind; respectful.", adequate: "Slightly soft or blunt.", weak: "Harsh, accusatory, or mushy." },
+      time: { strong: "Focused.", adequate: "Fits.", weak: "Rambles or stalls." },
+    },
+    modelAnswer: {
+      en: "I want to talk about something because I rate you highly and I'd want the same straight talk. The last three deliverables came in late, and the auth spec had gaps we usually wouldn't see from you. That's slowing the team and it's not like your normal work — which makes me think something's going on. Before I assume anything: what's your read, and what's actually happening for you right now? Let's figure out what changes, and what support you need, and put a simple plan on it for the next two weeks.",
+      de: "Ich möchte etwas ansprechen, weil ich dich sehr schätze und mir dieselbe Klarheit wünschen würde. Die letzten drei Ergebnisse kamen zu spät, und die Auth-Spezifikation hatte Lücken, die wir von dir sonst nicht sehen. Das bremst das Team und entspricht nicht deiner üblichen Arbeit — deshalb denke ich, da ist etwas los. Bevor ich etwas annehme: Wie siehst du es, und was ist gerade wirklich bei dir los? Lass uns klären, was sich ändert und welche Unterstützung du brauchst, und einen einfachen Plan für die nächsten zwei Wochen machen.",
+      "es-ES": "Quiero hablar de algo porque te valoro mucho y a mí me gustaría la misma franqueza. Las últimas tres entregas llegaron tarde, y la especificación de auth tenía huecos que normalmente no veríamos en ti. Eso frena al equipo y no es tu trabajo habitual — lo que me hace pensar que algo pasa. Antes de suponer nada: ¿cómo lo ves tú, y qué te está pasando ahora mismo? Vamos a ver qué cambia y qué apoyo necesitas, y ponemos un plan sencillo para las próximas dos semanas.",
+    },
+  },
+  {
+    id: "C-032",
+    type: "situational",
+    category: "conflict_resolution",
+    difficulty: 3,
+    media: {
+      scene: "office_1on1",
+      alt: {
+        en: "A 1:1 with your boss where you disagree.",
+        de: "Ein 1:1 mit deiner Chefin, in dem du anderer Meinung bist.",
+        "es-ES": "Un 1:1 con tu jefe en el que discrepas.",
+      },
+    },
+    roleCaption: {
+      en: "You're a team lead; you think your boss is wrong.",
+      de: "Du bist Teamlead; du hältst die Entscheidung deiner Chefin für falsch.",
+      "es-ES": "Eres team lead; crees que tu jefe se equivoca.",
+    },
+    scenario: {
+      en: "Your boss has decided to cut testing to hit the deadline. You're convinced it'll backfire badly. They ask, \"You look unconvinced — what?\" Respond.",
+      de: "Deine Chefin hat beschlossen, Tests zu kürzen, um den Termin zu halten. Du bist sicher, dass das übel nach hinten losgeht. Sie fragt: „Du wirkst nicht überzeugt — was ist?“ Reagiere.",
+      "es-ES": "Tu jefe ha decidido recortar las pruebas para llegar a la fecha. Estás convencido de que saldrá muy mal. Te pregunta: «Te veo poco convencido — ¿qué pasa?». Responde.",
+    },
+    weights: { content: 0.5, delivery: 0.35, time: 0.15 },
+    keyPoints: [
+      { en: "respectful, share the shared goal first", de: "respektvoll, zuerst das gemeinsame Ziel", "es-ES": "respetuoso, primero el objetivo común" },
+      { en: "the specific risk, with evidence", de: "das konkrete Risiko, mit Belegen", "es-ES": "el riesgo concreto, con evidencia" },
+      { en: "offer an alternative, not just a no", de: "eine Alternative bieten, nicht nur ein Nein", "es-ES": "ofrecer una alternativa, no solo un no" },
+      { en: "commit to the decision either way", de: "die Entscheidung so oder so mittragen", "es-ES": "comprometerte con la decisión de todos modos" },
+    ],
+    rubric: {
+      content: { strong: "Shared goal, specific evidenced risk, a real alternative, and disagree-and-commit.", adequate: "Raises the risk but no alternative or commitment.", weak: "Just objects, or caves silently." },
+      delivery: { strong: "Calm, respectful, confident.", adequate: "A bit tense.", weak: "Combative or timid." },
+      time: { strong: "Tight.", adequate: "Fits.", weak: "Rambles." },
+    },
+    modelAnswer: {
+      en: "We both want to hit Thursday — I'm with you on that. My worry is specific: the last time we shipped this module without regression tests, we spent the following week on hotfixes and lost more time than we saved, plus a customer escalation. So instead of cutting all testing, could we keep the regression suite on the payment path only — that's two hours — and drop the lower-risk UI tests? We hit the date and protect the part that hurts most if it breaks. If you still want the full cut after that, I'll back it fully and make it work.",
+      de: "Wir wollen beide Donnerstag schaffen — da bin ich bei dir. Meine Sorge ist konkret: Als wir dieses Modul zuletzt ohne Regressionstests auslieferten, verbrachten wir die Folgewoche mit Hotfixes und verloren mehr Zeit als wir sparten, plus eine Kundeneskalation. Statt alle Tests zu streichen — könnten wir die Regressionssuite nur für den Zahlungspfad behalten, das sind zwei Stunden, und die risikoärmeren UI-Tests weglassen? Wir halten den Termin und schützen den Teil, der am meisten wehtut. Willst du danach trotzdem alles streichen, trage ich es voll mit.",
+      "es-ES": "Los dos queremos llegar al jueves — en eso estoy contigo. Mi preocupación es concreta: la última vez que entregamos este módulo sin pruebas de regresión, pasamos la semana siguiente con parches y perdimos más tiempo del que ahorramos, además de una escalada de un cliente. Así que en vez de recortar todas las pruebas, ¿podríamos mantener la suite de regresión solo en el flujo de pagos — son dos horas — y quitar las pruebas de UI de menor riesgo? Llegamos a la fecha y protegemos lo que más duele si falla. Si aun así quieres el recorte completo, lo apoyo del todo y lo saco adelante.",
+    },
+  },
+  {
+    id: "C-033",
+    type: "wave",
+    category: "strategic_thinking",
+    difficulty: 4,
+    media: {
+      scene: "exec_committee",
+      alt: {
+        en: "The exec committee, waiting for your pitch.",
+        de: "Das Executive Committee wartet auf deinen Pitch.",
+        "es-ES": "El comité ejecutivo, esperando tu propuesta.",
+      },
+    },
+    roleCaption: {
+      en: "You have 60 seconds with the leadership team.",
+      de: "Du hast 60 Sekunden mit dem Führungsteam.",
+      "es-ES": "Tienes 60 segundos con el equipo directivo.",
+    },
+    scenario: {
+      en: "You catch the leadership team between sessions. You have one idea that could matter. Pitch it — the problem, your solution, and the ask — before they move on.",
+      de: "Du erwischst das Führungsteam zwischen zwei Sessions. Du hast eine Idee, die zählen könnte. Pitch sie — Problem, Lösung und Ask — bevor sie weiterziehen.",
+      "es-ES": "Pillas al equipo directivo entre sesiones. Tienes una idea que podría importar. Preséntala — el problema, tu solución y lo que pides — antes de que se vayan.",
+    },
+    weights: { content: 0.45, delivery: 0.4, time: 0.15 },
+    keyPoints: [
+      { en: "hook with the problem and its size", de: "Haken: das Problem und seine Größe", "es-ES": "engancha con el problema y su tamaño" },
+      { en: "one clear solution, not three", de: "eine klare Lösung, nicht drei", "es-ES": "una solución clara, no tres" },
+      { en: "the business impact in a number", de: "der Geschäftsnutzen als Zahl", "es-ES": "el impacto de negocio en una cifra" },
+      { en: "a specific, small ask", de: "ein konkreter, kleiner Ask", "es-ES": "una petición concreta y pequeña" },
+    ],
+    rubric: {
+      content: { strong: "Sharp problem, one solution, a quantified impact, and a crisp ask.", adequate: "Has the idea but fuzzy impact or ask.", weak: "Rambling, no clear ask, or no why-now." },
+      delivery: { strong: "Confident, energetic, executive presence.", adequate: "Steady but flat.", weak: "Nervous or apologetic." },
+      time: { strong: "Lands the ask inside 60s.", adequate: "Just fits.", weak: "Runs out before the ask." },
+    },
+    modelAnswer: {
+      en: "Quick one while I have you. We're losing about 9% of new signups in the first 24 hours — that's roughly two million a year walking out the door before they ever see value. I've prototyped a guided first-run that gets people to their first win in under two minutes, and early tests cut that drop-off by a third. I'm not asking for a budget line — just one engineer for three weeks to run a proper A/B test. If it works, it pays for itself in a month. Can I send you the one-pager and grab fifteen minutes next week?",
+      de: "Kurz, solange ich euch habe. Wir verlieren rund 9% der neuen Anmeldungen in den ersten 24 Stunden — das sind etwa zwei Millionen pro Jahr, die gehen, bevor sie je einen Wert sehen. Ich habe einen geführten Erststart prototypisiert, der Leute in unter zwei Minuten zum ersten Erfolg bringt, und erste Tests senken den Abbruch um ein Drittel. Ich will kein Budget — nur eine:n Engineer für drei Wochen für einen sauberen A/B-Test. Wenn es klappt, amortisiert es sich in einem Monat. Darf ich euch den One-Pager schicken und nächste Woche fünfzehn Minuten bekommen?",
+      "es-ES": "Rápido, ya que os tengo. Estamos perdiendo en torno al 9% de los registros nuevos en las primeras 24 horas — son unos dos millones al año que se van antes de ver ningún valor. He prototipado un primer arranque guiado que lleva a la gente a su primer logro en menos de dos minutos, y las pruebas iniciales reducen ese abandono un tercio. No pido presupuesto — solo un ingeniero durante tres semanas para un test A/B serio. Si funciona, se paga solo en un mes. ¿Os mando el resumen de una página y cojo quince minutos la semana que viene?",
+    },
+  },
+  {
+    id: "C-034",
+    type: "situational",
+    category: "self_awareness_development",
+    difficulty: 3,
+    media: {
+      scene: "boardroom",
+      alt: {
+        en: "A room of colleagues after a mistake came to light.",
+        de: "Ein Raum voller Kolleg:innen, nachdem ein Fehler ans Licht kam.",
+        "es-ES": "Una sala de colegas tras salir a la luz un error.",
+      },
+    },
+    roleCaption: {
+      en: "You're accountable; the mistake was yours.",
+      de: "Du bist verantwortlich; der Fehler war deiner.",
+      "es-ES": "Eres responsable; el error fue tuyo.",
+    },
+    scenario: {
+      en: "A decision you championed caused a costly miss. The team is in the room, morale is low, and everyone's looking at you. Speak.",
+      de: "Eine Entscheidung, für die du eingetreten bist, hat einen teuren Fehlschlag verursacht. Das Team ist im Raum, die Stimmung ist tief, und alle schauen auf dich. Sprich.",
+      "es-ES": "Una decisión que defendiste causó un fallo costoso. El equipo está en la sala, la moral está baja y todos te miran. Habla.",
+    },
+    weights: { content: 0.45, delivery: 0.4, time: 0.15 },
+    keyPoints: [
+      { en: "own it plainly, no deflection", de: "klar Verantwortung übernehmen, kein Ablenken", "es-ES": "asumirlo con claridad, sin desviar" },
+      { en: "no blame on the team", de: "keine Schuld aufs Team", "es-ES": "sin culpar al equipo" },
+      { en: "what you learned / will change", de: "was du gelernt hast / änderst", "es-ES": "qué aprendiste / cambiarás" },
+      { en: "steady the room, refocus forward", de: "den Raum beruhigen, nach vorn richten", "es-ES": "calmar la sala, reenfocar hacia delante" },
+    ],
+    rubric: {
+      content: { strong: "Clear ownership, no blame, a real lesson, and a forward refocus.", adequate: "Owns it but thin on the lesson or the path.", weak: "Deflects, blames, or spirals into apology." },
+      delivery: { strong: "Composed, sincere, steadying — leaderly.", adequate: "Mostly steady.", weak: "Defensive, deflated, or cold." },
+      time: { strong: "Contained and clear.", adequate: "Fits.", weak: "Rambles or over-apologizes." },
+    },
+    modelAnswer: {
+      en: "I want to be clear up front: this one's on me. I pushed for the early launch, I made that call, and it cost us. That's not on anyone in this room — you executed what I asked for. What I got wrong was discounting the risk you flagged, and I'm changing how we gate these decisions so a single strong opinion — mine included — can't override the data. Here's what matters now: we've contained the customer impact, we ship the fix Friday, and I'll have the post-mortem out by Monday with no names, just lessons. We've recovered from worse together. Let's go fix it.",
+      de: "Ich will es vorweg klar sagen: Das geht auf mich. Ich habe auf den frühen Launch gedrängt, ich habe die Entscheidung getroffen, und sie hat uns etwas gekostet. Das liegt an niemandem in diesem Raum — ihr habt umgesetzt, worum ich gebeten habe. Mein Fehler war, das von euch markierte Risiko abzutun, und ich ändere, wie wir solche Entscheidungen absichern, damit keine einzelne starke Meinung — auch nicht meine — die Daten übersteuert. Was jetzt zählt: Wir haben den Kundenschaden eingedämmt, der Fix kommt Freitag, und das Post-mortem liegt Montag vor — ohne Namen, nur Lehren. Wir haben Schlimmeres gemeinsam überstanden. Lasst es uns beheben.",
+      "es-ES": "Quiero dejarlo claro de entrada: esto es responsabilidad mía. Yo empujé el lanzamiento anticipado, yo tomé esa decisión, y nos ha costado. No es culpa de nadie en esta sala — vosotros ejecutasteis lo que pedí. Lo que hice mal fue restar importancia al riesgo que señalasteis, y voy a cambiar cómo validamos estas decisiones para que una sola opinión fuerte — la mía incluida — no pueda imponerse a los datos. Lo que importa ahora: hemos contenido el impacto en clientes, el arreglo sale el viernes, y tendré el post-mortem el lunes, sin nombres, solo lecciones. Hemos remontado cosas peores juntos. Vamos a arreglarlo.",
+    },
+  },
 ];
 
 export function getChallenge(id: string): Challenge | undefined {

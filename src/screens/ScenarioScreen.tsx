@@ -8,6 +8,7 @@ export function ScenarioScreen({ challengeId }: { challengeId: string }) {
   const ch = getChallenge(challengeId);
   // Reveal sequence: 0 media → 1 role caption → 2 scenario text → 3 play enabled
   const [stage, setStage] = useState(0);
+  const [showTips, setShowTips] = useState(false);
 
   useEffect(() => {
     setStage(0);
@@ -39,6 +40,28 @@ export function ScenarioScreen({ challengeId }: { challengeId: string }) {
 
         <div className={`scenario-launch reveal ${stage >= 3 ? "in" : ""}`}>
           <p className="muted small center read-hint">{t("scenario.readFirst")}</p>
+
+          <button
+            className={`btn tips-toggle ${showTips ? "open" : ""}`}
+            onClick={() => setShowTips((s) => !s)}
+            aria-expanded={showTips}
+          >
+            💡 {t("tips.button")}
+          </button>
+
+          {showTips && (
+            <div className="tips-panel">
+              <h4 className="tips-title">{t("tips.title")}</h4>
+              <p className="tips-framework">{t(`tips.fw.${ch.type}`)}</p>
+              <span className="tips-cover-label">{t("tips.cover")}</span>
+              <ul className="tips-points">
+                {ch.keyPoints.map((kp, i) => (
+                  <li key={i}>{kp[locale]}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <button
             className="btn play"
             disabled={stage < 3}
