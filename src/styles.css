@@ -415,12 +415,19 @@ input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 .status-badge { font-size: 0.68rem; font-weight: 700; padding: 0.16rem 0.5rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.04em; }
 .status-badge.active { background: rgba(22,163,74,0.14); color: var(--good); }
 .status-badge.pending { background: rgba(201,138,22,0.16); color: var(--warn); }
+.user-delete { background: none; border: 1px solid var(--line); border-radius: 8px; padding: 6px 9px; font-size: 0.95rem; color: var(--muted); transition: all 0.15s; }
+.user-delete:hover { border-color: var(--bad); color: var(--bad); background: rgba(229,72,77,0.08); }
 
 /* login: auth tabs + guest + email */
 .auth-tabs { display: flex; background: var(--bg-2); border: 1px solid var(--line); border-radius: 999px; padding: 4px; margin: 6px 0 14px; }
 .auth-tab { flex: 1; border: none; background: transparent; color: var(--muted); font-weight: 600; font-size: 0.9rem; padding: 0.5rem; border-radius: 999px; }
 .auth-tab.active { background: var(--panel); color: var(--text); box-shadow: var(--shadow); }
 .login-formtitle { font-size: 1.1rem; margin-bottom: 4px; text-align: left; }
+.left { text-align: left; }
+.pw-wrap { position: relative; display: flex; }
+.pw-wrap input { width: 100%; padding-right: 42px; }
+.pw-eye { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.05rem; padding: 4px 6px; line-height: 1; opacity: 0.7; }
+.pw-eye:hover { opacity: 1; }
 .login-forgot { align-self: flex-start; padding: 2px 0; }
 .login-divider { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 0.78rem; margin: 4px 0; }
 .login-divider::before, .login-divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }

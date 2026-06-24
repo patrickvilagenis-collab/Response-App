@@ -20,11 +20,10 @@ export default async function handler(req, res) {
 
     const raw = (await cmd(s, ["HGET", "ra:users", email]))?.result;
     const user = raw ? JSON.parse(raw) : null;
-    if (!user || !verifyPw(password, user.salt, user.hash)) {
+    if (!user) return res.status(401).json({ error: "bad_credentials" });
+    if (user.status !== "active") return res.status(403).json({ error: "not_activated" });
+    if (!verifyPw(password, user.salt, user.hash)) {
       return res.status(401).json({ error: "bad_credentials" });
-    }
-    if (user.status !== "active") {
-      return res.status(403).json({ error: "not_activated" });
     }
     user.lastSeen = new Date().toISOString();
     await cmd(s, ["HSET", "ra:users", email, JSON.stringify(user)]);

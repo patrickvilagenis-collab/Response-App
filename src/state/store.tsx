@@ -87,9 +87,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // On first load: complete email activation (if ?activate=token) or restore session.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    // Password-reset link: stay on the login screen so the reset form shows.
-    if (params.get("reset")) return;
-    const token = params.get("activate");
+    // Activation / password-reset links are handled on the login screen
+    // (set-password form), so don't auto-restore a session here.
+    if (params.get("reset") || params.get("activate")) return;
     const restore = () => {
       const id = storage.getCurrentProfileId();
       if (!id) return;
@@ -107,21 +107,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
         }).catch(() => {});
       }
     };
-    if (token) {
-      window.history.replaceState({}, "", window.location.pathname);
-      fetch("/api/activate", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ token }),
-      })
-        .then((r) => (r.ok ? r.json() : null))
-        .then((d) => {
-          if (d?.ok) loginAccount(d.email, d.name);
-          else restore();
-        })
-        .catch(restore);
-      return;
-    }
     restore();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -122,6 +122,24 @@ export function AdminScreen() {
     }
   }
 
+  async function deleteUser(email: string) {
+    if (!confirm(t("team.confirmDelete").replace("{email}", email))) return;
+    try {
+      const r = await fetch("/api/delete-user", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ password: pw, email }),
+      });
+      if (!r.ok) return;
+      setUsers((prev) => prev.filter((u) => u.email !== email));
+      // Drop their responses from the local view too.
+      const acctId = "acct_" + email;
+      setList((prev) => prev.filter((a) => a.profileId !== acctId && (a.user || "").toLowerCase() !== email));
+    } catch {
+      /* ignore */
+    }
+  }
+
   const groups = useMemo<UserGroup[]>(() => {
     const map = new Map<string, LoggedAttempt[]>();
     for (const a of list) {
@@ -271,6 +289,9 @@ export function AdminScreen() {
                     <span className={`status-badge ${u.status}`}>{u.status === "active" ? t("team.statusActive") : t("team.statusPending")}</span>
                     <span className="muted small">{u.lastSeen ? new Date(u.lastSeen).toLocaleDateString() : "—"}</span>
                   </div>
+                  <button className="user-delete" onClick={() => deleteUser(u.email)} title={t("team.delete")} aria-label={t("team.delete")}>
+                    🗑
+                  </button>
                 </div>
               ))}
             </div>

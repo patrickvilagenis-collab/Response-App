@@ -4,19 +4,48 @@ import { storage, uid } from "../lib/storage";
 import { LanguagePicker } from "../components/LanguagePicker";
 import type { Profile } from "../types";
 
-type Mode = "login" | "register" | "forgot" | "reset" | "sent" | "devlink";
+type Mode = "login" | "register" | "forgot" | "sent" | "devlink" | "setpw";
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+function PasswordInput(props: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  autoFocus?: boolean;
+  onEnter?: () => void;
+}) {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="pw-wrap">
+      <input
+        type={show ? "text" : "password"}
+        value={props.value}
+        onChange={(e) => props.onChange(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && props.onEnter?.()}
+        placeholder={props.placeholder ?? "••••••••"}
+        autoFocus={props.autoFocus}
+      />
+      <button type="button" className="pw-eye" onClick={() => setShow((s) => !s)} aria-label="Show password" tabIndex={-1}>
+        {show ? "🙈" : "👁"}
+      </button>
+    </div>
+  );
+}
 
 export function LoginScreen() {
   const { t, locale, login, loginAccount } = useApp();
   const profiles = storage.getProfiles();
-  const resetToken = new URLSearchParams(window.location.search).get("reset");
+  const params = new URLSearchParams(window.location.search);
+  const activateToken = params.get("activate");
+  const resetToken = params.get("reset");
+  const setpwKind: "activate" | "reset" | null = activateToken ? "activate" : resetToken ? "reset" : null;
 
-  const [mode, setMode] = useState<Mode>(resetToken ? "reset" : "login");
+  const [mode, setMode] = useState<Mode>(setpwKind ? "setpw" : "login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [msg, setMsg] = useState("");
   const [devLink, setDevLink] = useState("");
   const [busy, setBusy] = useState(false);
@@ -65,17 +94,15 @@ export function LoginScreen() {
 
   async function doRegister() {
     if (!EMAIL_RE.test(email.trim())) return setMsg(t("login.emailInvalid"));
-    if (password.length < 6) return setMsg(t("login.weakPassword"));
     setBusy(true);
     setMsg("");
     try {
       const r = await fetch("/api/register", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), name: name.trim(), password }),
+        body: JSON.stringify({ email: email.trim(), name: name.trim() }),
       });
       if (r.status === 503) return setMsg(t("login.notConfigured"));
-      if (r.status === 400) return setMsg(t("login.weakPassword"));
       const d = await r.json();
       if (d.exists) return setMsg(t("login.exists"));
       if (d.link) {
@@ -116,15 +143,19 @@ export function LoginScreen() {
     }
   }
 
-  async function doReset() {
+  // Sets the password from an activation OR reset link.
+  async function doSetPassword() {
     if (password.length < 6) return setMsg(t("login.weakPassword"));
+    if (password !== confirm) return setMsg(t("login.pwMismatch"));
     setBusy(true);
     setMsg("");
+    const endpoint = setpwKind === "reset" ? "/api/reset" : "/api/activate";
+    const tokenVal = setpwKind === "reset" ? resetToken : activateToken;
     try {
-      const r = await fetch("/api/reset", {
+      const r = await fetch(endpoint, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ token: resetToken, password }),
+        body: JSON.stringify({ token: tokenVal, password }),
       });
       if (r.status === 400) return setMsg(t("login.weakPassword"));
       if (!r.ok) return setMsg(t("login.resetInvalid"));
@@ -156,13 +187,33 @@ export function LoginScreen() {
           <h1>{t("app.name")}</h1>
           <p className="muted">{t("login.title")}</p>
 
-          {/* Confirmation states */}
-          {mode === "sent" || mode === "devlink" ? (
+          {mode === "setpw" ? (
+            <div className="login-form">
+              <h3 className="login-formtitle">
+                {setpwKind === "reset" ? t("login.resetTitle") : t("login.activateTitle")}
+              </h3>
+              <p className="muted small left">
+                {setpwKind === "reset" ? "" : t("login.activateSub")}
+              </p>
+              <label>
+                {t("login.passwordSet")}
+                <PasswordInput value={password} onChange={setPassword} autoFocus onEnter={doSetPassword} />
+              </label>
+              <label>
+                {t("login.confirmPassword")}
+                <PasswordInput value={confirm} onChange={setConfirm} onEnter={doSetPassword} />
+              </label>
+              {msg && <div className="error">{msg}</div>}
+              <button className="btn primary block" onClick={doSetPassword} disabled={busy}>
+                {busy ? "…" : t("login.finish")}
+              </button>
+            </div>
+          ) : mode === "sent" || mode === "devlink" ? (
             <div className="login-sent">
               <div className="login-sent-icon">✉️</div>
               {mode === "sent" ? (
                 <p>
-                  {t("login.checkEmailGeneric")} <strong>{email}</strong>.
+                  {t("login.checkEmailGeneric")} <strong>{email}</strong>. {t("login.thenSetPw")}
                 </p>
               ) : (
                 <>
@@ -174,25 +225,6 @@ export function LoginScreen() {
               )}
               <button className="btn ghost block" onClick={() => go("login")}>
                 ← {t("login.back")}
-              </button>
-            </div>
-          ) : mode === "reset" ? (
-            <div className="login-form">
-              <h3 className="login-formtitle">{t("login.resetTitle")}</h3>
-              <label>
-                {t("login.password")}
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && doReset()}
-                  placeholder="••••••••"
-                  autoFocus
-                />
-              </label>
-              {msg && <div className="error">{msg}</div>}
-              <button className="btn primary block" onClick={doReset} disabled={busy}>
-                {busy ? "…" : t("login.resetSave")}
               </button>
             </div>
           ) : mode === "forgot" ? (
@@ -219,7 +251,6 @@ export function LoginScreen() {
             </div>
           ) : (
             <>
-              {/* Login / Register tabs */}
               <div className="auth-tabs">
                 <button className={`auth-tab ${mode === "login" ? "active" : ""}`} onClick={() => go("login")}>
                   {t("login.tabLogin")}
@@ -229,46 +260,52 @@ export function LoginScreen() {
                 </button>
               </div>
 
-              <div className="login-form">
-                {mode === "register" && (
+              {mode === "register" ? (
+                <div className="login-form">
+                  <p className="muted small left">{t("login.registerHint")}</p>
                   <label>
                     {t("login.name")}
                     <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Alex" />
                   </label>
-                )}
-                <label>
-                  {t("login.email")}
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@work.com"
-                  />
-                </label>
-                <label>
-                  {mode === "register" ? t("login.passwordSet") : t("login.password")}
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && (mode === "register" ? doRegister() : doLogin())}
-                    placeholder="••••••••"
-                  />
-                </label>
-                {msg && <div className="error">{msg}</div>}
-                <button
-                  className="btn primary block"
-                  onClick={mode === "register" ? doRegister : doLogin}
-                  disabled={busy}
-                >
-                  {busy ? "…" : mode === "register" ? t("login.create") : t("login.signin")}
-                </button>
-                {mode === "login" && (
+                  <label>
+                    {t("login.email")}
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && doRegister()}
+                      placeholder="you@work.com"
+                    />
+                  </label>
+                  {msg && <div className="error">{msg}</div>}
+                  <button className="btn primary block" onClick={doRegister} disabled={busy}>
+                    {busy ? "…" : t("login.sendActivation")}
+                  </button>
+                </div>
+              ) : (
+                <div className="login-form">
+                  <label>
+                    {t("login.email")}
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@work.com"
+                    />
+                  </label>
+                  <label>
+                    {t("login.password")}
+                    <PasswordInput value={password} onChange={setPassword} onEnter={doLogin} />
+                  </label>
+                  {msg && <div className="error">{msg}</div>}
+                  <button className="btn primary block" onClick={doLogin} disabled={busy}>
+                    {busy ? "…" : t("login.signin")}
+                  </button>
                   <button className="link-btn login-forgot" onClick={() => go("forgot")}>
                     {t("login.forgot")}
                   </button>
-                )}
-              </div>
+                </div>
+              )}
 
               <div className="login-divider">
                 <span>{t("login.or")}</span>
