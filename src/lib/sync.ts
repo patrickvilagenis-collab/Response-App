@@ -15,10 +15,10 @@ export interface AccountSnapshot {
 
 async function call(body: Record<string, unknown>): Promise<unknown | null> {
   try {
-    const r = await fetch("/api/sync", {
+    const r = await fetch("/api/account", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ action: "sync", ...body }),
     });
     if (!r.ok) return null;
     return await r.json();
