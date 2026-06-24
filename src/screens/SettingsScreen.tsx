@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useApp } from "../state/store";
 import { LanguagePicker } from "../components/LanguagePicker";
 import { testMicrophone } from "../lib/speech";
+import { llmEvaluate } from "../lib/evaluator";
+import { CHALLENGES } from "../data/challenges";
 
 export function SettingsScreen() {
   const { t, settings, setSettings, profile, updateProfile, go } = useApp();
@@ -24,28 +26,23 @@ export function SettingsScreen() {
     setMicResult(ok ? "✓" : "✗");
   }
 
-  // Owner diagnostic: hits the AI proxy and reports exactly what happened, so
-  // "why is it falling back to offline?" has a precise answer.
+  // Owner diagnostic: runs a REAL AI evaluation (same path as a scored answer)
+  // and reports exactly what happened, so "why is it falling back to offline?"
+  // has a precise answer — including the actual upstream error if it fails.
   async function testAi() {
     setAiBusy(true);
     setAiTest(null);
     try {
-      const r = await fetch("/api/evaluate", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ system: "Reply with the single word OK.", user: "Say OK", max_tokens: 10 }),
-      });
-      if (r.ok) {
-        setAiTest({ ok: true, msg: t("settings.aiOk") });
-      } else if (r.status === 503) {
-        setAiTest({ ok: false, msg: t("settings.aiNoKey") });
-      } else {
-        const d = await r.json().catch(() => ({}));
-        const detail = d.detail || d.error || `HTTP ${r.status}`;
-        setAiTest({ ok: false, msg: `${t("settings.aiErr")} ${detail}` });
-      }
-    } catch {
-      setAiTest({ ok: false, msg: t("settings.aiUnreach") });
+      const ch = CHALLENGES[0];
+      const sample = "This is a short sample answer used only to test the AI connection end to end.";
+      const result = await llmEvaluate(ch, sample, 30, profile?.language ?? "en");
+      // A real AI result is tagged source:"llm"; offline never reaches here.
+      if (result.source === "llm") setAiTest({ ok: true, msg: t("settings.aiOk") });
+      else setAiTest({ ok: false, msg: t("settings.aiErr") });
+    } catch (e) {
+      const m = e instanceof Error ? e.message : String(e);
+      if (m.includes("503")) setAiTest({ ok: false, msg: t("settings.aiNoKey") });
+      else setAiTest({ ok: false, msg: `${t("settings.aiErr")} ${m}` });
     } finally {
       setAiBusy(false);
     }

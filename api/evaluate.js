@@ -38,7 +38,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: process.env.EVAL_MODEL || DEFAULT_MODEL,
-        max_tokens: Math.min(Number(max_tokens) || 900, 1500),
+        max_tokens: Math.min(Number(max_tokens) || 1200, 2048),
         system,
         messages: [{ role: "user", content: user }],
       }),
