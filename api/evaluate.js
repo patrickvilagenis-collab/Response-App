@@ -44,9 +44,10 @@ export default async function handler(req, res) {
       }),
     });
 
-    const data = await upstream.json();
+    const data = await upstream.json().catch(() => null);
     if (!upstream.ok) {
-      res.status(502).json({ error: "upstream_error", status: upstream.status });
+      const detail = data?.error?.message || data?.error?.type || "HTTP " + upstream.status;
+      res.status(502).json({ error: "upstream_error", status: upstream.status, detail: String(detail).slice(0, 300) });
       return;
     }
 

@@ -9,6 +9,8 @@ export function SettingsScreen() {
   const [inputDefault, setInputDefault] = useState(profile?.inputDefault ?? "voice");
   const [saved, setSaved] = useState(false);
   const [micResult, setMicResult] = useState<string | null>(null);
+  const [aiTest, setAiTest] = useState<{ ok: boolean; msg: string } | null>(null);
+  const [aiBusy, setAiBusy] = useState(false);
 
   function save() {
     setSettings({ useLlm });
@@ -20,6 +22,33 @@ export function SettingsScreen() {
   async function checkMic() {
     const ok = await testMicrophone();
     setMicResult(ok ? "✓" : "✗");
+  }
+
+  // Owner diagnostic: hits the AI proxy and reports exactly what happened, so
+  // "why is it falling back to offline?" has a precise answer.
+  async function testAi() {
+    setAiBusy(true);
+    setAiTest(null);
+    try {
+      const r = await fetch("/api/evaluate", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ system: "Reply with the single word OK.", user: "Say OK", max_tokens: 10 }),
+      });
+      if (r.ok) {
+        setAiTest({ ok: true, msg: t("settings.aiOk") });
+      } else if (r.status === 503) {
+        setAiTest({ ok: false, msg: t("settings.aiNoKey") });
+      } else {
+        const d = await r.json().catch(() => ({}));
+        const detail = d.detail || d.error || `HTTP ${r.status}`;
+        setAiTest({ ok: false, msg: `${t("settings.aiErr")} ${detail}` });
+      }
+    } catch {
+      setAiTest({ ok: false, msg: t("settings.aiUnreach") });
+    } finally {
+      setAiBusy(false);
+    }
   }
 
   return (
@@ -62,6 +91,14 @@ export function SettingsScreen() {
           {t("settings.useLlm")}
         </label>
         <p className="muted small">{t("settings.aiIntegrated")}</p>
+        <button className="btn ghost sm" onClick={testAi} disabled={aiBusy}>
+          {aiBusy ? "…" : t("settings.aiTest")}
+        </button>
+        {aiTest && (
+          <p className={`ai-test-result ${aiTest.ok ? "ok" : "err"}`}>
+            {aiTest.ok ? "✅" : "⚠️"} {aiTest.msg}
+          </p>
+        )}
       </section>
 
       <p className="muted small privacy-note">🔒 {t("settings.privacy")}</p>
