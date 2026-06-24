@@ -27,6 +27,7 @@ export type Route =
   | { name: "response"; challengeId: string }
   | { name: "results"; attemptId: string }
   | { name: "history" }
+  | { name: "resources" }
   | { name: "settings" }
   | { name: "warmup" }
   | { name: "admin" };

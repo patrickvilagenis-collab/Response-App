@@ -10,6 +10,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const NAV: { name: Route["name"]; key: string }[] = [
     { name: "home", key: "nav.home" },
     { name: "library", key: "nav.library" },
+    { name: "resources", key: "nav.resources" },
     { name: "history", key: "nav.history" },
     ...(profile?.segment === "company" ? [{ name: "admin" as const, key: "nav.team" }] : []),
     { name: "settings", key: "nav.settings" },
