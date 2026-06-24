@@ -434,6 +434,7 @@ input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 .login-sent { text-align: center; display: grid; gap: 12px; margin: 18px 0 8px; }
 .login-sent-icon { font-size: 2.2rem; }
 .login-sent p { color: var(--muted); }
+.mail-err { color: var(--bad) !important; background: rgba(229,72,77,0.08); border: 1px solid rgba(229,72,77,0.25); border-radius: 8px; padding: 8px 10px; word-break: break-word; text-align: left; }
 
 /* team dashboard */
 .team-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 6px 0 16px; }

@@ -29,8 +29,8 @@ export default async function handler(req, res) {
     await cmd(s, ["HSET", "ra:users", email, JSON.stringify(user)]);
 
     const link = `${baseUrl(req)}/?reset=${token}`;
-    const emailed = await sendResetEmail(email, user.name, link);
-    res.status(200).json({ ok: true, emailed, link: emailed ? undefined : link });
+    const m = await sendResetEmail(email, user.name, link);
+    res.status(200).json({ ok: true, emailed: m.sent, link: m.sent ? undefined : link, mailError: m.error });
   } catch {
     res.status(500).json({ error: "reset_request_failed" });
   }

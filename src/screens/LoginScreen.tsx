@@ -48,6 +48,7 @@ export function LoginScreen() {
   const [confirm, setConfirm] = useState("");
   const [msg, setMsg] = useState("");
   const [devLink, setDevLink] = useState("");
+  const [mailErr, setMailErr] = useState("");
   const [busy, setBusy] = useState(false);
 
   function go(m: Mode) {
@@ -107,6 +108,7 @@ export function LoginScreen() {
       if (d.exists) return setMsg(t("login.exists"));
       if (d.link) {
         setDevLink(d.link);
+        setMailErr(d.mailError || "");
         setMode("devlink");
       } else {
         setMode("sent");
@@ -132,6 +134,7 @@ export function LoginScreen() {
       const d = await r.json();
       if (d.link) {
         setDevLink(d.link);
+        setMailErr(d.mailError || "");
         setMode("devlink");
       } else {
         setMode("sent");
@@ -221,6 +224,7 @@ export function LoginScreen() {
                   <a className="btn primary block" href={devLink}>
                     {t("login.openLink")} →
                   </a>
+                  {mailErr && <p className="muted small mail-err">📭 {mailErr}</p>}
                 </>
               )}
               <button className="btn ghost block" onClick={() => go("login")}>

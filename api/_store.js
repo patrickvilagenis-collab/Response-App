@@ -37,27 +37,40 @@ export function readBody(req) {
 }
 
 export async function sendActivationEmail(to, name, link) {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) return false;
-  const from = process.env.MAIL_FROM || "Response <onboarding@resend.dev>";
   const html = `
     <div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:480px;margin:auto;padding:24px;color:#16181d">
       <h1 style="font-size:22px;margin:0 0 8px">Welcome to Response${name ? ", " + escapeHtml(name) : ""} 👋</h1>
-      <p style="color:#5b6072;line-height:1.5">Confirm your email to activate your account and start practising.</p>
+      <p style="color:#5b6072;line-height:1.5">Confirm your email to activate your account and set your password.</p>
       <p style="margin:24px 0">
         <a href="${link}" style="background:#4f46e5;color:#fff;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:600;display:inline-block">Activate my account</a>
       </p>
       <p style="color:#9aa0b0;font-size:13px">Or paste this link in your browser:<br>${link}</p>
     </div>`;
+  return sendMail(to, "Activate your Response account", html);
+}
+
+// Returns { sent: boolean, error?: string } so callers can surface why it failed.
+export async function sendMail(to, subject, html) {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return { sent: false, error: "RESEND_API_KEY not set" };
+  const from = process.env.MAIL_FROM || "Response <onboarding@resend.dev>";
   try {
     const r = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "content-type": "application/json" },
-      body: JSON.stringify({ from, to, subject: "Activate your Response account", html }),
+      body: JSON.stringify({ from, to, subject, html }),
     });
-    return r.ok;
-  } catch {
-    return false;
+    if (r.ok) return { sent: true };
+    let detail = "";
+    try {
+      const j = await r.json();
+      detail = j?.message || j?.error || JSON.stringify(j);
+    } catch {
+      detail = "HTTP " + r.status;
+    }
+    return { sent: false, error: detail.slice(0, 300) };
+  } catch (e) {
+    return { sent: false, error: String(e).slice(0, 200) };
   }
 }
 
@@ -87,9 +100,6 @@ export function verifyPw(password, salt, hash) {
 }
 
 export async function sendResetEmail(to, name, link) {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) return false;
-  const from = process.env.MAIL_FROM || "Response <onboarding@resend.dev>";
   const html = `
     <div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:480px;margin:auto;padding:24px;color:#16181d">
       <h1 style="font-size:22px;margin:0 0 8px">Reset your password</h1>
@@ -99,14 +109,5 @@ export async function sendResetEmail(to, name, link) {
       </p>
       <p style="color:#9aa0b0;font-size:13px">If you didn't request this, you can ignore this email.<br>${link}</p>
     </div>`;
-  try {
-    const r = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "content-type": "application/json" },
-      body: JSON.stringify({ from, to, subject: "Reset your Response password", html }),
-    });
-    return r.ok;
-  } catch {
-    return false;
-  }
+  return sendMail(to, "Reset your Response password", html);
 }
