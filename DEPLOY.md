@@ -111,6 +111,15 @@ manual per person — and you see registered/active users in the Team → Users 
 The Team dashboard's **Users** tab shows everyone who registered, who's
 **active** vs **pending**, and when they were last seen.
 
+### Cross-device sync (built in)
+
+Registered accounts also **sync their profile, attempt history and settings**
+across devices. On login the browser pulls the account's data from the same KV
+store (authorized by a session token issued at login) and merges it with
+anything created locally, then keeps it up to date automatically. So a user can
+sign in on a new phone or browser and find their progress already there instead
+of starting from zero. Guests (no account) stay local to the browser as before.
+
 ## Other hosts
 
 The same pattern works on **Cloudflare Pages** or **Netlify** — move the proxy
