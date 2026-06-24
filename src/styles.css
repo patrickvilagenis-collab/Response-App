@@ -416,7 +416,12 @@ input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 .status-badge.active { background: rgba(22,163,74,0.14); color: var(--good); }
 .status-badge.pending { background: rgba(201,138,22,0.16); color: var(--warn); }
 
-/* login: guest + email */
+/* login: auth tabs + guest + email */
+.auth-tabs { display: flex; background: var(--bg-2); border: 1px solid var(--line); border-radius: 999px; padding: 4px; margin: 6px 0 14px; }
+.auth-tab { flex: 1; border: none; background: transparent; color: var(--muted); font-weight: 600; font-size: 0.9rem; padding: 0.5rem; border-radius: 999px; }
+.auth-tab.active { background: var(--panel); color: var(--text); box-shadow: var(--shadow); }
+.login-formtitle { font-size: 1.1rem; margin-bottom: 4px; text-align: left; }
+.login-forgot { align-self: flex-start; padding: 2px 0; }
 .login-divider { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 0.78rem; margin: 4px 0; }
 .login-divider::before, .login-divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 .login-sent { text-align: center; display: grid; gap: 12px; margin: 18px 0 8px; }

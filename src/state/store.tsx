@@ -87,6 +87,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // On first load: complete email activation (if ?activate=token) or restore session.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    // Password-reset link: stay on the login screen so the reset form shows.
+    if (params.get("reset")) return;
     const token = params.get("activate");
     const restore = () => {
       const id = storage.getCurrentProfileId();

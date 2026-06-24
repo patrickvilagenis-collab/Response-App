@@ -79,10 +79,12 @@ challenge, score, time and full transcript.
 
 ## Optional: accounts + activation email
 
-Anyone can use the app instantly as a **guest** (no setup). If you also want
-people to **register with their email** and receive an **activation link** — and
-to see active users in the Team dashboard — it works on the **same KV store** you
-already created (no per-user setup, nothing manual per person).
+Anyone can use the app instantly as a **guest** (no setup). People can also
+**create an account with email + a password they choose**, confirm it via an
+**activation link**, then **log in with email + password** (and **reset their
+password** by email). Passwords are stored hashed (scrypt) server-side. It all
+runs on the **same KV store** you already created — no per-user setup, nothing
+manual per person — and you see registered/active users in the Team → Users tab.
 
 - **With zero extra setup:** registration already works. Because no email
   provider is configured, the app shows the user their activation link directly

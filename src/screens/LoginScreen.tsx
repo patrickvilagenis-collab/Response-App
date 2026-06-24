@@ -4,15 +4,27 @@ import { storage, uid } from "../lib/storage";
 import { LanguagePicker } from "../components/LanguagePicker";
 import type { Profile } from "../types";
 
-type MagicState = "idle" | "sending" | "sent" | "devlink" | "error" | "notConfigured";
+type Mode = "login" | "register" | "forgot" | "reset" | "sent" | "devlink";
+
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 export function LoginScreen() {
-  const { t, locale, login } = useApp();
+  const { t, locale, login, loginAccount } = useApp();
   const profiles = storage.getProfiles();
+  const resetToken = new URLSearchParams(window.location.search).get("reset");
+
+  const [mode, setMode] = useState<Mode>(resetToken ? "reset" : "login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [state, setState] = useState<MagicState>("idle");
+  const [password, setPassword] = useState("");
+  const [msg, setMsg] = useState("");
   const [devLink, setDevLink] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  function go(m: Mode) {
+    setMsg("");
+    setMode(m);
+  }
 
   function guest() {
     const profile: Profile = {
@@ -29,35 +41,100 @@ export function LoginScreen() {
     login({ ...p, language: locale });
   }
 
-  async function sendMagic() {
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) {
-      setState("error");
-      return;
-    }
-    setState("sending");
+  async function doLogin() {
+    if (!EMAIL_RE.test(email.trim())) return setMsg(t("login.emailInvalid"));
+    setBusy(true);
+    setMsg("");
     try {
-      const r = await fetch("/api/magic", {
+      const r = await fetch("/api/login", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), name: name.trim() }),
+        body: JSON.stringify({ email: email.trim(), password }),
       });
-      if (r.status === 503) {
-        setState("notConfigured");
-        return;
+      if (r.status === 503) return setMsg(t("login.notConfigured"));
+      if (r.status === 403) return setMsg(t("login.notActivated"));
+      if (!r.ok) return setMsg(t("login.badCredentials"));
+      const d = await r.json();
+      loginAccount(d.email, d.name);
+    } catch {
+      setMsg(t("login.badCredentials"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function doRegister() {
+    if (!EMAIL_RE.test(email.trim())) return setMsg(t("login.emailInvalid"));
+    if (password.length < 6) return setMsg(t("login.weakPassword"));
+    setBusy(true);
+    setMsg("");
+    try {
+      const r = await fetch("/api/register", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), name: name.trim(), password }),
+      });
+      if (r.status === 503) return setMsg(t("login.notConfigured"));
+      if (r.status === 400) return setMsg(t("login.weakPassword"));
+      const d = await r.json();
+      if (d.exists) return setMsg(t("login.exists"));
+      if (d.link) {
+        setDevLink(d.link);
+        setMode("devlink");
+      } else {
+        setMode("sent");
       }
-      if (!r.ok) {
-        setState("error");
-        return;
-      }
+    } catch {
+      setMsg(t("login.badCredentials"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function doForgot() {
+    if (!EMAIL_RE.test(email.trim())) return setMsg(t("login.emailInvalid"));
+    setBusy(true);
+    setMsg("");
+    try {
+      const r = await fetch("/api/reset-request", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email: email.trim() }),
+      });
+      if (r.status === 503) return setMsg(t("login.notConfigured"));
       const d = await r.json();
       if (d.link) {
         setDevLink(d.link);
-        setState("devlink");
+        setMode("devlink");
       } else {
-        setState("sent");
+        setMode("sent");
       }
     } catch {
-      setState("error");
+      setMsg(t("login.badCredentials"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function doReset() {
+    if (password.length < 6) return setMsg(t("login.weakPassword"));
+    setBusy(true);
+    setMsg("");
+    try {
+      const r = await fetch("/api/reset", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ token: resetToken, password }),
+      });
+      if (r.status === 400) return setMsg(t("login.weakPassword"));
+      if (!r.ok) return setMsg(t("login.resetInvalid"));
+      const d = await r.json();
+      window.history.replaceState({}, "", window.location.pathname);
+      loginAccount(d.email, d.name);
+    } catch {
+      setMsg(t("login.resetInvalid"));
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -79,70 +156,141 @@ export function LoginScreen() {
           <h1>{t("app.name")}</h1>
           <p className="muted">{t("login.title")}</p>
 
-          {state === "sent" || state === "devlink" ? (
+          {/* Confirmation states */}
+          {mode === "sent" || mode === "devlink" ? (
             <div className="login-sent">
               <div className="login-sent-icon">✉️</div>
-              {state === "sent" ? (
+              {mode === "sent" ? (
                 <p>
-                  {t("login.sent")} <strong>{email}</strong>. {t("login.checkEmail")}
+                  {t("login.checkEmailGeneric")} <strong>{email}</strong>.
                 </p>
               ) : (
                 <>
                   <p>{t("login.devLink")}</p>
                   <a className="btn primary block" href={devLink}>
-                    {t("login.activateNow")} →
+                    {t("login.openLink")} →
                   </a>
                 </>
               )}
-              <button className="btn ghost block" onClick={() => setState("idle")}>
+              <button className="btn ghost block" onClick={() => go("login")}>
                 ← {t("login.back")}
               </button>
             </div>
-          ) : (
+          ) : mode === "reset" ? (
             <div className="login-form">
+              <h3 className="login-formtitle">{t("login.resetTitle")}</h3>
               <label>
-                {t("login.name")}
-                <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Alex" autoFocus />
+                {t("login.password")}
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && doReset()}
+                  placeholder="••••••••"
+                  autoFocus
+                />
               </label>
-
-              <button className="btn primary block" onClick={guest}>
-                {t("login.guest")}
+              {msg && <div className="error">{msg}</div>}
+              <button className="btn primary block" onClick={doReset} disabled={busy}>
+                {busy ? "…" : t("login.resetSave")}
               </button>
-
-              <div className="login-divider">
-                <span>{t("login.orEmail")}</span>
-              </div>
-
+            </div>
+          ) : mode === "forgot" ? (
+            <div className="login-form">
+              <h3 className="login-formtitle">{t("login.forgotTitle")}</h3>
               <label>
                 {t("login.email")}
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && sendMagic()}
+                  onKeyDown={(e) => e.key === "Enter" && doForgot()}
                   placeholder="you@work.com"
+                  autoFocus
                 />
               </label>
-              {state === "error" && <div className="error">{t("login.emailInvalid")}</div>}
-              {state === "notConfigured" && <div className="notice">{t("login.notConfigured")}</div>}
-              <button className="btn ghost block" onClick={sendMagic} disabled={state === "sending"}>
-                {state === "sending" ? "…" : "✉️ " + t("login.sendLink")}
+              {msg && <div className="error">{msg}</div>}
+              <button className="btn primary block" onClick={doForgot} disabled={busy}>
+                {busy ? "…" : t("login.forgotSend")}
+              </button>
+              <button className="btn ghost block" onClick={() => go("login")}>
+                ← {t("login.back")}
               </button>
             </div>
-          )}
-
-          {profiles.length > 0 && state === "idle" && (
-            <div className="profile-list">
-              <span className="muted small">{t("login.existing")}</span>
-              <div className="chips">
-                {profiles.map((p) => (
-                  <button key={p.id} className="chip" onClick={() => quickLogin(p)}>
-                    {p.email ? "✉ " : "🙂 "}
-                    {p.displayName}
-                  </button>
-                ))}
+          ) : (
+            <>
+              {/* Login / Register tabs */}
+              <div className="auth-tabs">
+                <button className={`auth-tab ${mode === "login" ? "active" : ""}`} onClick={() => go("login")}>
+                  {t("login.tabLogin")}
+                </button>
+                <button className={`auth-tab ${mode === "register" ? "active" : ""}`} onClick={() => go("register")}>
+                  {t("login.tabRegister")}
+                </button>
               </div>
-            </div>
+
+              <div className="login-form">
+                {mode === "register" && (
+                  <label>
+                    {t("login.name")}
+                    <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Alex" />
+                  </label>
+                )}
+                <label>
+                  {t("login.email")}
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@work.com"
+                  />
+                </label>
+                <label>
+                  {mode === "register" ? t("login.passwordSet") : t("login.password")}
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && (mode === "register" ? doRegister() : doLogin())}
+                    placeholder="••••••••"
+                  />
+                </label>
+                {msg && <div className="error">{msg}</div>}
+                <button
+                  className="btn primary block"
+                  onClick={mode === "register" ? doRegister : doLogin}
+                  disabled={busy}
+                >
+                  {busy ? "…" : mode === "register" ? t("login.create") : t("login.signin")}
+                </button>
+                {mode === "login" && (
+                  <button className="link-btn login-forgot" onClick={() => go("forgot")}>
+                    {t("login.forgot")}
+                  </button>
+                )}
+              </div>
+
+              <div className="login-divider">
+                <span>{t("login.or")}</span>
+              </div>
+              <button className="btn ghost block" onClick={guest}>
+                {t("login.guest")}
+              </button>
+
+              {profiles.length > 0 && (
+                <div className="profile-list">
+                  <span className="muted small">{t("login.existing")}</span>
+                  <div className="chips">
+                    {profiles.map((p) => (
+                      <button key={p.id} className="chip" onClick={() => quickLogin(p)}>
+                        {p.email ? "✉ " : "🙂 "}
+                        {p.displayName}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
           )}
           <p className="muted small center">{t("login.subtitle")}</p>
         </div>
