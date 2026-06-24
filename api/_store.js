@@ -82,6 +82,12 @@ export function uuid() {
   return globalThis.crypto?.randomUUID?.() ?? "t_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
+// Opaque session token issued on login/activation/reset. The browser stores it
+// and sends it back to /api/sync to read or write that account's data.
+export function makeToken() {
+  return crypto.randomBytes(32).toString("hex");
+}
+
 // --- Password hashing (scrypt, server-side only) ---
 export function makeHash(password) {
   const salt = crypto.randomBytes(16).toString("hex");

@@ -8,6 +8,7 @@ const KEYS = {
   attempts: "ra.attempts",
   settings: "ra.settings",
   currentProfile: "ra.currentProfile",
+  token: "ra.token",
 };
 
 function read<T>(key: string, fallback: T): T {
@@ -48,6 +49,20 @@ export const storage = {
     const all = read<Attempt[]>(KEYS.attempts, []);
     all.push(attempt);
     write(KEYS.attempts, all);
+  },
+  // Replace a single profile's attempts (other profiles untouched). Used when
+  // merging the server copy back into local storage.
+  setAttemptsForProfile(profileId: string, attempts: Attempt[]): void {
+    const others = read<Attempt[]>(KEYS.attempts, []).filter((a) => a.profileId !== profileId);
+    write(KEYS.attempts, [...others, ...attempts]);
+  },
+
+  getToken(): string | null {
+    return read<string | null>(KEYS.token, null);
+  },
+  setToken(token: string | null): void {
+    if (token) write(KEYS.token, token);
+    else localStorage.removeItem(KEYS.token);
   },
 
   getSettings(): Settings {

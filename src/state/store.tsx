@@ -2,8 +2,21 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type { ReactNode } from "react";
 import type { Attempt, Locale, Profile, Settings } from "../types";
 import { storage } from "../lib/storage";
+import { buildSnapshot, mergeIntoLocal, pullAccount, pushAccount } from "../lib/sync";
 import { translator } from "../i18n";
 import { getChallenge } from "../data/challenges";
+
+// Debounced upload of the current account's data, so rapid changes (onboarding
+// taps, settings) coalesce into a single server write. No-op for guests.
+let syncTimer: ReturnType<typeof setTimeout> | null = null;
+function schedulePush(profile: Profile | null): void {
+  const token = storage.getToken();
+  if (!profile?.email || !token) return;
+  if (syncTimer) clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => {
+    void pushAccount(profile.email as string, token, buildSnapshot(profile));
+  }, 1500);
+}
 
 export type Route =
   | { name: "login" }
@@ -27,7 +40,7 @@ interface AppState {
   lastAttempt: Attempt | null;
   t: (key: string) => string;
   login: (profile: Profile) => void;
-  loginAccount: (email: string, name: string) => void;
+  loginAccount: (email: string, name: string, token?: string) => void;
   updateProfile: (patch: Partial<Profile>) => void;
   logout: () => void;
   setLocale: (locale: Locale) => void;
@@ -58,9 +71,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setRoute(p.onboarded ? { name: "home" } : { name: "onboarding" });
   }, []);
 
-  // Log in via a registered account (after email activation).
+  // Pull this account's data from the server and merge it into local state, then
+  // push the union back so anything created locally (offline / on this device)
+  // is preserved. Best-effort: silently keeps local data if the server is down.
+  const hydrateFromServer = useCallback(async (p: Profile) => {
+    const token = storage.getToken();
+    if (!p.email || !token) return;
+    const server = await pullAccount(p.email, token);
+    let current = p;
+    if (server) {
+      const merged = mergeIntoLocal(p.id, p, server);
+      current = merged.profile;
+      setProfile(merged.profile);
+      setAttempts(storage.getAttempts(p.id));
+      setSettingsState(merged.settings);
+      setLocaleState(merged.profile.language);
+      setRoute(merged.profile.onboarded ? { name: "home" } : { name: "onboarding" });
+    }
+    void pushAccount(p.email, token, buildSnapshot(current));
+  }, []);
+
+  // Log in via a registered account (after email activation). `token` is the
+  // session token from the server, used to sync this account's data.
   const loginAccount = useCallback(
-    (email: string, name: string) => {
+    (email: string, name: string, token?: string) => {
+      if (token) storage.setToken(token);
       const id = "acct_" + email;
       const existing = storage.getProfiles().find((p) => p.id === id || p.email === email);
       const p: Profile =
@@ -75,13 +110,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
               createdAt: new Date().toISOString(),
             };
       login(p);
+      void hydrateFromServer(p);
       void fetch("/api/seen", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ email }),
       }).catch(() => {});
     },
-    [login, locale]
+    [login, locale, hydrateFromServer]
   );
 
   // On first load: complete email activation (if ?activate=token) or restore session.
@@ -100,6 +136,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setAttempts(storage.getAttempts(p.id));
       setRoute(p.onboarded ? { name: "home" } : { name: "onboarding" });
       if (p.email) {
+        void hydrateFromServer(p);
         void fetch("/api/seen", {
           method: "POST",
           headers: { "content-type": "application/json" },
@@ -117,12 +154,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (!prev) return prev;
       const next = { ...prev, ...patch };
       storage.saveProfile(next);
+      schedulePush(next);
       return next;
     });
   }, []);
 
   const logout = useCallback(() => {
     storage.setCurrentProfileId(null);
+    storage.setToken(null);
     setProfile(null);
     setRoute({ name: "login" });
   }, []);
@@ -134,15 +173,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const updated = { ...profile, language: l };
         setProfile(updated);
         storage.saveProfile(updated);
+        schedulePush(updated);
       }
     },
     [profile]
   );
 
-  const setSettings = useCallback((s: Settings) => {
-    setSettingsState(s);
-    storage.saveSettings(s);
-  }, []);
+  const setSettings = useCallback(
+    (s: Settings) => {
+      setSettingsState(s);
+      storage.saveSettings(s);
+      schedulePush(profile);
+    },
+    [profile]
+  );
 
   const go = useCallback((r: Route) => setRoute(r), []);
 
@@ -151,6 +195,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       storage.addAttempt(a);
       setAttempts((prev) => [a, ...prev]);
       setLastAttempt(a);
+      schedulePush(profile);
       // Fire-and-forget central logging for admin review. No-op if the backend
       // store isn't configured; never blocks or breaks the user flow.
       void fetch("/api/log", {

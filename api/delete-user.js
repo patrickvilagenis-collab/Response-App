@@ -22,8 +22,9 @@ export default async function handler(req, res) {
   if (!email) return res.status(400).json({ error: "missing_email" });
 
   try {
-    // 1) Remove the account.
+    // 1) Remove the account and its synced data (profile/history/settings).
     await cmd(s, ["HDEL", "ra:users", email]);
+    await cmd(s, ["HDEL", "ra:userdata", email]);
 
     // 2) Remove their logged responses (account profileId = "acct_<email>").
     const acctId = "acct_" + email;

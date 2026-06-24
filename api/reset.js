@@ -1,6 +1,6 @@
 // Complete a password reset with the token from the email + a new password.
 // Body: { token, password }. Returns { ok, email, name }.
-import { store, cmd, readBody, makeHash } from "./_store.js";
+import { store, cmd, readBody, makeHash, makeToken } from "./_store.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -48,8 +48,9 @@ export default async function handler(req, res) {
       user.activatedAt = user.activatedAt || new Date().toISOString();
     }
     user.lastSeen = new Date().toISOString();
+    user.sessionToken = makeToken();
     await cmd(s, ["HSET", "ra:users", user.email, JSON.stringify(user)]);
-    res.status(200).json({ ok: true, email: user.email, name: user.name });
+    res.status(200).json({ ok: true, email: user.email, name: user.name, token: user.sessionToken });
   } catch {
     res.status(500).json({ error: "reset_failed" });
   }

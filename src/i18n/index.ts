@@ -14,7 +14,7 @@ const en: Dict = {
 
   "login.title": "Welcome",
   "login.heroLine": "Step into high-stakes moments and learn to respond with clarity, speed and presence.",
-  "login.subtitle": "Local profile — your data stays in this browser.",
+  "login.subtitle": "Sign in to keep your progress across all your devices.",
   "login.guest": "Continue as guest",
   "login.guestName": "Guest",
   "login.orEmail": "or save your progress with email",
@@ -281,7 +281,7 @@ const de: Dict = {
 
   "login.title": "Willkommen",
   "login.heroLine": "Tritt in Hochdruck-Momente ein und lerne, mit Klarheit, Tempo und Präsenz zu reagieren.",
-  "login.subtitle": "Lokales Profil — deine Daten bleiben in diesem Browser.",
+  "login.subtitle": "Melde dich an, damit dein Fortschritt auf allen Geräten erhalten bleibt.",
   "login.guest": "Als Gast fortfahren",
   "login.guestName": "Gast",
   "login.orEmail": "oder sichere deinen Fortschritt per E-Mail",
@@ -548,7 +548,7 @@ const esES: Dict = {
 
   "login.title": "Bienvenido",
   "login.heroLine": "Métete en momentos de alta presión y aprende a responder con claridad, rapidez y presencia.",
-  "login.subtitle": "Perfil local — tus datos se quedan en este navegador.",
+  "login.subtitle": "Inicia sesión para conservar tu progreso en todos tus dispositivos.",
   "login.guest": "Continuar como invitado",
   "login.guestName": "Invitado",
   "login.orEmail": "o guarda tu progreso con tu email",

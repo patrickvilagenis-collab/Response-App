@@ -1,6 +1,6 @@
 // Log in with email + password. Returns { ok, email, name } on success.
 // Distinguishes: bad credentials (401) vs not-yet-activated (403).
-import { store, cmd, validEmail, readBody, verifyPw } from "./_store.js";
+import { store, cmd, validEmail, readBody, verifyPw, makeToken } from "./_store.js";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -26,8 +26,9 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: "bad_credentials" });
     }
     user.lastSeen = new Date().toISOString();
+    user.sessionToken = makeToken();
     await cmd(s, ["HSET", "ra:users", email, JSON.stringify(user)]);
-    res.status(200).json({ ok: true, email: user.email, name: user.name });
+    res.status(200).json({ ok: true, email: user.email, name: user.name, token: user.sessionToken });
   } catch {
     res.status(500).json({ error: "login_failed" });
   }
