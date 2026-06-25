@@ -476,6 +476,10 @@ input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 .onb-track { display: inline-flex; align-items: center; gap: 8px; background: var(--panel-2); border: 1.5px solid var(--line); border-radius: 999px; padding: 0.7rem 1.1rem; font-size: 0.95rem; font-weight: 600; color: var(--text); transition: all 0.15s; }
 .onb-track:hover { border-color: var(--accent); }
 .onb-track.sel { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.onb-goal-input { width: 100%; padding: 0.8rem 0.9rem; border: 1.5px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--panel); color: var(--text); font-size: 1rem; font-family: inherit; transition: border 0.18s var(--ease); }
+.onb-goal-input:focus { outline: none; border-color: var(--accent); }
+.onb-editlater { margin-top: 12px; }
 .onb-actions { display: flex; justify-content: space-between; margin-top: 26px; }
 .seg-badge { margin-left: 8px; background: var(--gold-soft); color: var(--gold); font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.18rem 0.5rem; border-radius: 999px; }
 
