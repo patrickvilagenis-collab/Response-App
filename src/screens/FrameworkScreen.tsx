@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useApp } from "../state/store";
+import type { Route } from "../state/store";
 import { FRAMEWORK, SCALE, behaviorLabel, behaviorPillar } from "../data/leadershipFramework";
-import { generateDevelopmentPlan } from "../lib/leadership";
-import type { DevPlan } from "../types";
+import { generateDevelopmentPlan, scenariosForBehavior } from "../lib/leadership";
+import { bestAttemptsById } from "../lib/stats";
+import { levelOf } from "../lib/facets";
+import type { Attempt, DevPlan, Locale } from "../types";
 
 const PILLAR_NAME: Record<string, string> = { elevate: "Elevate", engage: "Engage", execute: "Execute" };
 
@@ -11,8 +14,9 @@ function scoreColor(score: number): string {
 }
 
 export function FrameworkScreen() {
-  const { t, locale, attempts, profile, updateProfile } = useApp();
+  const { t, locale, attempts, profile, updateProfile, go } = useApp();
   const plan = profile?.devPlan ?? null;
+  const bestById = useMemo(() => bestAttemptsById(attempts), [attempts]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [showRef, setShowRef] = useState(!plan);
@@ -60,7 +64,7 @@ export function FrameworkScreen() {
         {error && <p className="error fw-error">{error}</p>}
       </section>
 
-      {plan && <PlanView plan={plan} locale={locale} t={t} />}
+      {plan && <PlanView plan={plan} locale={locale} t={t} go={go} bestById={bestById} />}
 
       {/* Framework reference */}
       <section className="fw-ref">
@@ -103,7 +107,19 @@ export function FrameworkScreen() {
   );
 }
 
-function PlanView({ plan, locale, t }: { plan: DevPlan; locale: import("../types").Locale; t: (k: string) => string }) {
+function PlanView({
+  plan,
+  locale,
+  t,
+  go,
+  bestById,
+}: {
+  plan: DevPlan;
+  locale: Locale;
+  t: (k: string) => string;
+  go: (r: Route) => void;
+  bestById: Map<string, Attempt>;
+}) {
   const ratingsByPillar = FRAMEWORK.map((p) => ({
     pillar: p,
     rows: plan.ratings.filter((r) => behaviorPillar(r.behavior) === p.id),
@@ -156,24 +172,52 @@ function PlanView({ plan, locale, t }: { plan: DevPlan; locale: import("../types
       {plan.growthAreas.length > 0 && (
         <section className="fw-section">
           <h2 className="section-title">{t("framework.growthTitle")}</h2>
-          {plan.growthAreas.map((g) => (
-            <div key={g.behavior} className="fw-growth">
-              <h3 className="fw-growth-title">{behaviorLabel(g.behavior, locale)}</h3>
-              {g.why && <p className="fw-growth-why muted">{g.why}</p>}
-              <div className="fw-growth-cols">
-                <div className="fw-col">
-                  <span className="fw-col-label">{t("framework.challenges")}</span>
-                  <ul>{g.challenges.map((c, i) => <li key={i}>{c}</li>)}</ul>
+          {plan.growthAreas.map((g) => {
+            const scenarios = scenariosForBehavior(g.behavior, bestById, 3);
+            return (
+              <div key={g.behavior} className="fw-growth">
+                <h3 className="fw-growth-title">{behaviorLabel(g.behavior, locale)}</h3>
+                {g.why && <p className="fw-growth-why muted">{g.why}</p>}
+                <div className="fw-growth-cols">
+                  <div className="fw-col">
+                    <span className="fw-col-label">{t("framework.challenges")}</span>
+                    <ul>{g.challenges.map((c, i) => <li key={i}>{c}</li>)}</ul>
+                  </div>
+                  <div className="fw-col">
+                    <span className="fw-col-label">{t("framework.exercises")}</span>
+                    <ul>{g.exercises.map((e, i) => <li key={i}>{e}</li>)}</ul>
+                  </div>
                 </div>
-                <div className="fw-col">
-                  <span className="fw-col-label">{t("framework.exercises")}</span>
-                  <ul>{g.exercises.map((e, i) => <li key={i}>{e}</li>)}</ul>
-                </div>
+                {scenarios.length > 0 && (
+                  <div className="fw-package">
+                    <span className="fw-col-label">{t("framework.practiceThese")}</span>
+                    <div className="fw-package-list">
+                      {scenarios.map((c) => (
+                        <button
+                          key={c.id}
+                          className="fw-scenario"
+                          onClick={() => go({ name: "scenario", challengeId: c.id })}
+                        >
+                          <span className="fw-scenario-text">{trim(c.scenario[locale], 90)}</span>
+                          <span className="fw-scenario-meta">
+                            {t(`lvl.${levelOf(c.difficulty)}`)}
+                            {(bestById.get(c.id)?.evaluation.final ?? -1) >= 55 && <span className="fw-scenario-done"> · ✓</span>}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </section>
       )}
     </>
   );
+}
+
+function trim(s: string | undefined, n: number): string {
+  if (!s) return "";
+  return s.length > n ? s.slice(0, n).trimEnd() + "…" : s;
 }
