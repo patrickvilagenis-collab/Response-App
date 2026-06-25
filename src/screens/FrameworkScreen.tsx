@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useApp } from "../state/store";
 import type { Route } from "../state/store";
 import { FRAMEWORK, SCALE, behaviorLabel, behaviorPillar, pillarAverages } from "../data/leadershipFramework";
-import { generateDevelopmentPlan, scenariosForBehavior } from "../lib/leadership";
+import { generateDevelopmentPlan, scenariosForBehavior, scenariosForPillar } from "../lib/leadership";
 import { bestAttemptsById } from "../lib/stats";
 import { levelOf } from "../lib/facets";
 import { translator } from "../i18n";
@@ -133,10 +133,13 @@ function PlanView({
   go: (r: Route) => void;
   bestById: Map<string, Attempt>;
 }) {
+  // Show ALL three pillars. A pillar with no ratings means the user hasn't
+  // practised scenarios that reveal it (e.g. Elevate = strategic/innovation),
+  // so instead of hiding it we prompt them to practise it.
   const ratingsByPillar = FRAMEWORK.map((p) => ({
     pillar: p,
     rows: plan.ratings.filter((r) => behaviorPillar(r.behavior) === p.id),
-  })).filter((g) => g.rows.length > 0);
+  }));
 
   return (
     <>
@@ -147,23 +150,27 @@ function PlanView({
           {ratingsByPillar.map(({ pillar, rows }) => (
             <div key={pillar.id} className="fw-rate-group">
               <span className={`fw-pill-tag ${pillar.id}`}>{PILLAR_NAME[pillar.id]}</span>
-              {rows.map((r) => (
-                <div key={r.behavior} className="fw-rate">
-                  <div className="fw-rate-head">
-                    <span className="fw-rate-name">{behaviorLabel(r.behavior, locale)}</span>
-                    <span className="fw-dots">
-                      {[1, 2, 3, 4, 5].map((n) => (
-                        <span
-                          key={n}
-                          className="fw-dot"
-                          style={{ background: n <= r.score ? scoreColor(r.score) : "var(--line)" }}
-                        />
-                      ))}
-                    </span>
+              {rows.length === 0 ? (
+                <PillarEmpty pillarId={pillar.id} locale={locale} t={t} go={go} bestById={bestById} />
+              ) : (
+                rows.map((r) => (
+                  <div key={r.behavior} className="fw-rate">
+                    <div className="fw-rate-head">
+                      <span className="fw-rate-name">{behaviorLabel(r.behavior, locale)}</span>
+                      <span className="fw-dots">
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <span
+                            key={n}
+                            className="fw-dot"
+                            style={{ background: n <= r.score ? scoreColor(r.score) : "var(--line)" }}
+                          />
+                        ))}
+                      </span>
+                    </div>
+                    {r.evidence && <p className="fw-evidence muted small">{r.evidence}</p>}
                   </div>
-                  {r.evidence && <p className="fw-evidence muted small">{r.evidence}</p>}
-                </div>
-              ))}
+                ))
+              )}
             </div>
           ))}
         </section>
@@ -233,6 +240,43 @@ function PlanView({
 function trim(s: string | undefined, n: number): string {
   if (!s) return "";
   return s.length > n ? s.slice(0, n).trimEnd() + "…" : s;
+}
+
+// Shown for a pillar with no ratings yet: explains why and offers scenarios
+// that exercise it, so the user can fill the gap instead of seeing a blank.
+function PillarEmpty({
+  pillarId,
+  locale,
+  t,
+  go,
+  bestById,
+}: {
+  pillarId: "elevate" | "engage" | "execute";
+  locale: Locale;
+  t: (k: string) => string;
+  go: (r: Route) => void;
+  bestById: Map<string, Attempt>;
+}) {
+  const scenarios = scenariosForPillar(pillarId, bestById, 3);
+  return (
+    <div className="fw-pillar-empty">
+      <p className="muted small">{t("framework.pillarEmpty")}</p>
+      {scenarios.length > 0 && (
+        <div className="fw-package-list">
+          {scenarios.map((c) => (
+            <button
+              key={c.id}
+              className="fw-scenario"
+              onClick={() => go({ name: "scenario", challengeId: c.id })}
+            >
+              <span className="fw-scenario-text">{trim(c.scenario[locale], 90)}</span>
+              <span className="fw-scenario-meta">{t(`lvl.${levelOf(c.difficulty)}`)}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function avgColor(n: number | null): string {

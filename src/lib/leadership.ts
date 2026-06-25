@@ -257,3 +257,30 @@ export function scenariosForBehavior(
   });
   return matches.slice(0, n);
 }
+
+/** Scenarios that exercise a whole pillar — used to prompt practice for a
+ *  pillar the user hasn't covered yet (so it never silently disappears). */
+export function scenariosForPillar(
+  pillarId: "elevate" | "engage" | "execute",
+  bestById: Map<string, Attempt>,
+  n = 3
+): Challenge[] {
+  const pillar = FRAMEWORK.find((p) => p.id === pillarId);
+  if (!pillar) return [];
+  const behaviorIds = pillar.competencies.flatMap((c) => c.behaviors.map((b) => b.id));
+  const seen = new Set<string>();
+  const out: Challenge[] = [];
+  // Round-robin one scenario per behavior so the mix spans the whole pillar.
+  const perBehavior = behaviorIds.map((id) => scenariosForBehavior(id, bestById, n + 2));
+  let i = 0;
+  while (out.length < n && perBehavior.some((list) => list.length)) {
+    const list = perBehavior[i % perBehavior.length];
+    const c = list.shift();
+    if (c && !seen.has(c.id)) {
+      seen.add(c.id);
+      out.push(c);
+    }
+    i++;
+  }
+  return out.slice(0, n);
+}
