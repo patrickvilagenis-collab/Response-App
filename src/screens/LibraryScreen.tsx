@@ -6,16 +6,19 @@ import { SceneMedia } from "../components/SceneMedia";
 import { WarmUpBanner } from "../components/WarmUpBanner";
 import { TRACKS, tracksFor, challengesInTrack, type TrackId } from "../lib/tracks";
 import { SITUATIONS, situationOf, levelOf, LEVELS, type Situation } from "../lib/facets";
-import type { Challenge, RoleLevel } from "../types";
+import { DEPARTMENTS, challengeDept } from "../data/departments";
+import type { Challenge, RoleLevel, Department } from "../types";
 
 export function LibraryScreen() {
-  const { t, locale, attempts, go, route } = useApp();
+  const { t, locale, attempts, go, route, profile } = useApp();
   const stats = computeStats(attempts);
 
   const initialTrack = (route.name === "library" && route.track ? route.track : "all") as TrackId | "all";
   const [track, setTrack] = useState<TrackId | "all">(initialTrack);
   const [situation, setSituation] = useState<Situation | "all">("all");
   const [level, setLevel] = useState<RoleLevel | "all">("all");
+  // Default the area filter to what the user practises most, if known.
+  const [dept, setDept] = useState<Department | "all">(profile?.focus ?? profile?.department ?? "all");
   const [query, setQuery] = useState("");
 
   const q = query.trim().toLowerCase();
@@ -23,15 +26,16 @@ export function LibraryScreen() {
     () =>
       CHALLENGES.filter(
         (c) =>
+          (dept === "all" || challengeDept(c) === dept) &&
           (track === "all" || tracksFor(c).includes(track)) &&
           (situation === "all" || situationOf(c) === situation) &&
           (level === "all" || levelOf(c.difficulty) === level) &&
           (q === "" || (c.scenario[locale] ?? "").toLowerCase().includes(q))
       ),
-    [track, situation, level, q, locale]
+    [dept, track, situation, level, q, locale]
   );
 
-  const noFilters = track === "all" && situation === "all" && level === "all" && q === "";
+  const noFilters = dept === "all" && track === "all" && situation === "all" && level === "all" && q === "";
 
   function card(c: Challenge) {
     return (
@@ -65,6 +69,22 @@ export function LibraryScreen() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
+
+      {/* Area / department chips — the primary axis */}
+      <div className="chip-scroll">
+        <button className={`sit-chip ${dept === "all" ? "active" : ""}`} onClick={() => setDept("all")}>
+          {t("library.allAreas")}
+        </button>
+        {DEPARTMENTS.map((d) => (
+          <button
+            key={d.key}
+            className={`sit-chip ${dept === d.key ? "active" : ""}`}
+            onClick={() => setDept((cur) => (cur === d.key ? "all" : d.key))}
+          >
+            <span>{d.icon}</span> {t(d.labelKey)}
+          </button>
+        ))}
+      </div>
 
       {/* Situation-first chips */}
       <div className="chip-scroll">

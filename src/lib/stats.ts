@@ -59,9 +59,14 @@ const DIM_TO_TYPES: Record<string, string[]> = {
 };
 
 /** Recommend the lowest-difficulty uncleared challenge biased to the weakest dimension. */
-export function recommend(_attempts: Attempt[], stats: Stats): Challenge {
+export function recommend(_attempts: Attempt[], stats: Stats, preferredDept?: string): Challenge {
   const uncleared = CHALLENGES.filter((c) => !stats.clearedIds.has(c.id));
-  const pool = uncleared.length > 0 ? uncleared : CHALLENGES;
+  let pool = uncleared.length > 0 ? uncleared : CHALLENGES;
+  // Prefer the user's focus area, but never return empty.
+  if (preferredDept) {
+    const inDept = pool.filter((c) => (c.department ?? "leadership") === preferredDept);
+    if (inDept.length > 0) pool = inDept;
+  }
 
   const preferredTypes = stats.weakestDimension ? DIM_TO_TYPES[stats.weakestDimension] : [];
   const sorted = [...pool].sort((a, b) => {
