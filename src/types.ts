@@ -178,6 +178,7 @@ export interface DevPlan {
   growthAreas: GrowthArea[];
   generatedAt: string;
   basedOn: number; // number of attempts analysed
+  locale?: Locale; // language the AI text was generated in (for consistent display)
 }
 // Lightweight record kept for the evolution history (no large text).
 export interface PlanSnapshot {
