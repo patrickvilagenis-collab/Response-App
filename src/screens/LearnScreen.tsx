@@ -5,7 +5,7 @@ import type { MicroCourse } from "../data/learn";
 import { behaviorLabel } from "../data/leadershipFramework";
 import { scenariosForBehavior } from "../lib/leadership";
 import { bestAttemptsById } from "../lib/stats";
-import { LearnVisual } from "../components/LearnVisual";
+import { LearnVisual, SlideArt, pillarColor } from "../components/LearnVisual";
 import type { LearnRecord } from "../types";
 
 const PILLAR_NAME: Record<string, string> = { elevate: "Elevate", engage: "Engage", execute: "Execute" };
@@ -231,29 +231,42 @@ function TeachSlide({
 }) {
   const isTool = slide === course.cards.length;
   return (
-    <div className="learn-slide teach">
-      <LearnVisual icon={course.icon} pillar={pillar} size={110} />
-      {!isTool ? (
-        <>
-          <span className="learn-kicker">{localized(course.title, locale)}</span>
-          <h2 className="learn-h">{localized(course.cards[slide].heading, locale)}</h2>
-          <p className="learn-body">{localized(course.cards[slide].body, locale)}</p>
-        </>
-      ) : (
-        <>
-          <span className="learn-kicker">{t("learn.tool")}</span>
-          <h2 className="learn-h">{localized(course.tool.name, locale)}</h2>
-          <p className="learn-body">{localized(course.tool.desc, locale)}</p>
-          <div className="learn-steps">
-            <span className="learn-steps-label">{t("learn.steps")}</span>
-            <ol>
-              {course.tool.steps.map((s, i) => (
-                <li key={i}>{localized(s, locale)}</li>
-              ))}
-            </ol>
-          </div>
-        </>
-      )}
+    <div className="learn-slide teach editorial" key={slide} style={{ ["--c" as string]: pillarColor(pillar) }}>
+      <SlideArt icon={course.icon} pillar={pillar} variant={slide} label={isTool ? t("learn.tool") : undefined} />
+
+      <div className="slide-copy">
+        {!isTool ? (
+          <>
+            <span className="slide-kicker">
+              <span className={`slide-pill ${pillar ?? ""}`} />
+              {localized(course.title, locale)}
+            </span>
+            <h2 className="slide-h">{localized(course.cards[slide].heading, locale)}</h2>
+            <p className="slide-body">{localized(course.cards[slide].body, locale)}</p>
+          </>
+        ) : (
+          <>
+            <span className="slide-kicker">
+              <span className={`slide-pill ${pillar ?? ""}`} />
+              {t("learn.tool")}
+            </span>
+            <h2 className="slide-h">{localized(course.tool.name, locale)}</h2>
+            <p className="slide-body">{localized(course.tool.desc, locale)}</p>
+            <div className="slide-steps">
+              <span className="slide-steps-label">{t("learn.steps")}</span>
+              <ol>
+                {course.tool.steps.map((s, i) => (
+                  <li key={i}>
+                    <span className="slide-step-n">{i + 1}</span>
+                    <span>{localized(s, locale)}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </>
+        )}
+      </div>
+
       <div className="learn-dots" aria-hidden="true">
         {Array.from({ length: course.cards.length + 1 }).map((_, i) => (
           <span key={i} className={i === slide ? "on" : ""} />
