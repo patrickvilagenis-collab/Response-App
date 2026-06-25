@@ -4,17 +4,15 @@ import { CHALLENGES } from "../data/challenges";
 import { computeStats } from "../lib/stats";
 import { SceneMedia } from "../components/SceneMedia";
 import { WarmUpBanner } from "../components/WarmUpBanner";
-import { situationOf, levelOf, LEVELS } from "../lib/facets";
-import { DEPARTMENTS, challengeDept } from "../data/departments";
-import type { Challenge, RoleLevel, Department } from "../types";
+import { SITUATIONS, situationOf, levelOf, LEVELS, type Situation } from "../lib/facets";
+import type { Challenge, RoleLevel } from "../types";
 
 export function LibraryScreen() {
   const { t, locale, attempts, go, profile, route } = useApp();
   const stats = computeStats(attempts);
 
-  // Area filter: an explicit choice from navigation wins, else the user's focus.
-  const routeDept = route.name === "library" ? (route.dept as Department | undefined) : undefined;
-  const [dept, setDept] = useState<Department | "all">(routeDept ?? profile?.focus ?? profile?.department ?? "all");
+  const routeSituation = route.name === "library" ? (route.situation as Situation | undefined) : undefined;
+  const [situation, setSituation] = useState<Situation | "all">(routeSituation ?? "all");
   const [level, setLevel] = useState<RoleLevel | "all">("all");
   const [query, setQuery] = useState("");
 
@@ -23,14 +21,16 @@ export function LibraryScreen() {
     () =>
       CHALLENGES.filter(
         (c) =>
-          (dept === "all" || challengeDept(c) === dept) &&
+          (situation === "all" || situationOf(c) === situation) &&
           (level === "all" || levelOf(c.difficulty) === level) &&
           (q === "" || (c.scenario[locale] ?? "").toLowerCase().includes(q))
       ),
-    [dept, level, q, locale]
+    [situation, level, q, locale]
   );
 
-  const noFilters = dept === "all" && level === "all" && q === "";
+  const noFilters = situation === "all" && level === "all" && q === "";
+  // Bias the no-filter ordering of situation rails toward the user's focus area.
+  const railOrder = useMemo(() => orderSituationsByFocus(profile?.focus ?? profile?.department), [profile]);
 
   function card(c: Challenge) {
     return (
@@ -65,18 +65,18 @@ export function LibraryScreen() {
         onChange={(e) => setQuery(e.target.value)}
       />
 
-      {/* Area / department — the single topical axis */}
-      <div className="chip-scroll">
-        <button className={`sit-chip ${dept === "all" ? "active" : ""}`} onClick={() => setDept("all")}>
-          {t("library.allAreas")}
+      {/* Situation — the kind of moment you want to rehearse */}
+      <div className="seg-filter">
+        <button className={`seg-chip ${situation === "all" ? "active" : ""}`} onClick={() => setSituation("all")}>
+          {t("library.all")}
         </button>
-        {DEPARTMENTS.map((d) => (
+        {SITUATIONS.map((s) => (
           <button
-            key={d.key}
-            className={`sit-chip ${dept === d.key ? "active" : ""}`}
-            onClick={() => setDept((cur) => (cur === d.key ? "all" : d.key))}
+            key={s.id}
+            className={`seg-chip ${situation === s.id ? "active" : ""}`}
+            onClick={() => setSituation((cur) => (cur === s.id ? "all" : s.id))}
           >
-            {t(d.labelKey)}
+            {t(`situation.${s.id}`)}
           </button>
         ))}
       </div>
@@ -99,15 +99,15 @@ export function LibraryScreen() {
       <WarmUpBanner />
 
       {noFilters ? (
-        // When nothing is filtered, browse by area
-        DEPARTMENTS.map((d) => {
-          const items = CHALLENGES.filter((c) => challengeDept(c) === d.key);
+        // When nothing is filtered, browse by situation
+        railOrder.map((sit) => {
+          const items = CHALLENGES.filter((c) => situationOf(c) === sit);
           if (items.length === 0) return null;
           return (
-            <section key={d.key} className="rail">
+            <section key={sit} className="rail">
               <div className="rail-head">
-                <h2 className="rail-title">{t(d.labelKey)}</h2>
-                <button className="link-btn" onClick={() => setDept(d.key)}>{t("home.seeAll")} →</button>
+                <h2 className="rail-title">{t(`situation.${sit}`)}</h2>
+                <button className="link-btn" onClick={() => setSituation(sit)}>{t("home.seeAll")} →</button>
               </div>
               <div className="rail-track">{items.map(card)}</div>
             </section>
@@ -120,6 +120,23 @@ export function LibraryScreen() {
       )}
     </div>
   );
+}
+
+// The situations most relevant to a given area float to the top of the rails.
+function orderSituationsByFocus(focus?: string): Situation[] {
+  const all = SITUATIONS.map((s) => s.id);
+  const priority: Record<string, Situation[]> = {
+    commercial: ["client", "conflict", "board"],
+    customer: ["client", "conflict", "crisis"],
+    people: ["one_on_one", "feedback", "conflict"],
+    finance: ["board", "conflict", "crisis"],
+    technology: ["crisis", "board", "conflict"],
+    operations: ["crisis", "board", "conflict"],
+    legal: ["board", "conflict", "client"],
+    leadership: ["board", "conflict", "one_on_one"],
+  };
+  const pref = (focus && priority[focus]) || [];
+  return [...pref, ...all.filter((s) => !pref.includes(s))];
 }
 
 function trim(s: string | undefined, n: number): string {

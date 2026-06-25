@@ -2,7 +2,7 @@ import { useApp } from "../state/store";
 import { computeStats, recommend, randomChallenge } from "../lib/stats";
 import { SceneMedia } from "../components/SceneMedia";
 import { challengesInTrack, type TrackId } from "../lib/tracks";
-import { DEPARTMENTS } from "../data/departments";
+import { SITUATIONS } from "../lib/facets";
 import { BAND_COLORS, bandFor } from "../lib/scoring";
 import { CHALLENGES, getChallenge } from "../data/challenges";
 import type { Challenge, Profile } from "../types";
@@ -54,15 +54,15 @@ export function HomeScreen() {
         </button>
       </div>
 
-      {/* Browse by area */}
+      {/* Browse by situation */}
       <div className="track-head">
-        <h2 className="section-title">{t("home.areas")}</h2>
+        <h2 className="section-title">{t("home.tracks")}</h2>
         <button className="link-btn" onClick={() => go({ name: "library" })}>{t("home.seeAll")} →</button>
       </div>
       <div className="track-chips">
-        {DEPARTMENTS.map((d) => (
-          <button key={d.key} className="track-chip" onClick={() => go({ name: "library", dept: d.key })}>
-            {t(d.labelKey)}
+        {SITUATIONS.map((s) => (
+          <button key={s.id} className="track-chip" onClick={() => go({ name: "library", situation: s.id })}>
+            {t(`situation.${s.id}`)}
           </button>
         ))}
       </div>
