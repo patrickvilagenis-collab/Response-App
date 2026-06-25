@@ -73,7 +73,7 @@ export function OnboardingScreen() {
             <div className="onb-tracks">
               {DEPARTMENTS.map((d) => (
                 <button key={d.key} className={`onb-track ${dept === d.key ? "sel" : ""}`} onClick={() => setDept(d.key)}>
-                  <span className="track-chip-icon">{d.icon}</span> {t(d.labelKey)}
+                  {t(d.labelKey)}
                 </button>
               ))}
             </div>
@@ -86,7 +86,7 @@ export function OnboardingScreen() {
             <div className="onb-tracks">
               {TRACKS.map((tr) => (
                 <button key={tr.id} className={`onb-track ${goal === tr.id ? "sel" : ""}`} onClick={() => setGoal(tr.id)}>
-                  <span className="track-chip-icon">{tr.icon}</span> {t(`track.${tr.id}`)}
+                  {t(`track.${tr.id}`)}
                 </button>
               ))}
             </div>

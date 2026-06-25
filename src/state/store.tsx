@@ -22,7 +22,7 @@ export type Route =
   | { name: "login" }
   | { name: "onboarding" }
   | { name: "home" }
-  | { name: "library"; track?: string }
+  | { name: "library"; track?: string; dept?: string }
   | { name: "scenario"; challengeId: string }
   | { name: "response"; challengeId: string }
   | { name: "results"; attemptId: string }
