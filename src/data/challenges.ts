@@ -1,4 +1,5 @@
 import type { Challenge } from "../types";
+import { DEPARTMENT_CHALLENGES } from "./challenges-departments";
 
 // Seed challenge library — see docs/challenge-library.md
 // Scenario text is immersive, second-person and localized (en / de / es-ES).
@@ -1472,6 +1473,9 @@ export const CHALLENGES: Challenge[] = [
     },
   },
 ];
+
+// Department-specific scenarios extend the general seed library.
+CHALLENGES.push(...DEPARTMENT_CHALLENGES);
 
 export function getChallenge(id: string): Challenge | undefined {
   return CHALLENGES.find((c) => c.id === id);

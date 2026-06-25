@@ -12,7 +12,7 @@ const PREF_DIFF: Record<string, number> = { ic: 2, manager: 2, director: 3, exec
 export function HomeScreen() {
   const { t, locale, profile, attempts, go } = useApp();
   const stats = computeStats(attempts);
-  const fallback = recommend(attempts, stats);
+  const fallback = recommend(attempts, stats, profile?.focus ?? profile?.department);
   const personalized = personalize(profile, stats.clearedIds);
   const rec = personalized[0] ?? fallback;
   const recommendedThree = personalized.length >= 3 ? personalized.slice(0, 3) : pickThree(rec.id);

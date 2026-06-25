@@ -4,11 +4,20 @@ import { LanguagePicker } from "../components/LanguagePicker";
 import { testMicrophone } from "../lib/speech";
 import { llmEvaluate } from "../lib/evaluator";
 import { CHALLENGES } from "../data/challenges";
+import { DEPARTMENTS } from "../data/departments";
+import { LEVELS } from "../lib/facets";
+import type { Department, RoleLevel, TeamSize } from "../types";
 
 export function SettingsScreen() {
   const { t, settings, setSettings, profile, updateProfile, go } = useApp();
   const [useLlm, setUseLlm] = useState(settings.useLlm);
   const [inputDefault, setInputDefault] = useState(profile?.inputDefault ?? "voice");
+  // Training profile — drives a more tailored plan.
+  const [department, setDepartment] = useState<Department | "">(profile?.department ?? "");
+  const [roleLevel, setRoleLevel] = useState<RoleLevel | "">(profile?.roleLevel ?? "");
+  const [teamSize, setTeamSize] = useState<TeamSize | "">(profile?.teamSize ?? "");
+  const [focus, setFocus] = useState<Department | "">(profile?.focus ?? "");
+  const [goal, setGoal] = useState(profile?.goal ?? "");
   const [saved, setSaved] = useState(false);
   const [micResult, setMicResult] = useState<string | null>(null);
   const [aiTest, setAiTest] = useState<{ ok: boolean; msg: string } | null>(null);
@@ -16,7 +25,14 @@ export function SettingsScreen() {
 
   function save() {
     setSettings({ useLlm });
-    updateProfile({ inputDefault });
+    updateProfile({
+      inputDefault,
+      department: department || undefined,
+      roleLevel: roleLevel || undefined,
+      teamSize: teamSize || undefined,
+      focus: focus || undefined,
+      goal: goal.trim() || undefined,
+    });
     setSaved(true);
     setTimeout(() => setSaved(false), 1500);
   }
@@ -58,6 +74,59 @@ export function SettingsScreen() {
         <h2 className="section-title">{t("settings.language")}</h2>
         <p className="muted small">{t("settings.languageHint")}</p>
         <LanguagePicker />
+      </section>
+
+      <section className="setting-block">
+        <h2 className="section-title">{t("settings.profileTitle")}</h2>
+        <p className="muted small">{t("settings.profileHint")}</p>
+        <div className="profile-grid">
+          <label className="field">
+            <span>{t("settings.area")}</span>
+            <select value={department} onChange={(e) => setDepartment(e.target.value as Department | "")}>
+              <option value="">{t("settings.choose")}</option>
+              {DEPARTMENTS.map((d) => (
+                <option key={d.key} value={d.key}>{t(d.labelKey)}</option>
+              ))}
+            </select>
+          </label>
+          <label className="field">
+            <span>{t("settings.role")}</span>
+            <select value={roleLevel} onChange={(e) => setRoleLevel(e.target.value as RoleLevel | "")}>
+              <option value="">{t("settings.choose")}</option>
+              {LEVELS.map((l) => (
+                <option key={l} value={l}>{t(`role.${l}`)}</option>
+              ))}
+            </select>
+          </label>
+          <label className="field">
+            <span>{t("settings.teamSize")}</span>
+            <select value={teamSize} onChange={(e) => setTeamSize(e.target.value as TeamSize | "")}>
+              <option value="">{t("settings.choose")}</option>
+              <option value="none">{t("settings.team.none")}</option>
+              <option value="small">{t("settings.team.small")}</option>
+              <option value="large">{t("settings.team.large")}</option>
+            </select>
+          </label>
+          <label className="field">
+            <span>{t("settings.focus")}</span>
+            <select value={focus} onChange={(e) => setFocus(e.target.value as Department | "")}>
+              <option value="">{t("settings.choose")}</option>
+              {DEPARTMENTS.map((d) => (
+                <option key={d.key} value={d.key}>{t(d.labelKey)}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+        <label className="field full">
+          <span>{t("settings.goal")}</span>
+          <input
+            type="text"
+            value={goal}
+            maxLength={120}
+            onChange={(e) => setGoal(e.target.value)}
+            placeholder={t("settings.goalPlaceholder")}
+          />
+        </label>
       </section>
 
       <section className="setting-block">

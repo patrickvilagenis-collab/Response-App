@@ -58,6 +58,8 @@ export interface Challenge {
   type: ChallengeType;
   category: Category;
   difficulty: Difficulty;
+  /** Business area this scenario belongs to (browse-by-department). */
+  department?: Department;
   roleCaption: LocalizedText;
   scenario: LocalizedText;
   media: Media;
@@ -117,6 +119,19 @@ export interface Attempt {
 export type RoleLevel = "ic" | "manager" | "director" | "exec";
 export type Segment = "individual" | "company";
 
+// Business area / department a scenario belongs to (and the user works in).
+export type Department =
+  | "leadership"
+  | "finance"
+  | "technology"
+  | "commercial"
+  | "people"
+  | "operations"
+  | "customer"
+  | "legal";
+
+export type TeamSize = "none" | "small" | "large";
+
 export interface Profile {
   id: string;
   displayName: string;
@@ -130,6 +145,11 @@ export interface Profile {
   roleLevel?: RoleLevel;
   goalTrack?: string;
   segment?: Segment;
+  // Richer profile for a tailored training plan.
+  department?: Department; // the area they work in
+  teamSize?: TeamSize; // how many people they manage
+  focus?: Department; // the area they most want to practise
+  goal?: string; // a concrete near-term goal (free text)
 }
 
 export interface Settings {
