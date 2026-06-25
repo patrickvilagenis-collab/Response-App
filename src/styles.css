@@ -688,6 +688,10 @@ input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 .seg-chip.active { background: var(--accent); border-color: var(--accent); color: var(--on-accent); box-shadow: 0 6px 16px rgba(79, 70, 229, 0.25); }
 
 /* ---------- Leadership Framework ---------- */
+.result-leadership { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+  margin: 24px 0 4px; padding: 14px 16px; border-radius: var(--radius);
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); }
+.result-leadership-text { display: flex; flex-direction: column; gap: 2px; }
 .framework { max-width: 720px; margin: 0 auto; }
 .fw-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 16px; margin-bottom: 8px;
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
