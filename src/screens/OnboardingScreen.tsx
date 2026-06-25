@@ -19,6 +19,7 @@ export function OnboardingScreen() {
   const [dept, setDept] = useState<Department | null>(profile?.department ?? null);
   const [goal, setGoal] = useState<string | null>(profile?.goalTrack ?? null);
   const [segment, setSegment] = useState<Segment | null>(profile?.segment ?? null);
+  const [goalText, setGoalText] = useState(profile?.goal ?? "");
 
   const canNext =
     (step === 0 && role) || (step === 1 && dept) || (step === 2 && goal) || (step === 3 && segment);
@@ -30,6 +31,7 @@ export function OnboardingScreen() {
       focus: dept ?? undefined, // default the practice focus to their area
       goalTrack: goal ?? undefined,
       segment: segment ?? undefined,
+      goal: goalText.trim() || undefined,
       onboarded: true,
     });
     go({ name: "home" });
@@ -44,7 +46,7 @@ export function OnboardingScreen() {
 
       <div className="onb-card">
         <div className="onb-dots">
-          {[0, 1, 2, 3].map((i) => (
+          {[0, 1, 2, 3, 4].map((i) => (
             <span key={i} className={`onb-dot ${i === step ? "active" : ""} ${i < step ? "done" : ""}`} />
           ))}
         </div>
@@ -109,18 +111,35 @@ export function OnboardingScreen() {
           </>
         )}
 
+        {step === 4 && (
+          <>
+            <p className="onb-q">{t("onb.qGoal")}</p>
+            <input
+              className="onb-goal-input"
+              type="text"
+              value={goalText}
+              maxLength={120}
+              autoFocus
+              onChange={(e) => setGoalText(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && finish()}
+              placeholder={t("settings.goalPlaceholder")}
+            />
+            <p className="muted small center onb-editlater">{t("onb.editLater")}</p>
+          </>
+        )}
+
         <div className="onb-actions">
           {step > 0 ? (
             <button className="btn ghost" onClick={() => setStep((s) => s - 1)}>← {t("onb.back")}</button>
           ) : (
             <button className="btn ghost" onClick={finish}>{t("onb.skip")}</button>
           )}
-          {step < 3 ? (
+          {step < 4 ? (
             <button className="btn primary" disabled={!canNext} onClick={() => setStep((s) => s + 1)}>
               {t("onb.next")} →
             </button>
           ) : (
-            <button className="btn primary" disabled={!canNext} onClick={finish}>{t("onb.start")} →</button>
+            <button className="btn primary" onClick={finish}>{t("onb.start")} →</button>
           )}
         </div>
       </div>
