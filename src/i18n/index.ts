@@ -259,6 +259,9 @@ const en: Dict = {
   "results.retry": "Retry this scenario",
   "results.next": "Next challenge",
   "results.library": "Back to library",
+  "results.leadershipTitle": "Leadership development",
+  "results.leadershipSub": "Add this answer to your Leadership Framework analysis.",
+  "results.leadershipCta": "Add to my leadership plan",
 
   "history.title": "History",
   "history.empty": "No attempts yet. Complete a challenge to see it here.",
@@ -621,6 +624,9 @@ const de: Dict = {
   "results.retry": "Szenario wiederholen",
   "results.next": "Nächste Challenge",
   "results.library": "Zur Bibliothek",
+  "results.leadershipTitle": "Führungsentwicklung",
+  "results.leadershipSub": "Diese Antwort in deine Leadership-Framework-Analyse aufnehmen.",
+  "results.leadershipCta": "Zu meinem Führungsplan hinzufügen",
 
   "history.title": "Verlauf",
   "history.empty": "Noch keine Versuche. Schließe eine Challenge ab, um sie hier zu sehen.",
@@ -983,6 +989,9 @@ const esES: Dict = {
   "results.retry": "Repetir este escenario",
   "results.next": "Siguiente reto",
   "results.library": "Volver a la biblioteca",
+  "results.leadershipTitle": "Desarrollo de liderazgo",
+  "results.leadershipSub": "Añade esta respuesta a tu análisis del Leadership Framework.",
+  "results.leadershipCta": "Añadir a mi plan de liderazgo",
 
   "history.title": "Historial",
   "history.empty": "Aún no hay intentos. Completa un reto para verlo aquí.",

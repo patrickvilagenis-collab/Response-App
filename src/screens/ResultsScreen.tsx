@@ -4,9 +4,12 @@ import { getChallenge } from "../data/challenges";
 // (helpers below)
 import { BAND_COLORS, MAX_RESPONSE_SEC } from "../lib/scoring";
 import { recommend, computeStats } from "../lib/stats";
+import { generateDevelopmentPlan } from "../lib/leadership";
 
 export function ResultsScreen({ attemptId }: { attemptId: string }) {
-  const { t, locale, attempts, go, prefersReducedMotion } = useAppSafe();
+  const { t, locale, attempts, go, profile, updateProfile, prefersReducedMotion } = useAppSafe();
+  const [lbusy, setLbusy] = useState(false);
+  const [lerr, setLerr] = useState("");
   const attempt = attempts.find((a) => a.id === attemptId);
   if (!attempt) {
     return (
@@ -25,6 +28,21 @@ export function ResultsScreen({ attemptId }: { attemptId: string }) {
 
   const stats = computeStats(attempts);
   const next = recommend(attempts, stats);
+
+  async function buildLeadershipPlan() {
+    setLbusy(true);
+    setLerr("");
+    try {
+      const dp = await generateDevelopmentPlan(attempts, profile, locale);
+      updateProfile({ devPlan: dp });
+      go({ name: "framework" });
+    } catch (e) {
+      const m = e instanceof Error ? e.message : String(e);
+      setLerr(m.includes("503") ? t("framework.noKey") : t("framework.aiError"));
+    } finally {
+      setLbusy(false);
+    }
+  }
 
   return (
     <div className="page results">
@@ -89,6 +107,17 @@ export function ResultsScreen({ attemptId }: { attemptId: string }) {
           <div className="answer-title">{t("results.model")}</div>
           <p>{ch?.modelAnswer[locale]}</p>
         </div>
+      </section>
+
+      <section className="result-leadership">
+        <div className="result-leadership-text">
+          <strong>{t("results.leadershipTitle")}</strong>
+          <span className="muted small">{t("results.leadershipSub")}</span>
+        </div>
+        <button className="btn primary sm" onClick={buildLeadershipPlan} disabled={lbusy}>
+          {lbusy ? t("framework.analyzing") : t("results.leadershipCta")}
+        </button>
+        {lerr && <p className="error small">{lerr}</p>}
       </section>
 
       <div className="result-actions">
