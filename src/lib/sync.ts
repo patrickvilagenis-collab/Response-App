@@ -1,4 +1,4 @@
-import type { Attempt, Profile, Settings } from "../types";
+import type { Attempt, DevPlan, PlanSnapshot, Profile, Settings } from "../types";
 import { storage } from "./storage";
 
 // Server-side persistence of a user's data, keyed to their account. Lets the
@@ -56,6 +56,20 @@ function mergeAttempts(a: Attempt[], b: Attempt[]): Attempt[] {
   return [...byId.values()].sort((x, y) => y.createdAt.localeCompare(x.createdAt));
 }
 
+/** Keep whichever leadership plan was generated most recently. */
+function newerPlan(a?: DevPlan, b?: DevPlan): DevPlan | undefined {
+  if (!a) return b;
+  if (!b) return a;
+  return (b.generatedAt || "").localeCompare(a.generatedAt || "") > 0 ? b : a;
+}
+
+/** Union plan-history snapshots by timestamp so the trend never loses entries. */
+function mergeHistory(a?: PlanSnapshot[], b?: PlanSnapshot[]): PlanSnapshot[] {
+  const byAt = new Map<string, PlanSnapshot>();
+  for (const s of [...(a || []), ...(b || [])]) if (s?.generatedAt) byAt.set(s.generatedAt, s);
+  return [...byAt.values()].sort((x, y) => x.generatedAt.localeCompare(y.generatedAt)).slice(-12);
+}
+
 /**
  * Merge a server snapshot into local storage for `profileId`, keeping anything
  * created locally that the server hasn't seen yet. Returns the merged pieces so
@@ -68,6 +82,12 @@ export function mergeIntoLocal(
 ): { profile: Profile; attempts: Attempt[]; settings: Settings } {
   // Server profile fields win, but the local id/email anchor the account.
   const profile: Profile = { ...local, ...(server.profile || {}), id: profileId, email: local.email };
+  // The leadership plan & its history are edited locally and may be newer here
+  // than on the server (e.g. a fresh analysis whose push hasn't landed yet).
+  // Merge by recency/union instead of letting a stale server copy clobber them.
+  profile.devPlan = newerPlan(local.devPlan, server.profile?.devPlan);
+  const history = mergeHistory(local.devPlanHistory, server.profile?.devPlanHistory);
+  if (history.length) profile.devPlanHistory = history;
   storage.saveProfile(profile);
 
   const attempts = mergeAttempts(storage.getAttempts(profileId), server.attempts || []);
