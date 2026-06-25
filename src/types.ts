@@ -150,10 +150,31 @@ export interface Profile {
   teamSize?: TeamSize; // how many people they manage
   focus?: Department; // the area they most want to practise
   goal?: string; // a concrete near-term goal (free text)
+  devPlan?: DevPlan; // latest Leadership Framework analysis & plan
 }
 
 export interface Settings {
   // AI evaluation is integrated server-side (no key in the browser). This toggle
   // lets a user opt for the faster offline evaluator instead.
   useLlm: boolean;
+}
+
+// --- Leadership Framework development plan ---
+export interface BehaviorRating {
+  behavior: string; // behavior id from the framework
+  score: number; // 1–5
+  evidence: string; // what was observed
+}
+export interface GrowthArea {
+  behavior: string; // behavior id
+  why: string;
+  challenges: string[]; // real-work challenges
+  exercises: string[]; // in-app exercises
+}
+export interface DevPlan {
+  ratings: BehaviorRating[];
+  strengths: string[]; // behavior ids rated 4–5
+  growthAreas: GrowthArea[];
+  generatedAt: string;
+  basedOn: number; // number of attempts analysed
 }

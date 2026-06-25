@@ -9,6 +9,7 @@ import { ResponseScreen } from "./screens/ResponseScreen";
 import { ResultsScreen } from "./screens/ResultsScreen";
 import { HistoryScreen } from "./screens/HistoryScreen";
 import { ResourcesScreen } from "./screens/ResourcesScreen";
+import { FrameworkScreen } from "./screens/FrameworkScreen";
 import { SettingsScreen } from "./screens/SettingsScreen";
 import { WarmUpScreen } from "./screens/WarmUpScreen";
 import { AdminScreen } from "./screens/AdminScreen";
@@ -46,6 +47,9 @@ export function App() {
       break;
     case "resources":
       screen = <ResourcesScreen />;
+      break;
+    case "framework":
+      screen = <FrameworkScreen />;
       break;
     case "settings":
       screen = <SettingsScreen />;
