@@ -34,7 +34,8 @@ export function ResultsScreen({ attemptId }: { attemptId: string }) {
     setLerr("");
     try {
       const dp = await generateDevelopmentPlan(attempts, profile, locale);
-      updateProfile({ devPlan: dp });
+      const history = [...(profile?.devPlanHistory ?? []), { generatedAt: dp.generatedAt, ratings: dp.ratings }].slice(-12);
+      updateProfile({ devPlan: dp, devPlanHistory: history });
       go({ name: "framework" });
     } catch (e) {
       const m = e instanceof Error ? e.message : String(e);

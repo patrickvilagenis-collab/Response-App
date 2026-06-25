@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
 import { useApp } from "../state/store";
 import type { Route } from "../state/store";
-import { FRAMEWORK, SCALE, behaviorLabel, behaviorPillar } from "../data/leadershipFramework";
+import { FRAMEWORK, SCALE, behaviorLabel, behaviorPillar, pillarAverages } from "../data/leadershipFramework";
 import { generateDevelopmentPlan, scenariosForBehavior } from "../lib/leadership";
 import { bestAttemptsById } from "../lib/stats";
 import { levelOf } from "../lib/facets";
-import type { Attempt, DevPlan, Locale } from "../types";
+import type { Attempt, DevPlan, Locale, PlanSnapshot } from "../types";
 
 const PILLAR_NAME: Record<string, string> = { elevate: "Elevate", engage: "Engage", execute: "Execute" };
 
@@ -26,7 +26,8 @@ export function FrameworkScreen() {
     setError("");
     try {
       const dp = await generateDevelopmentPlan(attempts, profile, locale);
-      updateProfile({ devPlan: dp });
+      const history = [...(profile?.devPlanHistory ?? []), { generatedAt: dp.generatedAt, ratings: dp.ratings }].slice(-12);
+      updateProfile({ devPlan: dp, devPlanHistory: history });
       setShowRef(false);
     } catch (e) {
       const m = e instanceof Error ? e.message : String(e);
@@ -65,6 +66,10 @@ export function FrameworkScreen() {
       </section>
 
       {plan && <PlanView plan={plan} locale={locale} t={t} go={go} bestById={bestById} />}
+
+      {(profile?.devPlanHistory?.length ?? 0) >= 2 && (
+        <EvolutionView history={profile!.devPlanHistory!} locale={locale} t={t} />
+      )}
 
       {/* Framework reference */}
       <section className="fw-ref">
@@ -220,4 +225,52 @@ function PlanView({
 function trim(s: string | undefined, n: number): string {
   if (!s) return "";
   return s.length > n ? s.slice(0, n).trimEnd() + "…" : s;
+}
+
+function avgColor(n: number | null): string {
+  if (n == null) return "var(--muted)";
+  return n >= 4 ? "#16a34a" : n >= 3 ? "#eab308" : "#ef4444";
+}
+
+function EvolutionView({ history, locale, t }: { history: PlanSnapshot[]; locale: Locale; t: (k: string) => string }) {
+  const rows = history.map((h) => ({ at: h.generatedAt, avg: pillarAverages(h.ratings) }));
+  const display = [...rows].reverse(); // most recent first
+  const fmt = (n: number | null) => (n == null ? "—" : n.toFixed(1));
+  return (
+    <section className="fw-section">
+      <h2 className="section-title">{t("framework.evolutionTitle")}</h2>
+      <div className="fw-evo">
+        <div className="fw-evo-row head">
+          <span className="fw-evo-date" />
+          <span>Elevate</span>
+          <span>Engage</span>
+          <span>Execute</span>
+          <span>{t("framework.overall")}</span>
+        </div>
+        {display.map((r, i) => {
+          const prev = display[i + 1]; // older entry
+          const delta =
+            r.avg.overall != null && prev?.avg.overall != null ? r.avg.overall - prev.avg.overall : null;
+          return (
+            <div key={r.at} className="fw-evo-row">
+              <span className="fw-evo-date">{new Date(r.at).toLocaleDateString(locale)}</span>
+              <span style={{ color: avgColor(r.avg.elevate) }}>{fmt(r.avg.elevate)}</span>
+              <span style={{ color: avgColor(r.avg.engage) }}>{fmt(r.avg.engage)}</span>
+              <span style={{ color: avgColor(r.avg.execute) }}>{fmt(r.avg.execute)}</span>
+              <span className="fw-evo-overall">
+                {fmt(r.avg.overall)}
+                {delta != null && delta !== 0 && (
+                  <span className={delta > 0 ? "fw-up" : "fw-down"}>
+                    {" "}
+                    {delta > 0 ? "▲" : "▼"}
+                    {Math.abs(delta).toFixed(1)}
+                  </span>
+                )}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
 }

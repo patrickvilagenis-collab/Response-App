@@ -731,6 +731,16 @@ input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 .fw-scenario-text { font-size: 0.9rem; line-height: 1.35; }
 .fw-scenario-meta { flex-shrink: 0; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
 .fw-scenario-done { color: #16a34a; }
+.fw-evo { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.fw-evo-row { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 0.9rem; }
+.fw-evo-row:last-child { border-bottom: none; }
+.fw-evo-row > span:not(.fw-evo-date) { text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+.fw-evo-row.head { background: var(--panel-2); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+.fw-evo-row.head > span { font-weight: 700; }
+.fw-evo-date { color: var(--muted); font-size: 0.82rem; }
+.fw-evo-overall { color: var(--text); }
+.fw-up { color: #16a34a; font-size: 0.78rem; }
+.fw-down { color: #ef4444; font-size: 0.78rem; }
 
 .fw-ref { margin-top: 30px; }
 .fw-ref-toggle { background: none; border: none; font-family: var(--font-display); font-size: 1.08rem; font-weight: 600;

@@ -151,6 +151,7 @@ export interface Profile {
   focus?: Department; // the area they most want to practise
   goal?: string; // a concrete near-term goal (free text)
   devPlan?: DevPlan; // latest Leadership Framework analysis & plan
+  devPlanHistory?: PlanSnapshot[]; // past analyses for the evolution view
 }
 
 export interface Settings {
@@ -177,4 +178,9 @@ export interface DevPlan {
   growthAreas: GrowthArea[];
   generatedAt: string;
   basedOn: number; // number of attempts analysed
+}
+// Lightweight record kept for the evolution history (no large text).
+export interface PlanSnapshot {
+  generatedAt: string;
+  ratings: BehaviorRating[];
 }

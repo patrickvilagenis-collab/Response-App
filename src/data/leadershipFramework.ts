@@ -118,3 +118,31 @@ export function behaviorPillar(id: string): Pillar["id"] | null {
   return INDEX[id]?.pillar.id ?? null;
 }
 export const ALL_BEHAVIOR_IDS = Object.keys(INDEX);
+
+// Average rating per pillar (and overall) for a set of behavior ratings.
+export function pillarAverages(
+  ratings: { behavior: string; score: number }[]
+): { elevate: number | null; engage: number | null; execute: number | null; overall: number | null } {
+  const sums: Record<string, { s: number; n: number }> = {
+    elevate: { s: 0, n: 0 },
+    engage: { s: 0, n: 0 },
+    execute: { s: 0, n: 0 },
+  };
+  let total = 0;
+  let count = 0;
+  for (const r of ratings) {
+    const p = behaviorPillar(r.behavior);
+    if (!p) continue;
+    sums[p].s += r.score;
+    sums[p].n += 1;
+    total += r.score;
+    count += 1;
+  }
+  const avg = (x: { s: number; n: number }) => (x.n ? Math.round((x.s / x.n) * 10) / 10 : null);
+  return {
+    elevate: avg(sums.elevate),
+    engage: avg(sums.engage),
+    execute: avg(sums.execute),
+    overall: count ? Math.round((total / count) * 10) / 10 : null,
+  };
+}
