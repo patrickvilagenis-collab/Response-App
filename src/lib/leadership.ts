@@ -20,20 +20,16 @@ function behaviorCatalogue(locale: Locale): string {
 
 function attemptsSummary(attempts: Attempt[], locale: Locale): string {
   return attempts
-    .slice(0, 8)
+    .slice(0, 5)
     .map((a, i) => {
       const ch = getChallenge(a.challengeId);
-      const scenario = ch?.scenario[locale] ?? ch?.scenario.en ?? "";
+      const scenario = (ch?.scenario[locale] ?? ch?.scenario.en ?? "").slice(0, 200);
       const ev = a.evaluation;
       return [
-        `#${i + 1} [${a.category}/${a.type}, score ${ev.final}/100, band ${ev.band}]`,
+        `#${i + 1} [${a.category}/${a.type}, score ${ev.final}/100]`,
         `Scenario: ${scenario}`,
-        `What they said: ${a.transcript || "(empty)"}`,
-        `Headline: ${ev.headline}`,
-        ev.coaching?.missing?.length ? `Gaps noted: ${ev.coaching.missing.join("; ")}` : "",
-      ]
-        .filter(Boolean)
-        .join("\n");
+        `What they said: ${(a.transcript || "(empty)").slice(0, 320)}`,
+      ].join("\n");
     })
     .join("\n\n");
 }
@@ -62,6 +58,7 @@ export async function generateDevelopmentPlan(
     "From the user's roleplay practice and profile, rate the behaviors you can actually observe, identify strengths (4–5) and the 2–3 behaviors with the most growth potential (1–3), and build a concrete, progressively harder development plan. " +
     "For each growth area give 3–4 targeted CHALLENGES the user can practise in real work situations, and 3–4 EXERCISES they can do inside this app (reflective, practical, or roleplay-based). Tie everything to the specific behaviors and to the user's real role and context. " +
     "Be encouraging but honest; frame development as opportunity, not deficit; connect to real leadership impact; avoid jargon. " +
+    "Be concise: keep each evidence and 'why' to one short sentence, and each challenge/exercise to one short line. Rate at most 8 behaviors. " +
     `Write ALL human-readable text (evidence, why, challenges, exercises) in ${localeName}. Use ONLY behavior ids from the provided catalogue. Return ONLY valid JSON.`;
 
   const scale = SCALE.map((s) => `${s.level} = ${s.label.en}`).join("; ");
@@ -81,7 +78,7 @@ export async function generateDevelopmentPlan(
   const res = await fetch("/api/evaluate", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ system: sys, user, max_tokens: 2000 }),
+    body: JSON.stringify({ system: sys, user, max_tokens: 1500 }),
   });
   if (!res.ok) {
     let detail = `${res.status}`;
