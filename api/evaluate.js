@@ -8,6 +8,10 @@
 
 const DEFAULT_MODEL = "claude-sonnet-4-6";
 
+// Allow the function to run longer than the 10s default — the leadership
+// development plan is a larger generation. Vercel clamps this to the plan's max.
+export const maxDuration = 60;
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.status(405).json({ error: "method_not_allowed" });
