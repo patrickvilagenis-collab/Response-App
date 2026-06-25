@@ -100,6 +100,7 @@ const en: Dict = {
 
   "onb.title": "Let's make this yours.",
   "onb.q1": "Who are you, at work?",
+  "onb.qArea": "Which area do you work in?",
   "onb.q2": "What do you want to get better at first?",
   "onb.q3": "Are you here on your own, or through your company?",
   "onb.individual": "On my own",
@@ -436,6 +437,7 @@ const de: Dict = {
 
   "onb.title": "Machen wir es zu deinem.",
   "onb.q1": "Wer bist du im Job?",
+  "onb.qArea": "In welchem Bereich arbeitest du?",
   "onb.q2": "Worin willst du zuerst besser werden?",
   "onb.q3": "Bist du privat hier oder über dein Unternehmen?",
   "onb.individual": "Auf eigene Faust",
@@ -772,6 +774,7 @@ const esES: Dict = {
 
   "onb.title": "Hagamos esto tuyo.",
   "onb.q1": "¿Quién eres en el trabajo?",
+  "onb.qArea": "¿En qué área trabajas?",
   "onb.q2": "¿Qué quieres mejorar primero?",
   "onb.q3": "¿Vienes por tu cuenta o a través de tu empresa?",
   "onb.individual": "Por mi cuenta",

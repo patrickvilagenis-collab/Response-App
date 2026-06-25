@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useApp } from "../state/store";
 import { LanguagePicker } from "../components/LanguagePicker";
 import { TRACKS } from "../lib/tracks";
-import type { RoleLevel, Segment } from "../types";
+import { DEPARTMENTS } from "../data/departments";
+import type { RoleLevel, Segment, Department } from "../types";
 
 const ROLES: { id: RoleLevel; icon: string }[] = [
   { id: "ic", icon: "◦" },
@@ -15,14 +16,18 @@ export function OnboardingScreen() {
   const { t, profile, updateProfile, go } = useApp();
   const [step, setStep] = useState(0);
   const [role, setRole] = useState<RoleLevel | null>(profile?.roleLevel ?? null);
+  const [dept, setDept] = useState<Department | null>(profile?.department ?? null);
   const [goal, setGoal] = useState<string | null>(profile?.goalTrack ?? null);
   const [segment, setSegment] = useState<Segment | null>(profile?.segment ?? null);
 
-  const canNext = (step === 0 && role) || (step === 1 && goal) || (step === 2 && segment);
+  const canNext =
+    (step === 0 && role) || (step === 1 && dept) || (step === 2 && goal) || (step === 3 && segment);
 
   function finish() {
     updateProfile({
       roleLevel: role ?? undefined,
+      department: dept ?? undefined,
+      focus: dept ?? undefined, // default the practice focus to their area
       goalTrack: goal ?? undefined,
       segment: segment ?? undefined,
       onboarded: true,
@@ -39,7 +44,7 @@ export function OnboardingScreen() {
 
       <div className="onb-card">
         <div className="onb-dots">
-          {[0, 1, 2].map((i) => (
+          {[0, 1, 2, 3].map((i) => (
             <span key={i} className={`onb-dot ${i === step ? "active" : ""} ${i < step ? "done" : ""}`} />
           ))}
         </div>
@@ -62,6 +67,19 @@ export function OnboardingScreen() {
 
         {step === 1 && (
           <>
+            <p className="onb-q">{t("onb.qArea")}</p>
+            <div className="onb-tracks">
+              {DEPARTMENTS.map((d) => (
+                <button key={d.key} className={`onb-track ${dept === d.key ? "sel" : ""}`} onClick={() => setDept(d.key)}>
+                  <span className="track-chip-icon">{d.icon}</span> {t(d.labelKey)}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {step === 2 && (
+          <>
             <p className="onb-q">{t("onb.q2")}</p>
             <div className="onb-tracks">
               {TRACKS.map((tr) => (
@@ -73,7 +91,7 @@ export function OnboardingScreen() {
           </>
         )}
 
-        {step === 2 && (
+        {step === 3 && (
           <>
             <p className="onb-q">{t("onb.q3")}</p>
             <div className="onb-options two">
@@ -97,7 +115,7 @@ export function OnboardingScreen() {
           ) : (
             <button className="btn ghost" onClick={finish}>{t("onb.skip")}</button>
           )}
-          {step < 2 ? (
+          {step < 3 ? (
             <button className="btn primary" disabled={!canNext} onClick={() => setStep((s) => s + 1)}>
               {t("onb.next")} →
             </button>
