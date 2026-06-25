@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { useApp } from "../state/store";
 import { CHALLENGES } from "../data/challenges";
-import { computeStats } from "../lib/stats";
+import { bestAttemptsById } from "../lib/stats";
+import { bandFor, BAND_COLORS } from "../lib/scoring";
 import { SceneMedia } from "../components/SceneMedia";
 import { WarmUpBanner } from "../components/WarmUpBanner";
 import { SITUATIONS, situationOf, levelOf, LEVELS, type Situation } from "../lib/facets";
@@ -9,7 +10,8 @@ import type { Challenge, RoleLevel } from "../types";
 
 export function LibraryScreen() {
   const { t, locale, attempts, go, profile, route } = useApp();
-  const stats = computeStats(attempts);
+  const bestById = useMemo(() => bestAttemptsById(attempts), [attempts]);
+  const PASS = 55; // adequate or better counts as passed
 
   const routeSituation = route.name === "library" ? (route.situation as Situation | undefined) : undefined;
   const [situation, setSituation] = useState<Situation | "all">(routeSituation ?? "all");
@@ -33,18 +35,36 @@ export function LibraryScreen() {
   const railOrder = useMemo(() => orderSituationsByFocus(profile?.focus ?? profile?.department), [profile]);
 
   function card(c: Challenge) {
+    const best = bestById.get(c.id);
+    const score = best ? best.evaluation.final : null;
+    const passed = score !== null && score >= PASS;
     return (
-      <button key={c.id} className="pcard" onClick={() => go({ name: "scenario", challengeId: c.id })}>
+      <button
+        key={c.id}
+        className={`pcard ${best ? "done" : ""}`}
+        onClick={() => go({ name: "scenario", challengeId: c.id })}
+      >
         <div className="pcard-cover">
           <SceneMedia scene={c.media.scene} alt={c.media.alt[locale] ?? ""} seed={c.id} />
           <div className="pcard-cover-grad" />
           <span className="pcard-situation">{t(`situation.${situationOf(c)}`)}</span>
-          {stats.clearedIds.has(c.id) && <span className="pcard-cleared">✓</span>}
+          {score !== null && (
+            <span className="pcard-score" style={{ background: BAND_COLORS[bandFor(score)] }}>
+              {passed ? "✓ " : ""}{score}%
+            </span>
+          )}
         </div>
         <div className="pcard-body">
-          <span className="pcard-level">{t(`lvl.${levelOf(c.difficulty)}`)}</span>
+          <div className="pcard-meta">
+            <span className="pcard-level">{t(`lvl.${levelOf(c.difficulty)}`)}</span>
+            {best && (
+              <span className={`pcard-status ${passed ? "ok" : "review"}`}>
+                {passed ? t("library.passed") : t("library.review")}
+              </span>
+            )}
+          </div>
           <p className="pcard-text">{trim(c.scenario[locale], 110)}</p>
-          <span className="pcard-cta">{t("library.start")} →</span>
+          <span className="pcard-cta">{best ? t("library.retry") : t("library.start")} →</span>
         </div>
       </button>
     );
