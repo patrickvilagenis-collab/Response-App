@@ -135,6 +135,7 @@ export async function generateDevelopmentPlan(
     growthAreas: plan.growthAreas,
     generatedAt: new Date().toISOString(),
     basedOn: Math.min(attempts.length, 8),
+    locale,
   };
 }
 

@@ -5,6 +5,7 @@ import { FRAMEWORK, SCALE, behaviorLabel, behaviorPillar, pillarAverages } from 
 import { generateDevelopmentPlan, scenariosForBehavior } from "../lib/leadership";
 import { bestAttemptsById } from "../lib/stats";
 import { levelOf } from "../lib/facets";
+import { translator } from "../i18n";
 import type { Attempt, DevPlan, Locale, PlanSnapshot } from "../types";
 
 const PILLAR_NAME: Record<string, string> = { elevate: "Elevate", engage: "Engage", execute: "Execute" };
@@ -16,6 +17,12 @@ function scoreColor(score: number): string {
 export function FrameworkScreen() {
   const { t, locale, attempts, profile, updateProfile, go } = useApp();
   const plan = profile?.devPlan ?? null;
+  // The AI text in a plan is frozen in the language it was generated in. Render
+  // the whole plan block in THAT language so labels and text never mix; if it
+  // differs from the current UI language, we prompt to regenerate.
+  const planLocale: Locale = plan?.locale ?? locale;
+  const tp = useMemo(() => translator(planLocale), [planLocale]);
+  const localeMismatch = Boolean(plan && planLocale !== locale);
   const bestById = useMemo(() => bestAttemptsById(attempts), [attempts]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -63,9 +70,10 @@ export function FrameworkScreen() {
           </>
         )}
         {error && <p className="error fw-error">{error}</p>}
+        {localeMismatch && !busy && <p className="muted small fw-langnote">{t("framework.otherLang")}</p>}
       </section>
 
-      {plan && <PlanView plan={plan} locale={locale} t={t} go={go} bestById={bestById} />}
+      {plan && <PlanView plan={plan} locale={planLocale} t={tp} go={go} bestById={bestById} />}
 
       {(profile?.devPlanHistory?.length ?? 0) >= 2 && (
         <EvolutionView history={profile!.devPlanHistory!} locale={locale} t={t} />

@@ -697,6 +697,7 @@ input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
 .fw-basedon { margin-left: 2px; }
 .fw-error { width: 100%; margin: 4px 0 0; }
+.fw-langnote { width: 100%; margin: 6px 0 0; padding-left: 10px; border-left: 3px solid var(--gold, #c79a3a); }
 .fw-section { margin-top: 26px; }
 .fw-rate-group { margin-bottom: 16px; }
 .fw-pill-tag { display: inline-block; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
