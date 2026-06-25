@@ -52,6 +52,16 @@ export function computeStats(attempts: Attempt[]): Stats {
   return { total: attempts.length, avgFinal, streakDays, weakestDimension, clearedIds };
 }
 
+/** Best (highest-scoring) attempt per challenge — used to mark done/score in the library. */
+export function bestAttemptsById(attempts: Attempt[]): Map<string, Attempt> {
+  const m = new Map<string, Attempt>();
+  for (const a of attempts) {
+    const cur = m.get(a.challengeId);
+    if (!cur || a.evaluation.final > cur.evaluation.final) m.set(a.challengeId, a);
+  }
+  return m;
+}
+
 const DIM_TO_TYPES: Record<string, string[]> = {
   content: ["behavioral", "wave"],
   delivery: ["situational", "conflict"],
