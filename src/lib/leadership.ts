@@ -1,6 +1,6 @@
-import type { Attempt, DevPlan, Locale, Profile } from "../types";
+import type { Attempt, DevPlan, Locale, Profile, Challenge } from "../types";
 import { FRAMEWORK, SCALE, behaviorLabel, ALL_BEHAVIOR_IDS } from "../data/leadershipFramework";
-import { getChallenge } from "../data/challenges";
+import { getChallenge, CHALLENGES } from "../data/challenges";
 
 // Generates a Leadership Framework analysis + development plan from the user's
 // practice history and profile, via the same secure AI proxy as scoring.
@@ -145,4 +145,46 @@ export async function generateDevelopmentPlan(
     generatedAt: new Date().toISOString(),
     basedOn: Math.min(attempts.length, 8),
   };
+}
+
+// --- Targeted practice package per growth behavior ---
+// Maps each framework behavior to the kinds of scenarios that build it.
+const BEHAVIOR_MATCH: Record<string, { categories?: string[]; types?: string[]; departments?: string[] }> = {
+  connects_trends: { categories: ["strategic_thinking"] },
+  innovates_smartly: { categories: ["strategic_thinking"], types: ["wave"] },
+  business_drivers: { categories: ["strategic_thinking", "professional_communication"], departments: ["finance", "commercial"] },
+  value_technology: { categories: ["strategic_thinking"], departments: ["technology"] },
+  growth_mindset: { categories: ["self_awareness_development"], types: ["coaching"] },
+  owns_people_dev: { categories: ["feedback_difficult_conversations"], types: ["coaching", "feedback360"] },
+  integrity_courage: { categories: ["conflict_resolution", "leadership_decisions"] },
+  service_first: { categories: ["professional_communication"], departments: ["customer", "commercial"] },
+  performance_accountability: { categories: ["leadership_decisions", "feedback_difficult_conversations"] },
+  frontline_impact: { categories: ["leadership_decisions"], departments: ["operations"] },
+  decisive_speed: { categories: ["leadership_decisions"], types: ["situational", "wave"] },
+  resilience: { categories: ["self_awareness_development"], types: ["situational"] },
+};
+
+const PASS = 55;
+
+/** Curated scenarios to practise a given growth behavior — not-yet-passed first. */
+export function scenariosForBehavior(
+  behaviorId: string,
+  bestById: Map<string, Attempt>,
+  n = 3
+): Challenge[] {
+  const m = BEHAVIOR_MATCH[behaviorId];
+  if (!m) return [];
+  const matches = CHALLENGES.filter(
+    (c) =>
+      (m.categories?.includes(c.category) ?? false) ||
+      (m.types?.includes(c.type) ?? false) ||
+      (m.departments?.includes(c.department ?? "leadership") ?? false)
+  );
+  matches.sort((a, b) => {
+    const ap = (bestById.get(a.id)?.evaluation.final ?? -1) >= PASS ? 1 : 0;
+    const bp = (bestById.get(b.id)?.evaluation.final ?? -1) >= PASS ? 1 : 0;
+    if (ap !== bp) return ap - bp; // unpassed first
+    return a.difficulty - b.difficulty;
+  });
+  return matches.slice(0, n);
 }

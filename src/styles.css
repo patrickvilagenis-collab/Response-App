@@ -722,6 +722,15 @@ input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 .fw-col ul { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 6px; }
 .fw-col li { font-size: 0.9rem; line-height: 1.45; }
 @media (max-width: 560px) { .fw-growth-cols { grid-template-columns: 1fr; } }
+.fw-package { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.fw-package-list { display: grid; gap: 8px; margin-top: 8px; }
+.fw-scenario { display: flex; align-items: center; justify-content: space-between; gap: 12px; text-align: left;
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 10px 12px;
+  color: var(--text); transition: transform 0.18s var(--ease), border-color 0.18s var(--ease); }
+.fw-scenario:hover { transform: translateY(-1px); border-color: var(--accent); }
+.fw-scenario-text { font-size: 0.9rem; line-height: 1.35; }
+.fw-scenario-meta { flex-shrink: 0; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+.fw-scenario-done { color: #16a34a; }
 
 .fw-ref { margin-top: 30px; }
 .fw-ref-toggle { background: none; border: none; font-family: var(--font-display); font-size: 1.08rem; font-weight: 600;
