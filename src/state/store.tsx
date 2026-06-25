@@ -28,6 +28,7 @@ export type Route =
   | { name: "results"; attemptId: string }
   | { name: "history" }
   | { name: "resources" }
+  | { name: "framework" }
   | { name: "settings" }
   | { name: "warmup" }
   | { name: "admin" };
