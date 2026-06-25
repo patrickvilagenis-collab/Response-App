@@ -27,11 +27,14 @@ export default async function handler(req, res) {
 
   try {
     const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
-    const { system, user, max_tokens } = body;
+    const { system, user, max_tokens, model } = body;
     if (!system || !user) {
       res.status(400).json({ error: "bad_request" });
       return;
     }
+    // Allow a caller to request a specific Claude model (e.g. a faster one for
+    // heavier generations). Falls back to the configured default otherwise.
+    const reqModel = typeof model === "string" && /^claude-[a-z0-9.-]{1,60}$/.test(model) ? model : null;
 
     const upstream = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -41,7 +44,7 @@ export default async function handler(req, res) {
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: process.env.EVAL_MODEL || DEFAULT_MODEL,
+        model: reqModel || process.env.EVAL_MODEL || DEFAULT_MODEL,
         max_tokens: Math.min(Number(max_tokens) || 1200, 2048),
         system,
         messages: [{ role: "user", content: user }],
