@@ -6,6 +6,7 @@ import { generateDevelopmentPlan, scenariosForBehavior, scenariosForPillar } fro
 import { bestAttemptsById } from "../lib/stats";
 import { levelOf } from "../lib/facets";
 import { translator } from "../i18n";
+import { courseForBehavior } from "../data/learn";
 import type { Attempt, DevPlan, Locale, PlanSnapshot } from "../types";
 
 const PILLAR_NAME: Record<string, string> = { elevate: "Elevate", engage: "Engage", execute: "Execute" };
@@ -198,6 +199,14 @@ function PlanView({
               <div key={g.behavior} className="fw-growth">
                 <h3 className="fw-growth-title">{behaviorLabel(g.behavior, locale)}</h3>
                 {g.why && <p className="fw-growth-why muted">{g.why}</p>}
+                {courseForBehavior(g.behavior) && (
+                  <button
+                    className="btn ghost sm fw-learn-link"
+                    onClick={() => go({ name: "learn", courseId: courseForBehavior(g.behavior)!.id })}
+                  >
+                    {t("framework.learnTheory")} →
+                  </button>
+                )}
                 <div className="fw-growth-cols">
                   <div className="fw-col">
                     <span className="fw-col-label">{t("framework.challenges")}</span>

@@ -152,6 +152,14 @@ export interface Profile {
   goal?: string; // a concrete near-term goal (free text)
   devPlan?: DevPlan; // latest Leadership Framework analysis & plan
   devPlanHistory?: PlanSnapshot[]; // past analyses for the evolution view
+  learnProgress?: Record<string, LearnRecord>; // Learn micro-course progress, by course id
+}
+
+// Progress on a single Learn micro-course.
+export interface LearnRecord {
+  completed: boolean;
+  quizScore?: number; // 0–100, best quiz result
+  completedAt?: string;
 }
 
 export interface Settings {

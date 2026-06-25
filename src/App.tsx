@@ -9,6 +9,7 @@ import { ResponseScreen } from "./screens/ResponseScreen";
 import { ResultsScreen } from "./screens/ResultsScreen";
 import { HistoryScreen } from "./screens/HistoryScreen";
 import { ResourcesScreen } from "./screens/ResourcesScreen";
+import { LearnScreen } from "./screens/LearnScreen";
 import { FrameworkScreen } from "./screens/FrameworkScreen";
 import { SettingsScreen } from "./screens/SettingsScreen";
 import { WarmUpScreen } from "./screens/WarmUpScreen";
@@ -47,6 +48,9 @@ export function App() {
       break;
     case "resources":
       screen = <ResourcesScreen />;
+      break;
+    case "learn":
+      screen = <LearnScreen courseId={route.courseId} />;
       break;
     case "framework":
       screen = <FrameworkScreen />;
