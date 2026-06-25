@@ -75,11 +75,26 @@ export async function generateDevelopmentPlan(
     `RECENT PRACTICE (most recent first):\n${attemptsSummary(attempts, locale)}\n\n` +
     `Rate only behaviors you can justify from the practice above. Pick the 2–3 strongest growth areas. Return JSON exactly in this shape:\n${schema}`;
 
-  const res = await fetch("/api/evaluate", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ system: sys, user, max_tokens: 1500 }),
-  });
+  // Use a faster model for this heavier generation to avoid timeouts; fall back
+  // to the server default if that model isn't available on this key.
+  async function ask(useFastModel: boolean) {
+    return fetch("/api/evaluate", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        system: sys,
+        user,
+        max_tokens: 1500,
+        ...(useFastModel ? { model: "claude-haiku-4-5-20251001" } : {}),
+      }),
+    });
+  }
+
+  let res = await ask(true);
+  if (!res.ok && res.status !== 503) {
+    // model unavailable / upstream hiccup → retry once on the default model
+    res = await ask(false);
+  }
   if (!res.ok) {
     let detail = `${res.status}`;
     try {
