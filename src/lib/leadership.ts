@@ -8,6 +8,16 @@ import { getChallenge, CHALLENGES } from "../data/challenges";
 
 const LOCALE_NAME: Record<Locale, string> = { en: "English", de: "German", "es-ES": "Spanish (Spain)" };
 
+// A blunt, in-language directive so the model never drifts back to English.
+// Repeated at the top of the system prompt and as the last line of the user
+// message — the two positions the model weights most heavily.
+const LANG_DIRECTIVE: Record<Locale, string> = {
+  en: "Write every human-readable value (evidence, why, challenges, exercises) in English.",
+  de: "Schreibe ALLE für Menschen lesbaren Werte (evidence, why, challenges, exercises) AUSSCHLIESSLICH auf Deutsch. Verwende niemals Englisch.",
+  "es-ES":
+    "Escribe TODOS los textos legibles (evidence, why, challenges, exercises) EXCLUSIVAMENTE en español. No uses inglés bajo ningún concepto.",
+};
+
 function behaviorCatalogue(locale: Locale): string {
   return FRAMEWORK.map((p) =>
     p.competencies
@@ -53,13 +63,16 @@ export async function generateDevelopmentPlan(
   if (attempts.length === 0) throw new Error("no_attempts");
   const localeName = LOCALE_NAME[locale];
 
+  const langDirective = LANG_DIRECTIVE[locale] ?? LANG_DIRECTIVE.en;
+
   const sys =
+    `LANGUAGE (most important rule): ${langDirective} The JSON keys stay in English, but every string VALUE must be in ${localeName}. ` +
     "You are an expert leadership-development coach working inside a coaching app. You use a three-pillar Leadership Framework (Elevate: shaping the future; Engage: leading with people & purpose; Execute: turning ambitions into results) made of specific behaviors, each rated on a 5-point scale (1 = applies inconsistently, 5 = sets organization-wide standards). " +
     "From the user's roleplay practice and profile, rate the behaviors you can actually observe, identify strengths (4–5) and the 2–3 behaviors with the most growth potential (1–3), and build a concrete, progressively harder development plan. " +
     "For each growth area give 3–4 targeted CHALLENGES the user can practise in real work situations, and 3–4 EXERCISES they can do inside this app (reflective, practical, or roleplay-based). Tie everything to the specific behaviors and to the user's real role and context. " +
     "Be encouraging but honest; frame development as opportunity, not deficit; connect to real leadership impact; avoid jargon. " +
     "Be concise: keep each evidence and 'why' to one short sentence, and each challenge/exercise to one short line. Rate at most 8 behaviors. " +
-    `Write ALL human-readable text (evidence, why, challenges, exercises) in ${localeName}. Use ONLY behavior ids from the provided catalogue. Return ONLY valid JSON.`;
+    `Use ONLY behavior ids from the provided catalogue. Return ONLY valid JSON. ${langDirective}`;
 
   const scale = SCALE.map((s) => `${s.level} = ${s.label.en}`).join("; ");
 
@@ -73,7 +86,7 @@ export async function generateDevelopmentPlan(
     `5-POINT SCALE: ${scale}\n\n` +
     `USER PROFILE: ${profileContext(profile, locale)}\n\n` +
     `RECENT PRACTICE (most recent first):\n${attemptsSummary(attempts, locale)}\n\n` +
-    `Rate only behaviors you can justify from the practice above. Pick the 2–3 strongest growth areas. Return JSON exactly in this shape:\n${schema}`;
+    `Rate only behaviors you can justify from the practice above. Pick the 2–3 strongest growth areas. Return JSON exactly in this shape:\n${schema}\n\n${langDirective}`;
 
   // Use a faster model for this heavier generation to avoid timeouts; fall back
   // to the server default if that model isn't available on this key.
