@@ -1,4 +1,4 @@
-import type { Attempt, DevPlan, PlanSnapshot, Profile, Settings } from "../types";
+import type { Attempt, DevPlan, LearnRecord, PlanSnapshot, Profile, Settings } from "../types";
 import { storage } from "./storage";
 
 // Server-side persistence of a user's data, keyed to their account. Lets the
@@ -70,6 +70,27 @@ function mergeHistory(a?: PlanSnapshot[], b?: PlanSnapshot[]): PlanSnapshot[] {
   return [...byAt.values()].sort((x, y) => x.generatedAt.localeCompare(y.generatedAt)).slice(-12);
 }
 
+/** Union Learn progress: a course counts as done if either side completed it,
+ *  keeping the best quiz score. */
+function mergeLearn(
+  a?: Record<string, LearnRecord>,
+  b?: Record<string, LearnRecord>
+): Record<string, LearnRecord> | undefined {
+  if (!a && !b) return undefined;
+  const out: Record<string, LearnRecord> = { ...(a || {}) };
+  for (const [id, r] of Object.entries(b || {})) {
+    const cur = out[id];
+    out[id] = cur
+      ? {
+          completed: cur.completed || r.completed,
+          quizScore: Math.max(cur.quizScore ?? 0, r.quizScore ?? 0),
+          completedAt: cur.completedAt || r.completedAt,
+        }
+      : r;
+  }
+  return out;
+}
+
 /**
  * Merge a server snapshot into local storage for `profileId`, keeping anything
  * created locally that the server hasn't seen yet. Returns the merged pieces so
@@ -88,6 +109,8 @@ export function mergeIntoLocal(
   profile.devPlan = newerPlan(local.devPlan, server.profile?.devPlan);
   const history = mergeHistory(local.devPlanHistory, server.profile?.devPlanHistory);
   if (history.length) profile.devPlanHistory = history;
+  const learn = mergeLearn(local.learnProgress, server.profile?.learnProgress);
+  if (learn) profile.learnProgress = learn;
   storage.saveProfile(profile);
 
   const attempts = mergeAttempts(storage.getAttempts(profileId), server.attempts || []);
