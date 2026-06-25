@@ -55,7 +55,29 @@ const SITUATION_BY_ID: Record<string, Situation> = {
 };
 
 export function situationOf(c: Challenge): Situation {
-  return SITUATION_BY_ID[c.id] ?? "crisis";
+  const explicit = SITUATION_BY_ID[c.id];
+  if (explicit) return explicit;
+  // Infer for newer content (department + extended scenarios) from type/scene.
+  if (c.type === "conflict") return "conflict";
+  if (c.type === "feedback360") return "feedback";
+  if (c.type === "behavioral") return "interview";
+  if (c.type === "coaching") return "one_on_one";
+  switch (c.media.scene) {
+    case "client_meeting":
+      return "client";
+    case "boardroom":
+    case "exec_committee":
+      return "board";
+    case "office_1on1":
+    case "coaching_room":
+      return "one_on_one";
+    case "feedback_report":
+      return "feedback";
+    case "video_call":
+      return "client";
+    default:
+      return "crisis";
+  }
 }
 
 // Role level is derived from difficulty so the existing content gains a

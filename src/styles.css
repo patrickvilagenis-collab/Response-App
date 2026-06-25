@@ -671,6 +671,16 @@ input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 .wait-dots span:nth-child(3) { animation-delay: 0.4s; }
 @keyframes waitPulse { 0%, 100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1); } }
 
+/* ---------- Situation filter (Practice) ---------- */
+.seg-filter { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 14px;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.seg-filter::-webkit-scrollbar { display: none; }
+.seg-chip { white-space: nowrap; flex-shrink: 0; padding: 0.55rem 1.05rem; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--panel); color: var(--muted); font-size: 0.9rem; font-weight: 600;
+  transition: color 0.2s var(--ease), background 0.2s var(--ease), border-color 0.2s var(--ease), box-shadow 0.2s var(--ease); }
+.seg-chip:hover { color: var(--text); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+.seg-chip.active { background: var(--accent); border-color: var(--accent); color: var(--on-accent); box-shadow: 0 6px 16px rgba(79, 70, 229, 0.25); }
+
 /* ---------- Resources / Learn ---------- */
 .res-filters { margin-bottom: 18px; flex-wrap: wrap; }
 .res-filters .chip { cursor: pointer; }
