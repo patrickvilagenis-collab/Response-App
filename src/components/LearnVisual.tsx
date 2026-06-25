@@ -10,6 +10,10 @@ const PILLAR_COLOR: Record<string, string> = {
   execute: "#f59e0b",
 };
 
+export function pillarColor(pillar: string | null): string {
+  return PILLAR_COLOR[pillar ?? ""] ?? "#7c5cff";
+}
+
 function Glyph({ icon }: { icon: LearnIcon }) {
   // All glyphs drawn on a 48×48 canvas, centered, stroked with currentColor.
   switch (icon) {
@@ -127,6 +131,106 @@ export function LearnVisual({
           <Glyph icon={icon} />
         </g>
       </svg>
+    </div>
+  );
+}
+
+// Just the line-icon glyph, no ring — for placing on a chip over the hero art.
+export function CourseGlyph({ icon, size = 34 }: { icon: LearnIcon; size?: number }) {
+  return (
+    <svg viewBox="0 0 48 48" width={size} height={size} aria-hidden="true">
+      <g fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <Glyph icon={icon} />
+      </g>
+    </svg>
+  );
+}
+
+// Bold, editorial hero art for a teaching slide — a themed gradient band with
+// layered geometric shapes, a giant index numeral and the icon on a floating
+// chip. Each `variant` (0..3) lays the shapes out differently so every slide
+// in a course feels distinct, like a real designer deck.
+type Shape =
+  | { t: "ring"; x: number; y: number; r: number; w?: number }
+  | { t: "disc"; x: number; y: number; r: number; o?: number }
+  | { t: "line"; x1: number; y1: number; x2: number; y2: number }
+  | { t: "dots"; x: number; y: number; cols: number; rows: number; gap: number };
+
+const DECO: Shape[][] = [
+  // 0 · "why it matters" — a rising horizon of discs + a far ring
+  [
+    { t: "ring", x: 330, y: 52, r: 78, w: 2 },
+    { t: "disc", x: 326, y: 150, r: 30, o: 0.16 },
+    { t: "dots", x: 40, y: 120, cols: 4, rows: 3, gap: 18 },
+    { t: "disc", x: 96, y: 46, r: 7, o: 0.5 },
+  ],
+  // 1 · "core idea" — orbit / concentric
+  [
+    { t: "ring", x: 150, y: 100, r: 92, w: 2 },
+    { t: "ring", x: 150, y: 100, r: 60, w: 2 },
+    { t: "disc", x: 318, y: 150, r: 7, o: 0.6 },
+    { t: "disc", x: 350, y: 60, r: 40, o: 0.14 },
+  ],
+  // 2 · "how to / tool" — structured grid + baseline
+  [
+    { t: "dots", x: 250, y: 40, cols: 6, rows: 4, gap: 22 },
+    { t: "line", x1: 36, y1: 158, x2: 200, y2: 158 },
+    { t: "disc", x: 70, y: 70, r: 34, o: 0.16 },
+    { t: "disc", x: 70, y: 70, r: 9, o: 0.6 },
+  ],
+  // 3 · "mistake / quick win" — a bold diagonal + accent
+  [
+    { t: "line", x1: 60, y1: 200, x2: 360, y2: 20 },
+    { t: "disc", x: 320, y: 70, r: 46, o: 0.16 },
+    { t: "ring", x: 110, y: 150, r: 40, w: 2 },
+    { t: "disc", x: 250, y: 150, r: 6, o: 0.55 },
+  ],
+];
+
+function DecoLayer({ variant }: { variant: number }) {
+  const shapes = DECO[variant % DECO.length];
+  return (
+    <svg className="slide-deco" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g stroke="#fff" fill="#fff">
+        {shapes.map((s, i) => {
+          if (s.t === "ring")
+            return <circle key={i} cx={s.x} cy={s.y} r={s.r} fill="none" strokeWidth={s.w ?? 2} opacity={0.22} />;
+          if (s.t === "disc") return <circle key={i} cx={s.x} cy={s.y} r={s.r} stroke="none" opacity={s.o ?? 0.2} />;
+          if (s.t === "line")
+            return <line key={i} x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2} strokeWidth={2} opacity={0.25} />;
+          // dots grid
+          const dots = [];
+          for (let r = 0; r < s.rows; r++)
+            for (let c = 0; c < s.cols; c++)
+              dots.push(<circle key={`${r}-${c}`} cx={s.x + c * s.gap} cy={s.y + r * s.gap} r={2.4} stroke="none" opacity={0.4} />);
+          return <g key={i}>{dots}</g>;
+        })}
+      </g>
+    </svg>
+  );
+}
+
+export function SlideArt({
+  icon,
+  pillar,
+  variant,
+  label,
+}: {
+  icon: LearnIcon;
+  pillar: string | null;
+  variant: number; // 0-based slide index
+  label?: string; // small overline shown on the art (e.g. "TOOL")
+}) {
+  const color = PILLAR_COLOR[pillar ?? ""] ?? "#7c5cff";
+  const num = String(variant + 1).padStart(2, "0");
+  return (
+    <div className={`slide-art v${variant % DECO.length}`} style={{ ["--c" as string]: color }}>
+      <DecoLayer variant={variant} />
+      <span className="slide-num">{num}</span>
+      {label && <span className="slide-art-label">{label}</span>}
+      <span className="slide-chip" style={{ color }}>
+        <CourseGlyph icon={icon} size={40} />
+      </span>
     </div>
   );
 }
