@@ -71,15 +71,15 @@ export async function generateDevelopmentPlan(
     "From the user's roleplay practice and profile, rate the behaviors you can actually observe, identify strengths (4–5) and the 2–3 behaviors with the most growth potential (1–3), and build a concrete, progressively harder development plan. " +
     "For each growth area give 3–4 targeted CHALLENGES the user can practise in real work situations, and 3–4 EXERCISES they can do inside this app (reflective, practical, or roleplay-based). Tie everything to the specific behaviors and to the user's real role and context. " +
     "Be encouraging but honest; frame development as opportunity, not deficit; connect to real leadership impact; avoid jargon. " +
-    "Be concise: keep each evidence and 'why' to one short sentence, and each challenge/exercise to one short line. Rate at most 8 behaviors. " +
-    `Use ONLY behavior ids from the provided catalogue. Return ONLY valid JSON. ${langDirective}`;
+    "Be concise: keep each evidence and 'why' to one short sentence, and each challenge/exercise to one short line. Rate at most 6 behaviors. " +
+    `Use ONLY behavior ids from the provided catalogue. Return ONLY valid JSON, no prose before or after. ${langDirective}`;
 
   const scale = SCALE.map((s) => `${s.level} = ${s.label.en}`).join("; ");
 
   const schema =
     '{"ratings":[{"behavior":"<behavior id>","score":1-5,"evidence":"specific, quoting what they said"}],' +
     '"strengths":["behavior ids rated 4-5"],' +
-    '"growthAreas":[{"behavior":"<behavior id>","why":"why this is the priority","challenges":["3-4 real-work challenges, progressively harder"],"exercises":["3-4 in-app exercises"]}]}';
+    '"growthAreas":[{"behavior":"<behavior id>","why":"why this is the priority","challenges":["3 real-work challenges, progressively harder"],"exercises":["3 in-app exercises"]}]}';
 
   const user =
     `BEHAVIOR CATALOGUE (use these ids exactly):\n${behaviorCatalogue(locale)}\n\n` +
@@ -88,48 +88,82 @@ export async function generateDevelopmentPlan(
     `RECENT PRACTICE (most recent first):\n${attemptsSummary(attempts, locale)}\n\n` +
     `Rate only behaviors you can justify from the practice above. Pick the 2–3 strongest growth areas. Return JSON exactly in this shape:\n${schema}\n\n${langDirective}`;
 
-  // Use a faster model for this heavier generation to avoid timeouts; fall back
-  // to the server default if that model isn't available on this key.
-  async function ask(useFastModel: boolean) {
-    return fetch("/api/evaluate", {
+  // One request to the AI proxy. `model` undefined → server default.
+  async function ask(model?: string): Promise<{ ok: boolean; status: number; text: string; detail: string }> {
+    const res = await fetch("/api/evaluate", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        system: sys,
-        user,
-        max_tokens: 1500,
-        ...(useFastModel ? { model: "claude-haiku-4-5-20251001" } : {}),
-      }),
+      body: JSON.stringify({ system: sys, user, max_tokens: 2048, ...(model ? { model } : {}) }),
     });
-  }
-
-  let res = await ask(true);
-  if (!res.ok && res.status !== 503) {
-    // model unavailable / upstream hiccup → retry once on the default model
-    res = await ask(false);
-  }
-  if (!res.ok) {
-    let detail = `${res.status}`;
-    try {
-      const e = await res.json();
-      detail = e.detail || e.error || detail;
-    } catch {
-      /* ignore */
+    if (!res.ok) {
+      let detail = `${res.status}`;
+      try {
+        const e = await res.json();
+        detail = e.detail || e.error || detail;
+      } catch {
+        /* ignore */
+      }
+      return { ok: false, status: res.status, text: "", detail };
     }
-    throw new Error(`HTTP ${res.status}: ${detail}`);
+    const data = await res.json().catch(() => null);
+    return { ok: true, status: 200, text: data?.text ?? "", detail: "" };
   }
-  const data = await res.json();
-  const text: string = data?.text ?? "";
-  if (!text) throw new Error("empty");
 
+  const FAST = "claude-haiku-4-5-20251001";
+  // Try a few times: the fast model first (twice — truncation/timeouts are often
+  // transient), then the default model. Take the first response that parses.
+  const plan: PlanShape = await (async () => {
+    let lastErr = "";
+    const tries: (string | undefined)[] = [FAST, FAST, undefined];
+    for (const model of tries) {
+      const r = await ask(model);
+      if (r.status === 503) throw new Error("HTTP 503: ai_not_configured");
+      if (!r.ok) {
+        lastErr = `HTTP ${r.status}: ${r.detail}`;
+        continue; // upstream/timeout — try the next attempt
+      }
+      const p = parsePlan(r.text);
+      if (p) return p;
+      lastErr = "unparseable";
+    }
+    throw new Error(lastErr || "unparseable");
+  })();
+
+  return {
+    ratings: plan.ratings,
+    strengths: plan.strengths,
+    growthAreas: plan.growthAreas,
+    generatedAt: new Date().toISOString(),
+    basedOn: Math.min(attempts.length, 8),
+  };
+}
+
+type PlanShape = { ratings: DevPlan["ratings"]; strengths: string[]; growthAreas: DevPlan["growthAreas"] };
+
+// Parse the model's reply into a validated plan. Tolerant: strips code fences,
+// repairs truncated JSON (closes dangling strings/brackets), and returns null
+// only if nothing usable can be salvaged.
+function parsePlan(text: string): PlanShape | null {
+  if (!text || !text.trim()) return null;
   let raw = text.trim();
   const fence = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
   if (fence) raw = fence[1].trim();
   const start = raw.indexOf("{");
-  const end = raw.lastIndexOf("}");
-  if (start === -1 || end <= start) throw new Error("no_json");
+  if (start === -1) return null;
+  raw = raw.slice(start);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const parsed: any = JSON.parse(raw.slice(start, end + 1));
+  let parsed: any = null;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    try {
+      parsed = JSON.parse(repairJson(raw));
+    } catch {
+      return null;
+    }
+  }
+  if (!parsed || typeof parsed !== "object") return null;
 
   const valid = new Set(ALL_BEHAVIOR_IDS);
   const ratings = (Array.isArray(parsed.ratings) ? parsed.ratings : [])
@@ -145,19 +179,40 @@ export async function generateDevelopmentPlan(
     .map((g: { behavior: string; why?: string; challenges?: string[]; exercises?: string[] }) => ({
       behavior: g.behavior,
       why: String(g.why ?? ""),
-      challenges: (Array.isArray(g.challenges) ? g.challenges : []).map(String).slice(0, 4),
-      exercises: (Array.isArray(g.exercises) ? g.exercises : []).map(String).slice(0, 4),
+      challenges: (Array.isArray(g.challenges) ? g.challenges : []).map(String).filter(Boolean).slice(0, 4),
+      exercises: (Array.isArray(g.exercises) ? g.exercises : []).map(String).filter(Boolean).slice(0, 4),
     }));
 
-  if (growthAreas.length === 0 && ratings.length === 0) throw new Error("unparseable");
+  if (growthAreas.length === 0 && ratings.length === 0) return null;
+  return { ratings, strengths, growthAreas };
+}
 
-  return {
-    ratings,
-    strengths,
-    growthAreas,
-    generatedAt: new Date().toISOString(),
-    basedOn: Math.min(attempts.length, 8),
-  };
+// Best-effort repair of a truncated JSON object: closes an open string and any
+// unbalanced brackets, after dropping a dangling trailing token (comma/colon).
+function repairJson(s: string): string {
+  let inStr = false;
+  let esc = false;
+  const stack: string[] = [];
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (c === "\\") esc = true;
+      else if (c === '"') inStr = false;
+      continue;
+    }
+    if (c === '"') inStr = true;
+    else if (c === "{" || c === "[") stack.push(c);
+    else if (c === "}" || c === "]") stack.pop();
+  }
+  let out = s;
+  if (inStr) out += '"'; // close an open string
+  // drop a dangling trailing token so we don't close on a comma/colon
+  out = out.replace(/[\s]*[,:]\s*$/, "");
+  for (let i = stack.length - 1; i >= 0; i--) {
+    out += stack[i] === "{" ? "}" : "]";
+  }
+  return out;
 }
 
 // --- Targeted practice package per growth behavior ---
