@@ -1,13 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useApp } from "../state/store";
 import { storage, uid } from "../lib/storage";
 import { LanguagePicker } from "../components/LanguagePicker";
 import type { Profile } from "../types";
 
-type Mode = "login" | "register" | "forgot" | "sent" | "devlink" | "setpw" | "pending" | "guestname" | "guestwait" | "guestrejected";
-
-const GUEST_ID_KEY = "ra.guestId";
-const GUEST_OK_KEY = "ra.guestApproved";
+type Mode = "login" | "register" | "forgot" | "sent" | "devlink" | "setpw";
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -70,75 +67,11 @@ export function LoginScreen() {
     login(profile);
   }
 
-  // Guest access requires the owner's approval — and a name, so the owner knows
-  // who's asking. Already-approved devices skip straight in.
+  // Guest access is instant — no approval needed.
   function guest() {
     setMsg("");
-    if (localStorage.getItem(GUEST_OK_KEY) === "1") return enterAsGuest();
-    setMode("guestname");
+    enterAsGuest();
   }
-
-  // Sends the (named) guest request and emails the owner to approve.
-  async function submitGuest() {
-    if (name.trim().length < 2) return setMsg(t("login.nameRequired"));
-    let gid = localStorage.getItem(GUEST_ID_KEY);
-    if (!gid) {
-      gid = uid("guest");
-      localStorage.setItem(GUEST_ID_KEY, gid);
-    }
-    setBusy(true);
-    setMsg("");
-    try {
-      const r = await fetch("/api/account", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ action: "guest-request", guestId: gid, name: name.trim() }),
-      });
-      if (r.status === 429) return setMsg(t("login.tooMany"));
-      if (r.status === 503) return enterAsGuest(); // no accounts backend → nothing to gate
-      if (!r.ok) return setMsg(t("login.badCredentials"));
-      const d = await r.json();
-      if (d.status === "approved") {
-        localStorage.setItem(GUEST_OK_KEY, "1");
-        return enterAsGuest();
-      }
-      if (d.status === "rejected") return setMode("guestrejected");
-      setMode("guestwait");
-    } catch {
-      setMsg(t("login.badCredentials"));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  // While waiting as a guest, poll until the owner approves or rejects.
-  useEffect(() => {
-    if (mode !== "guestwait") return;
-    const gid = localStorage.getItem(GUEST_ID_KEY);
-    if (!gid) return;
-    const iv = setInterval(async () => {
-      try {
-        const r = await fetch("/api/account", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ action: "guest-status", guestId: gid }),
-        });
-        const d = await r.json();
-        if (d.status === "approved") {
-          localStorage.setItem(GUEST_OK_KEY, "1");
-          clearInterval(iv);
-          enterAsGuest();
-        } else if (d.status === "rejected") {
-          clearInterval(iv);
-          setMode("guestrejected");
-        }
-      } catch {
-        /* keep waiting */
-      }
-    }, 4000);
-    return () => clearInterval(iv);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode]);
 
   function quickLogin(p: Profile) {
     login({ ...p, language: locale });
@@ -172,20 +105,24 @@ export function LoginScreen() {
 
   async function doRegister() {
     if (!EMAIL_RE.test(email.trim())) return setMsg(t("login.emailInvalid"));
+    if (password.length < 6) return setMsg(t("login.weakPassword"));
+    if (password !== confirm) return setMsg(t("login.pwMismatch"));
     setBusy(true);
     setMsg("");
     try {
       const r = await fetch("/api/account", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ action: "register", email: email.trim(), name: name.trim() }),
+        body: JSON.stringify({ action: "register", email: email.trim(), name: name.trim(), password }),
       });
       if (r.status === 503) return setMsg(t("login.notConfigured"));
       if (r.status === 429) return setMsg(t("login.tooMany"));
+      if (r.status === 400) return setMsg(t("login.weakPassword"));
       const d = await r.json();
       if (d.exists) return setMsg(t("login.exists"));
-      // Registration now waits for the owner's approval before anything is sent.
-      setMode("pending");
+      if (!r.ok || !d.token) return setMsg(t("login.badCredentials"));
+      // Account created and active — sign straight in.
+      loginAccount(d.email, d.name, d.token);
     } catch {
       setMsg(t("login.badCredentials"));
     } finally {
@@ -285,56 +222,6 @@ export function LoginScreen() {
                 {busy ? "…" : t("login.finish")}
               </button>
             </div>
-          ) : mode === "guestname" ? (
-            <div className="login-form">
-              <h3 className="login-formtitle">{t("login.guestNameTitle")}</h3>
-              <p className="muted small left">{t("login.guestNameSub")}</p>
-              <label>
-                {t("login.name")}
-                <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && submitGuest()}
-                  placeholder="Alex"
-                  autoFocus
-                />
-              </label>
-              {msg && <div className="error">{msg}</div>}
-              <button className="btn primary block" onClick={submitGuest} disabled={busy}>
-                {busy ? "…" : t("login.guestContinue")}
-              </button>
-              <button className="btn ghost block" onClick={() => go("login")}>
-                ← {t("login.back")}
-              </button>
-            </div>
-          ) : mode === "pending" || mode === "guestwait" || mode === "guestrejected" ? (
-            <div className="login-sent">
-              <div className="login-sent-icon">
-                {mode === "guestrejected" ? "🚫" : mode === "guestwait" ? "⏳" : "📨"}
-              </div>
-              {mode === "pending" && (
-                <>
-                  <h3 className="login-formtitle">{t("login.pendingTitle")}</h3>
-                  <p>{t("login.pendingBody")}</p>
-                </>
-              )}
-              {mode === "guestwait" && (
-                <>
-                  <h3 className="login-formtitle">{t("login.guestWaitTitle")}</h3>
-                  <p>{t("login.guestWaitBody")}</p>
-                  <div className="wait-dots" aria-hidden="true"><span /><span /><span /></div>
-                </>
-              )}
-              {mode === "guestrejected" && (
-                <>
-                  <h3 className="login-formtitle">{t("login.guestRejectedTitle")}</h3>
-                  <p>{t("login.guestRejected")}</p>
-                </>
-              )}
-              <button className="btn ghost block" onClick={() => go("login")}>
-                ← {t("login.back")}
-              </button>
-            </div>
           ) : mode === "sent" || mode === "devlink" ? (
             <div className="login-sent">
               <div className="login-sent-icon">✉️</div>
@@ -401,13 +288,20 @@ export function LoginScreen() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && doRegister()}
                       placeholder="you@work.com"
                     />
                   </label>
+                  <label>
+                    {t("login.passwordSet")}
+                    <PasswordInput value={password} onChange={setPassword} onEnter={doRegister} />
+                  </label>
+                  <label>
+                    {t("login.confirmPassword")}
+                    <PasswordInput value={confirm} onChange={setConfirm} onEnter={doRegister} />
+                  </label>
                   {msg && <div className="error">{msg}</div>}
                   <button className="btn primary block" onClick={doRegister} disabled={busy}>
-                    {busy ? "…" : t("login.sendActivation")}
+                    {busy ? "…" : t("login.create")}
                   </button>
                 </div>
               ) : (

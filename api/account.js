@@ -76,7 +76,9 @@ async function login(s, req, res, body) {
 async function register(s, req, res, body) {
   const email = String(body.email || "").trim().toLowerCase();
   const name = String(body.name || "").trim().slice(0, 80);
+  const password = String(body.password || "");
   if (!validEmail(email)) return res.status(400).json({ error: "invalid_email" });
+  if (password.length < 6) return res.status(400).json({ error: "weak_password" });
 
   const ip = clientIp(req);
   const ipLimit = await rateLimit(s, "register:ip:" + ip, 10, 3600);
@@ -86,31 +88,27 @@ async function register(s, req, res, body) {
 
   const existingRaw = (await cmd(s, ["HGET", "ra:users", email]))?.result;
   const existing = existingRaw ? JSON.parse(existingRaw) : null;
+  // An already-active account must log in instead (don't overwrite its password).
   if (existing && existing.status === "active") return res.status(200).json({ ok: false, exists: true });
 
-  const approvalToken = uuid();
+  // Self-service: create the account active right away and sign the user in.
+  // No owner approval, no activation email.
+  const { salt, hash } = makeHash(password);
   const now = new Date().toISOString();
   const user = {
     email,
     name: name || existing?.name || email.split("@")[0],
-    status: "pending",
-    approvalToken,
+    status: "active",
+    salt,
+    hash,
     token: "",
     createdAt: existing?.createdAt || now,
-    activatedAt: null,
+    activatedAt: now,
     lastSeen: now,
+    sessionToken: makeToken(),
   };
   await cmd(s, ["HSET", "ra:users", email, JSON.stringify(user)]);
-
-  const base = baseUrl(req);
-  const m = await sendOwnerApprovalEmail({
-    kind: "user",
-    name: user.name,
-    email,
-    approveLink: `${base}/api/approve?token=${approvalToken}&action=approve`,
-    rejectLink: `${base}/api/approve?token=${approvalToken}&action=reject`,
-  });
-  return res.status(200).json({ ok: true, pending: true, ownerNotified: m.sent, mailError: m.error });
+  return res.status(200).json({ ok: true, email: user.email, name: user.name, token: user.sessionToken });
 }
 
 async function resetRequest(s, req, res, body) {
