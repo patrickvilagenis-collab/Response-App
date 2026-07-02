@@ -36,7 +36,7 @@ export function HomeScreen() {
         </p>
       </div>
 
-      {/* Two velocities */}
+      {/* Three velocities: warm up, keep practising, create your own */}
       <div className="velocity-row">
         <button className="velocity quick" onClick={() => go({ name: "warmup" })}>
           <span className="velocity-icon">⚡</span>
@@ -50,6 +50,13 @@ export function HomeScreen() {
           <span className="velocity-body">
             <strong>{t("home.vDeepTitle")}</strong>
             <span className="muted small">{goalLabel}</span>
+          </span>
+        </button>
+        <button className="velocity mine" onClick={() => go({ name: "create" })}>
+          <span className="velocity-icon">+</span>
+          <span className="velocity-body">
+            <strong>{t("home.vMineTitle")}</strong>
+            <span className="muted small">{t("home.vMineSub")}</span>
           </span>
         </button>
       </div>

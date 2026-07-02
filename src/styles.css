@@ -490,14 +490,16 @@ input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 .home-greeting h1 { font-size: 2.3rem; margin: 4px 0 6px; }
 .grad { background: linear-gradient(90deg, var(--accent), var(--gold)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
-.velocity-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 26px; }
-.velocity { display: flex; align-items: center; gap: 14px; text-align: left; padding: 18px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--panel); box-shadow: var(--shadow); color: var(--text); transition: transform 0.28s var(--ease), box-shadow 0.28s var(--ease), border 0.2s; }
+.velocity-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 26px; }
+.velocity { display: flex; align-items: center; gap: 11px; text-align: left; padding: 12px 14px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--panel); box-shadow: var(--shadow); color: var(--text); transition: transform 0.28s var(--ease), box-shadow 0.28s var(--ease), border 0.2s; }
 .velocity:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: color-mix(in srgb, var(--accent) 30%, var(--line)); }
-.velocity-icon { width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center; font-size: 1.3rem; flex-shrink: 0; }
+.velocity-icon { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; font-size: 1.05rem; flex-shrink: 0; }
 .velocity.quick .velocity-icon { background: var(--gold-soft); color: var(--gold); }
 .velocity.deep .velocity-icon { background: var(--accent-soft); color: var(--accent); }
-.velocity-body { display: flex; flex-direction: column; gap: 2px; }
-.velocity-body strong { font-size: 1.05rem; }
+.velocity.mine .velocity-icon { background: rgba(22,163,74,.12); color: #16a34a; font-weight: 800; font-size: 1.25rem; }
+.velocity-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.velocity-body strong { font-size: 0.95rem; }
+.velocity-body .small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .track-head { display: flex; align-items: baseline; justify-content: space-between; }
 .link-btn { background: none; border: none; color: var(--accent); font-weight: 600; font-size: 0.88rem; }
