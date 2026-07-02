@@ -153,6 +153,7 @@ export interface Profile {
   devPlan?: DevPlan; // latest Leadership Framework analysis & plan
   devPlanHistory?: PlanSnapshot[]; // past analyses for the evolution view
   learnProgress?: Record<string, LearnRecord>; // Learn micro-course progress, by course id
+  customChallenges?: Challenge[]; // user-created scenarios ("practise MY situation"), synced
 }
 
 // Progress on a single Learn micro-course.

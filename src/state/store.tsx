@@ -4,7 +4,7 @@ import type { Attempt, Locale, Profile, Settings } from "../types";
 import { storage } from "../lib/storage";
 import { buildSnapshot, mergeIntoLocal, pullAccount, pushAccount } from "../lib/sync";
 import { translator } from "../i18n";
-import { getChallenge } from "../data/challenges";
+import { getChallenge, setCustomChallenges } from "../data/challenges";
 
 // Debounced upload of the current account's data, so rapid changes (onboarding
 // taps, settings) coalesce into a single server write. No-op for guests.
@@ -23,6 +23,7 @@ export type Route =
   | { name: "onboarding" }
   | { name: "home" }
   | { name: "library"; situation?: string }
+  | { name: "create" }
   | { name: "scenario"; challengeId: string }
   | { name: "response"; challengeId: string }
   | { name: "results"; attemptId: string }
@@ -64,6 +65,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [lastAttempt, setLastAttempt] = useState<Attempt | null>(null);
 
   const t = useMemo(() => translator(locale), [locale]);
+
+  // Keep the runtime challenge registry in sync with the profile's personal
+  // scenarios so getChallenge() resolves them everywhere (play, results, history).
+  useEffect(() => {
+    setCustomChallenges(profile?.customChallenges ?? []);
+  }, [profile]);
 
   const login = useCallback((p: Profile) => {
     storage.saveProfile(p);

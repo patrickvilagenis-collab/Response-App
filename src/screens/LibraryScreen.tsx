@@ -18,16 +18,19 @@ export function LibraryScreen() {
   const [level, setLevel] = useState<RoleLevel | "all">("all");
   const [query, setQuery] = useState("");
 
+  // The user's own AI-created scenarios browse alongside the built-in library.
+  const mine = profile?.customChallenges ?? [];
+
   const q = query.trim().toLowerCase();
   const filtered = useMemo(
     () =>
-      CHALLENGES.filter(
+      [...mine, ...CHALLENGES].filter(
         (c) =>
           (situation === "all" || situationOf(c) === situation) &&
           (level === "all" || levelOf(c.difficulty) === level) &&
-          (q === "" || (c.scenario[locale] ?? "").toLowerCase().includes(q))
+          (q === "" || (c.scenario[locale] ?? c.scenario.en ?? "").toLowerCase().includes(q))
       ),
-    [situation, level, q, locale]
+    [situation, level, q, locale, mine]
   );
 
   const noFilters = situation === "all" && level === "all" && q === "";
@@ -38,6 +41,7 @@ export function LibraryScreen() {
     const best = bestById.get(c.id);
     const score = best ? best.evaluation.final : null;
     const passed = score !== null && score >= PASS;
+    const isMine = c.id.startsWith("U-");
     return (
       <button
         key={c.id}
@@ -45,9 +49,9 @@ export function LibraryScreen() {
         onClick={() => go({ name: "scenario", challengeId: c.id })}
       >
         <div className="pcard-cover">
-          <SceneMedia scene={c.media.scene} alt={c.media.alt[locale] ?? ""} seed={c.id} />
+          <SceneMedia scene={c.media.scene} alt={c.media.alt[locale] ?? c.media.alt.en ?? ""} seed={c.id} />
           <div className="pcard-cover-grad" />
-          <span className="pcard-situation">{t(`situation.${situationOf(c)}`)}</span>
+          <span className="pcard-situation">{isMine ? t("library.mineBadge") : t(`situation.${situationOf(c)}`)}</span>
           {score !== null && (
             <span className="pcard-score" style={{ background: BAND_COLORS[bandFor(score)] }}>
               {passed ? "✓ " : ""}{score}%
@@ -63,7 +67,7 @@ export function LibraryScreen() {
               </span>
             )}
           </div>
-          <p className="pcard-text">{trim(c.scenario[locale], 110)}</p>
+          <p className="pcard-text">{trim(c.scenario[locale] ?? c.scenario.en, 110)}</p>
           <span className="pcard-cta">{best ? t("library.retry") : t("library.start")} →</span>
         </div>
       </button>
@@ -118,21 +122,41 @@ export function LibraryScreen() {
 
       <WarmUpBanner />
 
+      {/* Practise YOUR real situation — AI builds a personalised roleplay */}
+      <section className="create-banner">
+        <div className="create-banner-text">
+          <strong>{t("library.createTitle")}</strong>
+          <span className="muted small">{t("library.createSub")}</span>
+        </div>
+        <button className="btn primary sm" onClick={() => go({ name: "create" })}>
+          {t("library.createCta")} →
+        </button>
+      </section>
+
       {noFilters ? (
-        // When nothing is filtered, browse by situation
-        railOrder.map((sit) => {
-          const items = CHALLENGES.filter((c) => situationOf(c) === sit);
-          if (items.length === 0) return null;
-          return (
-            <section key={sit} className="rail">
+        <>
+          {mine.length > 0 && (
+            <section className="rail">
               <div className="rail-head">
-                <h2 className="rail-title">{t(`situation.${sit}`)}</h2>
-                <button className="link-btn" onClick={() => setSituation(sit)}>{t("home.seeAll")} →</button>
+                <h2 className="rail-title">{t("library.mine")}</h2>
               </div>
-              <div className="rail-track">{items.map(card)}</div>
+              <div className="rail-track">{[...mine].reverse().map(card)}</div>
             </section>
-          );
-        })
+          )}
+          {railOrder.map((sit) => {
+            const items = CHALLENGES.filter((c) => situationOf(c) === sit);
+            if (items.length === 0) return null;
+            return (
+              <section key={sit} className="rail">
+                <div className="rail-head">
+                  <h2 className="rail-title">{t(`situation.${sit}`)}</h2>
+                  <button className="link-btn" onClick={() => setSituation(sit)}>{t("home.seeAll")} →</button>
+                </div>
+                <div className="rail-track">{items.map(card)}</div>
+              </section>
+            );
+          })}
+        </>
       ) : filtered.length === 0 ? (
         <p className="muted practice-empty">{t("library.noResults")}</p>
       ) : (
