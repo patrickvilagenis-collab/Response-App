@@ -190,7 +190,8 @@ function parsePlan(text: string): PlanShape | null {
 
 // Best-effort repair of a truncated JSON object: closes an open string and any
 // unbalanced brackets, after dropping a dangling trailing token (comma/colon).
-function repairJson(s: string): string {
+// Exported for reuse by other AI-JSON callers (custom scenarios).
+export function repairJson(s: string): string {
   let inStr = false;
   let esc = false;
   const stack: string[] = [];

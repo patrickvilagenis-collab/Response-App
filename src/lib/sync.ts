@@ -1,4 +1,4 @@
-import type { Attempt, DevPlan, LearnRecord, PlanSnapshot, Profile, Settings } from "../types";
+import type { Attempt, Challenge, DevPlan, LearnRecord, PlanSnapshot, Profile, Settings } from "../types";
 import { storage } from "./storage";
 
 // Server-side persistence of a user's data, keyed to their account. Lets the
@@ -70,6 +70,14 @@ function mergeHistory(a?: PlanSnapshot[], b?: PlanSnapshot[]): PlanSnapshot[] {
   return [...byAt.values()].sort((x, y) => x.generatedAt.localeCompare(y.generatedAt)).slice(-12);
 }
 
+/** Union user-created scenarios by id (local copy wins on a clash). */
+function mergeCustomChallenges(a?: Challenge[], b?: Challenge[]): Challenge[] | undefined {
+  if (!a && !b) return undefined;
+  const byId = new Map<string, Challenge>();
+  for (const c of [...(b || []), ...(a || [])]) if (c?.id) byId.set(c.id, c);
+  return [...byId.values()];
+}
+
 /** Union Learn progress: a course counts as done if either side completed it,
  *  keeping the best quiz score. */
 function mergeLearn(
@@ -111,6 +119,8 @@ export function mergeIntoLocal(
   if (history.length) profile.devPlanHistory = history;
   const learn = mergeLearn(local.learnProgress, server.profile?.learnProgress);
   if (learn) profile.learnProgress = learn;
+  const custom = mergeCustomChallenges(local.customChallenges, server.profile?.customChallenges);
+  if (custom) profile.customChallenges = custom;
   storage.saveProfile(profile);
 
   const attempts = mergeAttempts(storage.getAttempts(profileId), server.attempts || []);

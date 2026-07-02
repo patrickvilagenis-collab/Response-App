@@ -1477,6 +1477,17 @@ export const CHALLENGES: Challenge[] = [
 // Department-specific scenarios extend the general seed library.
 CHALLENGES.push(...DEPARTMENT_CHALLENGES);
 
+// Personal, user-created scenarios (ids prefixed "U-"). They live on the
+// profile (and sync with the account); the store registers them here at
+// runtime so every lookup treats them exactly like built-ins.
+let CUSTOM: Challenge[] = [];
+export function setCustomChallenges(list: Challenge[]): void {
+  CUSTOM = list;
+}
+export function isCustomChallenge(id: string): boolean {
+  return id.startsWith("U-");
+}
+
 export function getChallenge(id: string): Challenge | undefined {
-  return CHALLENGES.find((c) => c.id === id);
+  return CHALLENGES.find((c) => c.id === id) ?? CUSTOM.find((c) => c.id === id);
 }

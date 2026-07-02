@@ -776,6 +776,25 @@ input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 .res-blurb { margin: 6px 0 0; font-size: 0.88rem; line-height: 1.45; color: var(--text); opacity: 0.9; }
 .res-open { position: absolute; top: 12px; right: 14px; color: var(--muted); font-size: 1rem; }
 
+/* --- Create your own scenario --- */
+.create-banner { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+  margin: 4px 0 18px; padding: 14px 16px; border-radius: var(--radius);
+  background: linear-gradient(120deg, rgba(124,92,255,.1), rgba(124,92,255,.03));
+  border: 1px solid rgba(124,92,255,.28); }
+.create-banner-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.create-scenario { max-width: 640px; margin: 0 auto; }
+.create-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+.create-label { font-weight: 700; font-size: .95rem; }
+.create-input { width: 100%; resize: vertical; min-height: 120px; padding: 12px 14px; border-radius: 12px;
+  border: 1.5px solid var(--line); background: var(--bg); font: inherit; line-height: 1.5; }
+.create-input:focus { outline: none; border-color: #7c5cff; }
+.create-hint { margin: 0; }
+.create-examples { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+.create-actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 8px; }
+.create-wait { margin: 0; text-align: center; animation: learn-in .3s ease; }
+.create-saved { margin: 0; text-align: center; }
+
 /* --- Learn (micro-courses) --- */
 .learn { max-width: 880px; margin: 0 auto; }
 .fw-learn-link { margin: 2px 0 8px; }

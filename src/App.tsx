@@ -4,6 +4,7 @@ import { LoginScreen } from "./screens/LoginScreen";
 import { OnboardingScreen } from "./screens/OnboardingScreen";
 import { HomeScreen } from "./screens/HomeScreen";
 import { LibraryScreen } from "./screens/LibraryScreen";
+import { CreateScenarioScreen } from "./screens/CreateScenarioScreen";
 import { ScenarioScreen } from "./screens/ScenarioScreen";
 import { ResponseScreen } from "./screens/ResponseScreen";
 import { ResultsScreen } from "./screens/ResultsScreen";
@@ -33,6 +34,9 @@ export function App() {
       break;
     case "library":
       screen = <LibraryScreen />;
+      break;
+    case "create":
+      screen = <CreateScenarioScreen />;
       break;
     case "scenario":
       screen = <ScenarioScreen challengeId={route.challengeId} />;
